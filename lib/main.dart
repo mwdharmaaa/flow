@@ -41,14 +41,6 @@ class _FlowAppState extends State<FlowApp> {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: _appState.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      builder: (context, child) {
-        final isDark = _appState.isDarkMode;
-        return Container(
-          color: isDark ? AppTheme.darkBgBase : const Color(0xFFF2F6FC),
-          alignment: Alignment.topCenter,
-          child: child ?? const SizedBox(),
-        );
-      },
       home: FlowMainScaffold(state: _appState),
     );
   }
@@ -135,11 +127,23 @@ class FlowMainScaffold extends StatelessWidget {
               ),
             )
           : null,
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 820),
-          child: activeView,
-        ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isWide = constraints.maxWidth >= 768;
+          return Container(
+            width: double.infinity,
+            height: double.infinity,
+            color: isDark ? AppTheme.darkBgBase : const Color(0xFFEBF3FE),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: SizedBox(
+                width: isWide ? 680 : double.infinity,
+                height: double.infinity,
+                child: activeView,
+              ),
+            ),
+          );
+        },
       ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: state.currentTabIndex <= 3 ? state.currentTabIndex : 0,
