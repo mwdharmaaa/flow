@@ -9,6 +9,8 @@ class BudgetCategoryTile extends StatelessWidget {
   final String currency;
   final IconData icon;
   final Color iconBgColor;
+  final VoidCallback? onDelete;
+  final bool isDark;
 
   const BudgetCategoryTile({
     super.key,
@@ -18,6 +20,8 @@ class BudgetCategoryTile extends StatelessWidget {
     required this.currency,
     this.icon = Icons.restaurant_rounded,
     this.iconBgColor = const Color(0xFF9E3615),
+    this.onDelete,
+    this.isDark = false,
   });
 
   @override
@@ -26,6 +30,10 @@ class BudgetCategoryTile extends StatelessWidget {
     final validSpent = spent;
     final percent = validLimit > 0 ? (validSpent / validLimit).clamp(0.0, 1.0) : 0.0;
     final percentageInt = (percent * 100).toInt();
+
+    final textPrimary = isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary;
+    final textSubtle = isDark ? AppTheme.darkTextSecondary : AppTheme.subtle;
+    final progressBg = isDark ? AppTheme.darkBorderSubtle : const Color(0xFFE8EEF8);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -49,19 +57,36 @@ class BudgetCategoryTile extends StatelessWidget {
                 children: [
                   Text(
                     category,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.textPrimary,
-                    ),
-                  ),
-                  Text(
-                    CurrencyFormatter.format(validSpent, currency: currency),
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: iconBgColor,
+                      color: textPrimary,
                     ),
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        CurrencyFormatter.format(validSpent, currency: currency),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: iconBgColor,
+                        ),
+                      ),
+                      if (onDelete != null) ...[
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: onDelete,
+                          behavior: HitTestBehavior.opaque,
+                          child: Icon(
+                            Icons.delete_outline_rounded,
+                            size: 17,
+                            color: textSubtle,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ],
               ),
@@ -70,7 +95,7 @@ class BudgetCategoryTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
                   value: percent,
-                  backgroundColor: const Color(0xFFE8EEF8),
+                  backgroundColor: progressBg,
                   valueColor: const AlwaysStoppedAnimation(AppTheme.primary),
                   minHeight: 6,
                 ),
@@ -81,11 +106,11 @@ class BudgetCategoryTile extends StatelessWidget {
                 children: [
                   Text(
                     'Budget ${CurrencyFormatter.format(validLimit, currency: currency)}',
-                    style: const TextStyle(fontSize: 11, color: AppTheme.subtle),
+                    style: TextStyle(fontSize: 11, color: textSubtle),
                   ),
                   Text(
                     '$percentageInt%',
-                    style: const TextStyle(fontSize: 11, color: AppTheme.subtle),
+                    style: TextStyle(fontSize: 11, color: textSubtle),
                   ),
                 ],
               ),

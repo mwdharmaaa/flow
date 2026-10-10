@@ -26,6 +26,54 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
     );
   }
 
+  void _confirmDeleteBudget(BuildContext context, BudgetModel budget) {
+    final isDark = widget.state.isDarkMode;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? AppTheme.darkBgElevated : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          'Delete Budget',
+          style: TextStyle(
+            color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to delete the budget for ${budget.category} (${CurrencyFormatter.format(budget.monthlyLimit, currency: widget.state.currency)})?',
+          style: TextStyle(
+            color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle,
+            fontSize: 14,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              widget.state.deleteBudget(budget.id);
+              Navigator.of(ctx).pop();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.expense,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              elevation: 0,
+            ),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = widget.state;
@@ -34,8 +82,11 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
     final totalLimit = state.budgets.fold(0.0, (sum, b) => sum + b.monthlyLimit);
     final totalSpent = state.budgets.fold(0.0, (sum, b) => sum + b.spent);
 
+    final isDark = state.isDarkMode;
+    final textPrimary = isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary;
+
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: isDark ? AppTheme.darkBgBase : AppTheme.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -46,12 +97,12 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Budget',
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.w900,
-                      color: AppTheme.textPrimary,
+                      color: textPrimary,
                       letterSpacing: -0.5,
                     ),
                   ),
@@ -60,23 +111,24 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                       decoration: BoxDecoration(
-                        color: AppTheme.primarySoft,
+                        color: isDark ? AppTheme.darkBgElevated : AppTheme.primarySoft,
                         borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : Colors.transparent),
                       ),
                       child: Row(
                         children: [
                           Icon(
                             state.budgets.isEmpty ? Icons.add : Icons.edit_outlined,
                             size: 14,
-                            color: AppTheme.primary,
+                            color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             state.budgets.isEmpty ? 'New' : 'Edit',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
-                              color: AppTheme.primary,
+                              color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary,
                             ),
                           ),
                         ],
@@ -96,18 +148,18 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.chevron_left, size: 20, color: AppTheme.textPrimary),
+                    Icon(Icons.chevron_left, size: 20, color: textPrimary),
                     const SizedBox(width: 8),
                     Text(
                       monthName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: AppTheme.textPrimary,
+                        color: textPrimary,
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Icon(Icons.chevron_right, size: 20, color: AppTheme.textPrimary),
+                    Icon(Icons.chevron_right, size: 20, color: textPrimary),
                   ],
                 ),
                 const SizedBox(height: 28),
@@ -121,12 +173,12 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                 const SizedBox(height: 36),
 
                 // By Category Section
-                const Text(
+                Text(
                   'By category',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: AppTheme.textPrimary,
+                    color: textPrimary,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -140,6 +192,8 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                         currency: state.currency,
                         icon: Icons.restaurant_rounded,
                         iconBgColor: Color(b.colorValue),
+                        isDark: isDark,
+                        onDelete: () => _confirmDeleteBudget(context, b),
                       ),
                     )),
                 const SizedBox(height: 36),
