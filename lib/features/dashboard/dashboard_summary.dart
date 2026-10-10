@@ -3,6 +3,8 @@ import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/formatters/currency_formatter.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/models/account_model.dart';
+import 'package:flow/models/transaction_model.dart';
+import 'package:flow/features/transactions/transaction_tile.dart';
 
 class DashboardSummary extends StatelessWidget {
   final AppState state;
@@ -140,13 +142,28 @@ class DashboardSummary extends StatelessWidget {
           // Latest records
           _buildSectionHeader('Latest records', onAddRecord),
           const SizedBox(height: 8),
-          _buildEmptyTile(
-            icon: Icons.edit_outlined,
-            title: 'No transactions yet',
-            subtitle: 'Try typing "coffee 18k" in chat',
-            buttonLabel: '+ Record',
-            onTap: onAddRecord,
-          ),
+          if (state.transactions.isEmpty)
+            _buildEmptyTile(
+              icon: Icons.edit_outlined,
+              title: 'No transactions yet',
+              subtitle: 'Try typing "coffee 18k" in chat',
+              buttonLabel: '+ Record',
+              onTap: onAddRecord,
+            )
+          else
+            ...state.transactions.take(5).map((tx) {
+              final account = state.accounts.where((a) => a.id == tx.accountId).firstOrNull;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: TransactionTile(
+                  transaction: tx,
+                  currency: state.currency,
+                  isDark: isDark,
+                  accountName: account?.name,
+                  onDelete: () => _confirmDeleteTransaction(context, tx),
+                ),
+              );
+            }),
           const SizedBox(height: 22),
 
           // Balances (Wallets)
@@ -284,6 +301,55 @@ class DashboardSummary extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDeleteTransaction(BuildContext context, TransactionModel tx) {
+    final isDark = state.isDarkMode;
+    final displayTitle = tx.note.isNotEmpty ? tx.note : tx.category;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? AppTheme.darkBgElevated : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          'Delete Expense',
+          style: TextStyle(
+            color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to delete "$displayTitle" (${CurrencyFormatter.format(tx.amount, currency: state.currency)})?',
+          style: TextStyle(
+            color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle,
+            fontSize: 14,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              state.deleteTransaction(tx.id);
+              Navigator.of(ctx).pop();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.expense,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              elevation: 0,
+            ),
+            child: const Text('Delete'),
           ),
         ],
       ),

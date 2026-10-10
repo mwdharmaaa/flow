@@ -92,9 +92,32 @@ class AppState extends ChangeNotifier {
   }
 
   void deleteTransaction(String id) {
-    _transactions.removeWhere((tx) => tx.id == id);
-    _saveState();
-    notifyListeners();
+    final txIndex = _transactions.indexWhere((tx) => tx.id == id);
+    if (txIndex != -1) {
+      final tx = _transactions[txIndex];
+      // Revert account balance
+      final accIndex = _accounts.indexWhere((a) => a.id == tx.accountId);
+      if (accIndex != -1) {
+        final acc = _accounts[accIndex];
+        if (tx.type == TransactionType.expense || tx.type == TransactionType.transfer) {
+          _accounts[accIndex] = acc.copyWith(balance: acc.balance + tx.amount);
+        } else if (tx.type == TransactionType.income) {
+          _accounts[accIndex] = acc.copyWith(balance: acc.balance - tx.amount);
+        }
+      }
+
+      if (tx.type == TransactionType.transfer && tx.destinationAccountId != null) {
+        final destIndex = _accounts.indexWhere((a) => a.id == tx.destinationAccountId);
+        if (destIndex != -1) {
+          final dest = _accounts[destIndex];
+          _accounts[destIndex] = dest.copyWith(balance: dest.balance - tx.amount);
+        }
+      }
+
+      _transactions.removeAt(txIndex);
+      _saveState();
+      notifyListeners();
+    }
   }
 
   void addAccount(AccountModel acc) {
