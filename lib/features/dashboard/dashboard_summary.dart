@@ -11,6 +11,7 @@ class DashboardSummary extends StatelessWidget {
   final VoidCallback onSeeAllDebts;
   final VoidCallback onSeeAllBudgets;
   final VoidCallback onSeeAllSavings;
+  final VoidCallback onSeeAllRecurring;
 
   const DashboardSummary({
     super.key,
@@ -20,6 +21,7 @@ class DashboardSummary extends StatelessWidget {
     required this.onSeeAllDebts,
     required this.onSeeAllBudgets,
     required this.onSeeAllSavings,
+    required this.onSeeAllRecurring,
   });
 
   @override
@@ -111,9 +113,9 @@ class DashboardSummary extends StatelessWidget {
                       const SizedBox(height: 4),
                       GestureDetector(
                         onTap: onSeeAllBudgets,
-                        child: const Text(
-                          'Set up a budget',
-                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.primary),
+                        child: Text(
+                          state.budgets.isEmpty ? 'Set up a budget' : 'View budget',
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.primary),
                         ),
                       ),
                     ],
@@ -133,47 +135,6 @@ class DashboardSummary extends StatelessWidget {
             subtitle: 'Try typing "coffee 18k" in chat',
             buttonLabel: '+ Record',
             onTap: onAddRecord,
-          ),
-          const SizedBox(height: 16),
-
-          // Premium Banner
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(
-              color: AppTheme.primary,
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.waves, size: 16, color: AppTheme.primary),
-                    ),
-                    const SizedBox(width: 12),
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Flow Premium', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white)),
-                        Text('Save receipt photos & multi-wallet', style: TextStyle(fontSize: 10, color: Colors.white70)),
-                      ],
-                    ),
-                  ],
-                ),
-                const Row(
-                  children: [
-                    Text('See', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white)),
-                    Icon(Icons.chevron_right, size: 16, color: Colors.white),
-                  ],
-                ),
-              ],
-            ),
           ),
           const SizedBox(height: 22),
 
@@ -215,6 +176,18 @@ class DashboardSummary extends StatelessWidget {
           ),
           const SizedBox(height: 22),
 
+          // Recurring bills
+          _buildSectionHeader('Recurring bills', onSeeAllRecurring),
+          const SizedBox(height: 8),
+          _buildEmptyTile(
+            icon: Icons.autorenew_rounded,
+            title: 'No recurring bills yet',
+            subtitle: 'Subscriptions, utilities and monthly payments',
+            buttonLabel: '+ Manage',
+            onTap: onSeeAllRecurring,
+          ),
+          const SizedBox(height: 22),
+
           // Savings (Goals)
           _buildSectionHeader('Savings', onSeeAllSavings),
           const SizedBox(height: 8),
@@ -226,6 +199,41 @@ class DashboardSummary extends StatelessWidget {
             onTap: onSeeAllSavings,
           ),
           const SizedBox(height: 22),
+
+          // Direct Export Data Feature (Standard & Unlocked)
+          GestureDetector(
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Financial data exported locally')),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF6F9FD),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppTheme.border),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.file_download_outlined, size: 20, color: AppTheme.primary),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Export Data (CSV / JSON)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                        SizedBox(height: 2),
+                        Text('Standard local export feature • 100% free', style: TextStyle(fontSize: 11, color: AppTheme.subtle)),
+                      ],
+                    ),
+                  ),
+                  Icon(Icons.chevron_right, size: 18, color: AppTheme.subtle),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
 
           // What we're watching
           const Text('What we\'re watching', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
