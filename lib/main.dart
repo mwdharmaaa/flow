@@ -6,7 +6,6 @@ import 'package:flow/features/dashboard/dashboard_screen.dart';
 import 'package:flow/features/analytics/analytics_screen.dart';
 import 'package:flow/features/budgets/budgets_screen.dart';
 import 'package:flow/features/accounts/accounts_screen.dart';
-import 'package:flow/features/settings/settings_screen.dart';
 import 'package:flow/features/debts/debts_screen.dart';
 import 'package:flow/features/recurring/recurring_screen.dart';
 import 'package:flow/features/goals/goals_screen.dart';
@@ -72,12 +71,10 @@ class FlowMainScaffold extends StatelessWidget {
   String _getSubViewTitle(int index) {
     switch (index) {
       case 4:
-        return 'Wallets & Accounts';
-      case 5:
         return 'Debts & Loans';
-      case 6:
+      case 5:
         return 'Recurring Bills';
-      case 7:
+      case 6:
         return 'Savings Goals';
       default:
         return 'Flow';
@@ -100,25 +97,15 @@ class FlowMainScaffold extends StatelessWidget {
         activeView = BudgetsScreen(state: state);
         break;
       case 3:
-        activeView = SettingsScreen(
-          state: state,
-          onOpenWallets: () => state.setTabIndex(4),
-          onOpenDebts: () => state.setTabIndex(5),
-          onOpenRecurring: () => state.setTabIndex(6),
-          onOpenBudgets: () => state.setTabIndex(2),
-          onOpenGoals: () => state.setTabIndex(7),
-        );
-        break;
-      case 4:
         activeView = AccountsScreen(state: state);
         break;
-      case 5:
+      case 4:
         activeView = DebtsScreen(state: state);
         break;
-      case 6:
+      case 5:
         activeView = RecurringScreen(state: state);
         break;
-      case 7:
+      case 6:
         activeView = GoalsScreen(state: state);
         break;
       default:
@@ -132,7 +119,7 @@ class FlowMainScaffold extends StatelessWidget {
               elevation: 0,
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
-                onPressed: () => state.setTabIndex(3),
+                onPressed: () => state.setTabIndex(0),
               ),
               title: Text(
                 _getSubViewTitle(state.currentTabIndex),
@@ -146,7 +133,7 @@ class FlowMainScaffold extends StatelessWidget {
           : null,
       body: activeView,
       bottomNavigationBar: BottomNavBar(
-        currentIndex: state.currentTabIndex <= 3 ? state.currentTabIndex : 3,
+        currentIndex: state.currentTabIndex <= 3 ? state.currentTabIndex : 0,
         onTap: (idx) => state.setTabIndex(idx),
         onAddTap: () => _openAddTransaction(context),
       ),

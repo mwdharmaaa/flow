@@ -79,9 +79,9 @@ class BottomNavBar extends StatelessWidget {
             ),
             _buildNavItem(
               index: 3,
-              icon: Icons.person_outline_rounded,
-              activeIcon: Icons.person_rounded,
-              label: 'Account',
+              icon: Icons.account_balance_wallet_outlined,
+              activeIcon: Icons.account_balance_wallet_rounded,
+              label: 'Wallets',
             ),
           ],
         ),
