@@ -39,6 +39,16 @@ class _FlowAppState extends State<FlowApp> {
       title: 'Flow',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
+      builder: (context, child) {
+        return Container(
+          color: const Color(0xFF070A10),
+          alignment: Alignment.center,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 500),
+            child: child ?? const SizedBox(),
+          ),
+        );
+      },
       home: FlowMainScaffold(state: _appState),
     );
   }
