@@ -12,16 +12,16 @@ class CategoryItem {
 }
 
 const List<CategoryItem> kDefaultCategories = [
-  CategoryItem('Makanan', Icons.restaurant, Color(0xFFF43F5E)),
-  CategoryItem('Belanja', Icons.shopping_bag, Color(0xFFEC4899)),
-  CategoryItem('Transportasi', Icons.directions_car, Color(0xFF3B82F6)),
-  CategoryItem('Tagihan', Icons.receipt, Color(0xFFEAB308)),
-  CategoryItem('Hiburan', Icons.movie, Color(0xFF8B5CF6)),
-  CategoryItem('Kesehatan', Icons.local_hospital, Color(0xFF10B981)),
-  CategoryItem('Pendidikan', Icons.school, Color(0xFF06B6D4)),
-  CategoryItem('Gaji', Icons.payments, Color(0xFF10B981)),
-  CategoryItem('Investasi', Icons.trending_up, Color(0xFF6366F1)),
-  CategoryItem('Lainnya', Icons.more_horiz, Color(0xFF64748B)),
+  CategoryItem('Food', Icons.restaurant, Color(0xFFF43F5E)),
+  CategoryItem('Shopping', Icons.shopping_bag, Color(0xFFEC4899)),
+  CategoryItem('Transport', Icons.directions_car, Color(0xFF3B82F6)),
+  CategoryItem('Bills', Icons.receipt, Color(0xFFEAB308)),
+  CategoryItem('Entertainment', Icons.movie, Color(0xFF8B5CF6)),
+  CategoryItem('Health', Icons.local_hospital, Color(0xFF10B981)),
+  CategoryItem('Education', Icons.school, Color(0xFF06B6D4)),
+  CategoryItem('Salary', Icons.payments, Color(0xFF10B981)),
+  CategoryItem('Investment', Icons.trending_up, Color(0xFF6366F1)),
+  CategoryItem('Other', Icons.more_horiz, Color(0xFF64748B)),
 ];
 
 class AddTransactionDialog extends StatefulWidget {
@@ -48,7 +48,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   late String _selectedAccountId;
   late String _selectedDestAccountId;
   String _selectedCategory = kDefaultCategories.first.name;
-  DateTime _selectedDate = DateTime.now();
+  final DateTime _selectedDate = DateTime.now();
 
   @override
   void initState() {
@@ -81,11 +81,11 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: AppTheme.card,
+      backgroundColor: Colors.white,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(22),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -94,44 +94,72 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Catat Transaksi', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                  const Text(
+                    'Log Transaction',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
                   IconButton(
                     icon: const Icon(Icons.close, size: 20, color: AppTheme.subtle),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               Row(
                 children: [
-                  _buildTypeTab(TransactionType.expense, 'Pengeluaran', AppTheme.expense),
-                  const SizedBox(width: 6),
-                  _buildTypeTab(TransactionType.income, 'Pemasukan', AppTheme.income),
-                  const SizedBox(width: 6),
+                  _buildTypeTab(TransactionType.expense, 'Expense', AppTheme.expense),
+                  const SizedBox(width: 8),
+                  _buildTypeTab(TransactionType.income, 'Income', AppTheme.income),
+                  const SizedBox(width: 8),
                   _buildTypeTab(TransactionType.transfer, 'Transfer', AppTheme.transfer),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 18),
               TextField(
                 controller: _amountController,
                 keyboardType: TextInputType.number,
-                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                ),
                 decoration: InputDecoration(
                   prefixText: 'Rp ',
-                  prefixStyle: const TextStyle(color: Colors.white70, fontSize: 18),
+                  prefixStyle: const TextStyle(
+                    color: AppTheme.subtle,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                   hintText: '0',
-                  hintStyle: const TextStyle(color: AppTheme.subtle),
+                  hintStyle: const TextStyle(color: Color(0xFFA3B8D8)),
                   filled: true,
-                  fillColor: AppTheme.surface,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppTheme.border)),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppTheme.border)),
+                  fillColor: const Color(0xFFF6F9FD),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(color: AppTheme.border),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(color: AppTheme.border),
+                  ),
                 ),
               ),
               if (_type != TransactionType.transfer) ...[
                 const SizedBox(height: 16),
-                const Text('Pilih Kategori', style: TextStyle(fontSize: 12, color: AppTheme.subtle, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
+                const Text(
+                  'Category',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppTheme.subtle,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 10),
                 SizedBox(
                   height: 80,
                   child: ListView.builder(
@@ -150,7 +178,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                               Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: cat.color.withValues(alpha: isSelected ? 0.3 : 0.12),
+                                  color: cat.color.withValues(alpha: isSelected ? 0.2 : 0.08),
                                   shape: BoxShape.circle,
                                   border: isSelected ? Border.all(color: cat.color, width: 2) : null,
                                 ),
@@ -159,7 +187,11 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                               const SizedBox(height: 4),
                               Text(
                                 cat.name,
-                                style: TextStyle(fontSize: 10, color: isSelected ? Colors.white : AppTheme.subtle, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: isSelected ? AppTheme.textPrimary : AppTheme.subtle,
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                ),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ],
@@ -173,9 +205,9 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 value: _selectedAccountId,
-                dropdownColor: AppTheme.card,
-                style: const TextStyle(color: Colors.white, fontSize: 13),
-                decoration: _inputDecoration(_type == TransactionType.transfer ? 'Dari Dompet' : 'Akun Dompet', Icons.account_balance_wallet),
+                dropdownColor: Colors.white,
+                style: const TextStyle(color: AppTheme.textPrimary, fontSize: 13),
+                decoration: _inputDecoration(_type == TransactionType.transfer ? 'From Wallet' : 'Wallet', Icons.account_balance_wallet_outlined),
                 items: widget.accounts.map((a) => DropdownMenuItem(value: a.id, child: Text(a.name))).toList(),
                 onChanged: (val) => setState(() => _selectedAccountId = val!),
               ),
@@ -183,9 +215,9 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   value: _selectedDestAccountId,
-                  dropdownColor: AppTheme.card,
-                  style: const TextStyle(color: Colors.white, fontSize: 13),
-                  decoration: _inputDecoration('Ke Dompet Tujuan', Icons.move_to_inbox),
+                  dropdownColor: Colors.white,
+                  style: const TextStyle(color: AppTheme.textPrimary, fontSize: 13),
+                  decoration: _inputDecoration('To Destination Wallet', Icons.move_to_inbox_outlined),
                   items: widget.accounts.where((a) => a.id != _selectedAccountId).map((a) => DropdownMenuItem(value: a.id, child: Text(a.name))).toList(),
                   onChanged: (val) => setState(() => _selectedDestAccountId = val!),
                 ),
@@ -193,18 +225,19 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               const SizedBox(height: 12),
               TextField(
                 controller: _noteController,
-                style: const TextStyle(color: Colors.white),
-                decoration: _inputDecoration('Catatan (Opsional)', Icons.notes),
+                style: const TextStyle(color: AppTheme.textPrimary, fontSize: 13),
+                decoration: _inputDecoration('Note (Optional)', Icons.notes_outlined),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 22),
               ElevatedButton(
                 onPressed: _submit,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.primary,
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  elevation: 0,
                 ),
-                child: const Text('Simpan Transaksi', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                child: const Text('Save Transaction', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 14)),
               ),
             ],
           ),
@@ -219,16 +252,20 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
       child: GestureDetector(
         onTap: () => setState(() => _type = type),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 9),
           decoration: BoxDecoration(
-            color: isSelected ? color.withValues(alpha: 0.2) : AppTheme.surface,
-            borderRadius: BorderRadius.circular(10),
+            color: isSelected ? color.withValues(alpha: 0.12) : const Color(0xFFF6F9FD),
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(color: isSelected ? color : AppTheme.border),
           ),
           alignment: Alignment.center,
           child: Text(
             label,
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isSelected ? color : AppTheme.subtle),
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: isSelected ? color : AppTheme.subtle,
+            ),
           ),
         ),
       ),
@@ -239,12 +276,12 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     return InputDecoration(
       labelText: label,
       labelStyle: const TextStyle(color: AppTheme.subtle, fontSize: 12),
-      prefixIcon: Icon(icon, size: 16, color: AppTheme.subtle),
+      prefixIcon: Icon(icon, size: 18, color: AppTheme.subtle),
       filled: true,
-      fillColor: AppTheme.surface,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppTheme.border)),
-      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppTheme.primary)),
+      fillColor: const Color(0xFFF6F9FD),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppTheme.border)),
+      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppTheme.primary)),
     );
   }
 }

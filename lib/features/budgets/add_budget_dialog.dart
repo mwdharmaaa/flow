@@ -13,22 +13,22 @@ class AddBudgetDialog extends StatefulWidget {
 
 class _AddBudgetDialogState extends State<AddBudgetDialog> {
   final _limitController = TextEditingController();
-  String _category = 'Makanan & Minuman';
-  final int _colorValue = 0xFFF43F5E;
+  String _category = 'Food';
+  final int _colorValue = 0xFF1D61E0;
 
   final List<String> _categories = const [
-    'Makanan & Minuman',
-    'Transportasi',
-    'Belanja',
-    'Hiburan & Langganan',
-    'Tagihan & Utilitas',
-    'Kesehatan',
-    'Pendidikan',
-    'Lain-lain',
+    'Food',
+    'Shopping',
+    'Transport',
+    'Bills',
+    'Entertainment',
+    'Health',
+    'Education',
+    'Other',
   ];
 
   void _submit() {
-    final limit = double.tryParse(_limitController.text) ?? 0.0;
+    final limit = double.tryParse(_limitController.text.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0.0;
     if (limit <= 0) return;
 
     final bgt = BudgetModel(
@@ -46,10 +46,10 @@ class _AddBudgetDialogState extends State<AddBudgetDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: AppTheme.card,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(22),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -57,16 +57,26 @@ class _AddBudgetDialogState extends State<AddBudgetDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Tambah Batas Anggaran', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
-                IconButton(icon: const Icon(Icons.close, size: 20, color: AppTheme.subtle), onPressed: () => Navigator.of(context).pop()),
+                const Text(
+                  'Create Budget',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, size: 20, color: AppTheme.subtle),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
             DropdownButtonFormField<String>(
               value: _category,
-              dropdownColor: AppTheme.card,
-              style: const TextStyle(color: Colors.white, fontSize: 13),
-              decoration: _inputDecoration('Pilih Kategori'),
+              dropdownColor: Colors.white,
+              style: const TextStyle(color: AppTheme.textPrimary, fontSize: 13),
+              decoration: _inputDecoration('Category'),
               items: _categories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
               onChanged: (val) => setState(() => _category = val!),
             ),
@@ -74,18 +84,19 @@ class _AddBudgetDialogState extends State<AddBudgetDialog> {
             TextField(
               controller: _limitController,
               keyboardType: TextInputType.number,
-              style: const TextStyle(color: Colors.white),
-              decoration: _inputDecoration('Batas Bulanan (Rp)'),
+              style: const TextStyle(color: AppTheme.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
+              decoration: _inputDecoration('Monthly Limit (Rp)', prefixText: 'Rp '),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 22),
             ElevatedButton(
               onPressed: _submit,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primary,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                elevation: 0,
               ),
-              child: const Text('Simpan Anggaran', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+              child: const Text('Save Budget', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 14)),
             ),
           ],
         ),
@@ -93,15 +104,17 @@ class _AddBudgetDialogState extends State<AddBudgetDialog> {
     );
   }
 
-  InputDecoration _inputDecoration(String label) {
+  InputDecoration _inputDecoration(String label, {String? prefixText}) {
     return InputDecoration(
       labelText: label,
       labelStyle: const TextStyle(color: AppTheme.subtle, fontSize: 12),
+      prefixText: prefixText,
+      prefixStyle: const TextStyle(color: AppTheme.subtle, fontSize: 14, fontWeight: FontWeight.bold),
       filled: true,
-      fillColor: AppTheme.surface,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppTheme.border)),
-      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppTheme.border)),
+      fillColor: const Color(0xFFF6F9FD),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppTheme.border)),
+      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppTheme.border)),
     );
   }
 }
