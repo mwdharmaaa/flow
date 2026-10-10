@@ -4,11 +4,13 @@ import 'package:flow/core/theme/app_theme.dart';
 class TopHeaderBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final String subtitle;
+  final VoidCallback? onBack;
 
   const TopHeaderBar({
     super.key,
     required this.title,
     this.subtitle = 'Manajemen Finansial Mandiri',
+    this.onBack,
   });
 
   @override
@@ -19,6 +21,12 @@ class TopHeaderBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: AppTheme.background,
       elevation: 0,
+      leading: onBack != null
+          ? IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: onBack,
+            )
+          : null,
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -10,6 +10,7 @@ import 'package:flow/features/accounts/accounts_screen.dart';
 import 'package:flow/features/settings/settings_screen.dart';
 import 'package:flow/features/debts/debts_screen.dart';
 import 'package:flow/features/recurring/recurring_screen.dart';
+import 'package:flow/features/goals/goals_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -64,6 +65,8 @@ class FlowMainScaffold extends StatelessWidget {
         return 'Hutang & Piutang';
       case 6:
         return 'Tagihan Rutin';
+      case 7:
+        return 'Target Keuangan & Celengan';
       default:
         return 'Flow';
     }
@@ -93,6 +96,7 @@ class FlowMainScaffold extends StatelessWidget {
           onOpenAnalytics: () => state.setTabIndex(1),
           onOpenDebts: () => state.setTabIndex(5),
           onOpenRecurring: () => state.setTabIndex(6),
+          onOpenGoals: () => state.setTabIndex(7),
         );
         break;
       case 5:
@@ -101,12 +105,18 @@ class FlowMainScaffold extends StatelessWidget {
       case 6:
         activeView = RecurringScreen(state: state);
         break;
+      case 7:
+        activeView = GoalsScreen(state: state);
+        break;
       default:
         activeView = DashboardScreen(state: state);
     }
 
     return Scaffold(
-      appBar: TopHeaderBar(title: title),
+      appBar: TopHeaderBar(
+        title: title,
+        onBack: state.currentTabIndex > 4 ? () => state.setTabIndex(4) : null,
+      ),
       body: activeView,
       bottomNavigationBar: BottomNavBar(
         currentIndex: state.currentTabIndex,

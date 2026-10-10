@@ -7,6 +7,7 @@ class SettingsScreen extends StatelessWidget {
   final VoidCallback onOpenAnalytics;
   final VoidCallback onOpenDebts;
   final VoidCallback onOpenRecurring;
+  final VoidCallback onOpenGoals;
 
   const SettingsScreen({
     super.key,
@@ -14,6 +15,7 @@ class SettingsScreen extends StatelessWidget {
     required this.onOpenAnalytics,
     required this.onOpenDebts,
     required this.onOpenRecurring,
+    required this.onOpenGoals,
   });
 
   @override
@@ -37,6 +39,8 @@ class SettingsScreen extends StatelessWidget {
                   const Text('FITUR & LAPORAN', style: TextStyle(fontSize: 11, color: AppTheme.subtle, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
                   _buildMenuTile(Icons.bar_chart, 'Analitik & Grafik Arus Kas', onOpenAnalytics),
+                  const Divider(color: AppTheme.border, height: 1),
+                  _buildMenuTile(Icons.savings_outlined, 'Target Keuangan & Celengan', onOpenGoals),
                   const Divider(color: AppTheme.border, height: 1),
                   _buildMenuTile(Icons.handshake_outlined, 'Catatan Hutang & Piutang', onOpenDebts),
                   const Divider(color: AppTheme.border, height: 1),

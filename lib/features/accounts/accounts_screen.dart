@@ -3,6 +3,7 @@ import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/formatters/currency_formatter.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/features/accounts/add_account_dialog.dart';
+import 'package:flow/features/accounts/adjust_balance_dialog.dart';
 
 class AccountsScreen extends StatelessWidget {
   final AppState state;
@@ -111,9 +112,39 @@ class AccountsScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Text(
-                          CurrencyFormatter.format(acc.balance, currency: state.currency),
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              CurrencyFormatter.format(acc.balance, currency: state.currency),
+                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                            ),
+                            const SizedBox(height: 4),
+                            GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => AdjustBalanceDialog(
+                                    account: acc,
+                                    currency: state.currency,
+                                    onSave: (val) => state.adjustAccountBalance(acc.id, val),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.primary.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: AppTheme.primary.withValues(alpha: 0.4)),
+                                ),
+                                child: const Text(
+                                  'Sesuaikan',
+                                  style: TextStyle(fontSize: 10, color: AppTheme.primary, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
