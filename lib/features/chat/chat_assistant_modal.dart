@@ -140,36 +140,30 @@ class _ChatAssistantModalState extends State<ChatAssistantModal> {
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-    final isDark = widget.state.isDarkMode;
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.75,
       margin: EdgeInsets.only(bottom: bottomInset),
-      decoration: BoxDecoration(
-        color: isDark ? AppTheme.darkBgSurface : Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         children: [
-          _buildHeader(isDark),
-          _buildSuggestions(isDark),
+          _buildHeader(),
+          _buildSuggestions(),
           Expanded(child: _buildMessagesList()),
-          _buildInputBar(isDark),
+          _buildInputBar(),
         ],
       ),
     );
   }
 
-  Widget _buildHeader(bool isDark) {
-    final borderCol = isDark ? AppTheme.darkBorderSubtle : AppTheme.border;
-    final textCol = isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary;
-    final subtleCol = isDark ? AppTheme.darkTextSecondary : AppTheme.subtle;
-    final activeColor = isDark ? AppTheme.darkAccentPrimary : AppTheme.primary;
-
+  Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: borderCol)),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: AppTheme.border)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -179,30 +173,30 @@ class _ChatAssistantModalState extends State<ChatAssistantModal> {
               Container(
                 width: 32,
                 height: 32,
-                decoration: BoxDecoration(
-                  color: activeColor,
+                decoration: const BoxDecoration(
+                  color: AppTheme.primary,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.auto_awesome, color: Colors.white, size: 16),
               ),
               const SizedBox(width: 10),
-              Column(
+              const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Flow Assistant',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: textCol),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppTheme.textPrimary),
                   ),
                   Text(
                     'Ketik pengeluaran atau pemasukan',
-                    style: TextStyle(fontSize: 11, color: subtleCol),
+                    style: TextStyle(fontSize: 11, color: AppTheme.subtle),
                   ),
                 ],
               ),
             ],
           ),
           IconButton(
-            icon: Icon(Icons.close, color: subtleCol, size: 20),
+            icon: const Icon(Icons.close, color: AppTheme.subtle, size: 20),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],
@@ -210,10 +204,7 @@ class _ChatAssistantModalState extends State<ChatAssistantModal> {
     );
   }
 
-  Widget _buildSuggestions(bool isDark) {
-    final chipBg = isDark ? AppTheme.darkAccentSubtle : AppTheme.primarySoft;
-    final activeColor = isDark ? AppTheme.darkAccentPrimary : AppTheme.primary;
-
+  Widget _buildSuggestions() {
     return Container(
       height: 40,
       margin: const EdgeInsets.only(top: 8),
@@ -225,8 +216,8 @@ class _ChatAssistantModalState extends State<ChatAssistantModal> {
         itemBuilder: (context, index) {
           final s = _suggestions[index];
           return ActionChip(
-            label: Text(s, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: activeColor)),
-            backgroundColor: chipBg,
+            label: Text(s, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.primary)),
+            backgroundColor: AppTheme.primarySoft,
             side: BorderSide.none,
             padding: const EdgeInsets.symmetric(horizontal: 4),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -246,19 +237,12 @@ class _ChatAssistantModalState extends State<ChatAssistantModal> {
     );
   }
 
-  Widget _buildInputBar(bool isDark) {
-    final borderCol = isDark ? AppTheme.darkBorderSubtle : AppTheme.border;
-    final bg = isDark ? AppTheme.darkBgSurface : Colors.white;
-    final inputBg = isDark ? AppTheme.darkBgElevated : const Color(0xFFF6F8FB);
-    final textCol = isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary;
-    final subtleCol = isDark ? AppTheme.darkTextSecondary : AppTheme.subtle;
-    final activeColor = isDark ? AppTheme.darkAccentPrimary : AppTheme.primary;
-
+  Widget _buildInputBar() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: bg,
-        border: Border(top: BorderSide(color: borderCol)),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: AppTheme.border)),
       ),
       child: SafeArea(
         top: false,
@@ -268,22 +252,22 @@ class _ChatAssistantModalState extends State<ChatAssistantModal> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 decoration: BoxDecoration(
-                  color: inputBg,
+                  color: const Color(0xFFF6F8FB),
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: borderCol),
+                  border: Border.all(color: AppTheme.border),
                 ),
                 child: TextField(
                   controller: _controller,
                   autofocus: true,
                   textInputAction: TextInputAction.send,
                   onSubmitted: _handleSend,
-                  style: TextStyle(fontSize: 13, color: textCol),
-                  decoration: InputDecoration(
+                  style: const TextStyle(fontSize: 13, color: AppTheme.textPrimary),
+                  decoration: const InputDecoration(
                     hintText: 'Ketik contoh: kopi 18k...',
-                    hintStyle: TextStyle(fontSize: 12, color: subtleCol),
+                    hintStyle: TextStyle(fontSize: 12, color: AppTheme.subtle),
                     border: InputBorder.none,
                     isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                    contentPadding: EdgeInsets.symmetric(vertical: 10),
                   ),
                 ),
               ),
@@ -294,8 +278,8 @@ class _ChatAssistantModalState extends State<ChatAssistantModal> {
               child: Container(
                 width: 40,
                 height: 40,
-                decoration: BoxDecoration(
-                  color: activeColor,
+                decoration: const BoxDecoration(
+                  color: AppTheme.primary,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.arrow_upward_rounded, color: Colors.white, size: 20),

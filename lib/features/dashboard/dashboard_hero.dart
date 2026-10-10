@@ -12,7 +12,6 @@ class DashboardHero extends StatefulWidget {
   final DateTime currentMonth;
   final VoidCallback onAddTransaction;
   final AppState state;
-  final VoidCallback? onOpenSidebar;
 
   const DashboardHero({
     super.key,
@@ -21,7 +20,6 @@ class DashboardHero extends StatefulWidget {
     required this.currentMonth,
     required this.onAddTransaction,
     required this.state,
-    this.onOpenSidebar,
   });
 
   @override
@@ -33,27 +31,20 @@ class _DashboardHeroState extends State<DashboardHero> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.state.isDarkMode;
     final monthName = DateFormat('MMMM', 'en_US').format(widget.currentMonth);
     final dayNum = DateTime.now().day;
     final dayLabel = DateFormat('d MMM', 'en_US').format(DateTime.now());
 
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: isDark
-              ? const [
-                  Color(0xFF121215),
-                  Color(0xFF09090B),
-                  Color(0xFF09090B),
-                ]
-              : const [
-                  Color(0xFFEBF3FE),
-                  Color(0xFFF3F7FD),
-                  Color(0xFFFFFFFF),
-                ],
+          colors: [
+            Color(0xFFEBF3FE),
+            Color(0xFFF3F7FD),
+            Color(0xFFFFFFFF),
+          ],
         ),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
@@ -64,55 +55,40 @@ class _DashboardHeroState extends State<DashboardHero> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Logo (Click to open sidebar)
-              Builder(
-                builder: (ctx) => InkWell(
-                  onTap: () {
-                    if (widget.onOpenSidebar != null) {
-                      widget.onOpenSidebar!();
-                    } else {
-                      Scaffold.of(ctx).openDrawer();
-                    }
-                  },
-                  borderRadius: BorderRadius.circular(18),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 30,
-                          height: 30,
-                          decoration: BoxDecoration(
-                            color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Center(
-                            child: Icon(Icons.waves, color: Colors.white, size: 18),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'flow',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w800,
-                            color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                      ],
+              // Logo
+              Row(
+                children: [
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: const BoxDecoration(
+                      color: AppTheme.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Center(
+                      child: Icon(Icons.waves, color: Colors.white, size: 16),
                     ),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'flow',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.textPrimary,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                ],
               ),
               // Pills
               Row(
                 children: [
-                  _buildPill(dayLabel, isDark),
+                  _buildPill(dayLabel),
                   const SizedBox(width: 6),
-                  _buildFeedbackPill(isDark),
+                  _buildFeedbackPill(),
                   const SizedBox(width: 6),
-                  _buildBadgePill('Day $dayNum', isDark),
+                  _buildBadgePill('Day $dayNum'),
                 ],
               ),
             ],
@@ -125,9 +101,9 @@ class _DashboardHeroState extends State<DashboardHero> {
               children: [
                 Text(
                   'Hi Friend • $monthName spending',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 13,
-                    color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle,
+                    color: AppTheme.subtle,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -140,10 +116,10 @@ class _DashboardHeroState extends State<DashboardHero> {
                       _isHidden
                           ? '••••••'
                           : CurrencyFormatter.format(widget.monthExpense, currency: widget.currency),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 34,
                         fontWeight: FontWeight.w900,
-                        color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+                        color: AppTheme.textPrimary,
                         letterSpacing: -0.5,
                       ),
                     ),
@@ -153,7 +129,7 @@ class _DashboardHeroState extends State<DashboardHero> {
                       child: Icon(
                         _isHidden ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                         size: 20,
-                        color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle,
+                        color: AppTheme.subtle,
                       ),
                     ),
                   ],
@@ -163,7 +139,7 @@ class _DashboardHeroState extends State<DashboardHero> {
                   widget.monthExpense == 0
                       ? 'Nothing recorded this month yet'
                       : 'Total pengeluaran tercatat bulan ini',
-                  style: TextStyle(fontSize: 12, color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle),
+                  style: const TextStyle(fontSize: 12, color: AppTheme.subtle),
                 ),
               ],
             ),
@@ -174,11 +150,9 @@ class _DashboardHeroState extends State<DashboardHero> {
           Container(
             height: 110,
             decoration: BoxDecoration(
-              color: isDark ? AppTheme.darkBgElevated : Colors.white.withValues(alpha: 0.6),
+              color: Colors.white.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border.withValues(alpha: 0.7),
-              ),
+              border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
             ),
             child: Stack(
               children: [
@@ -187,8 +161,8 @@ class _DashboardHeroState extends State<DashboardHero> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Container(height: 1, color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border.withValues(alpha: 0.4)),
-                      Container(height: 1, color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border.withValues(alpha: 0.4)),
+                      Container(height: 1, color: AppTheme.border.withValues(alpha: 0.4)),
+                      Container(height: 1, color: AppTheme.border.withValues(alpha: 0.4)),
                     ],
                   ),
                 ),
@@ -196,24 +170,24 @@ class _DashboardHeroState extends State<DashboardHero> {
                 Positioned(
                   top: 14,
                   left: 24,
-                  child: Icon(Icons.cloud, color: Colors.white.withValues(alpha: isDark ? 0.35 : 0.9), size: 36),
+                  child: Icon(Icons.cloud, color: Colors.white.withValues(alpha: 0.9), size: 36),
                 ),
                 Positioned(
                   top: 28,
                   left: 90,
-                  child: Icon(Icons.cloud, color: Colors.white.withValues(alpha: isDark ? 0.25 : 0.8), size: 28),
+                  child: Icon(Icons.cloud, color: Colors.white.withValues(alpha: 0.8), size: 28),
                 ),
                 // Center text
                 Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
+                      const Text(
                         'Record your first expense',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
-                          color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+                          color: AppTheme.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -222,7 +196,7 @@ class _DashboardHeroState extends State<DashboardHero> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 10,
-                          color: (isDark ? AppTheme.darkTextSecondary : AppTheme.subtle).withValues(alpha: 0.9),
+                          color: AppTheme.subtle.withValues(alpha: 0.9),
                         ),
                       ),
                     ],
@@ -245,7 +219,6 @@ class _DashboardHeroState extends State<DashboardHero> {
                   icon: Icons.receipt_long_outlined,
                   label: 'Receipt',
                   onTap: widget.onAddTransaction,
-                  isDark: isDark,
                 ),
               ),
               const SizedBox(width: 10),
@@ -254,7 +227,6 @@ class _DashboardHeroState extends State<DashboardHero> {
                   icon: Icons.mic_none_rounded,
                   label: 'Voice',
                   onTap: widget.onAddTransaction,
-                  isDark: isDark,
                 ),
               ),
               const SizedBox(width: 10),
@@ -263,14 +235,14 @@ class _DashboardHeroState extends State<DashboardHero> {
                 child: Container(
                   width: 48,
                   height: 48,
-                  decoration: BoxDecoration(
-                    color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary,
+                  decoration: const BoxDecoration(
+                    color: AppTheme.primary,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: (isDark ? AppTheme.darkAccentPrimary : AppTheme.primary).withValues(alpha: 0.25),
+                        color: Color(0x401D61E0),
                         blurRadius: 10,
-                        offset: const Offset(0, 4),
+                        offset: Offset(0, 4),
                       ),
                     ],
                   ),
@@ -284,83 +256,57 @@ class _DashboardHeroState extends State<DashboardHero> {
     );
   }
 
-  Widget _buildPill(String text, bool isDark) {
+  Widget _buildPill(String text) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: isDark ? AppTheme.darkBgElevated : Colors.white,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border),
+        border: Border.all(color: AppTheme.border),
       ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.bold,
-          color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
-        ),
-      ),
+      child: Text(text, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
     );
   }
 
-  Widget _buildFeedbackPill(bool isDark) {
+  Widget _buildFeedbackPill() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: isDark ? AppTheme.darkBgElevated : Colors.white,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border),
+        border: Border.all(color: AppTheme.border),
       ),
-      child: Row(
+      child: const Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.rate_review_outlined, size: 12, color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary),
-          const SizedBox(width: 4),
-          Text(
-            'Feedback',
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
-            ),
-          ),
+          Icon(Icons.rate_review_outlined, size: 12, color: AppTheme.textPrimary),
+          SizedBox(width: 4),
+          Text('Feedback', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
         ],
       ),
     );
   }
 
-  Widget _buildBadgePill(String text, bool isDark) {
+  Widget _buildBadgePill(String text) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: isDark ? AppTheme.darkAccentSubtle : AppTheme.primarySoft,
+        color: AppTheme.primarySoft,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.bold,
-          color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary,
-        ),
-      ),
+      child: Text(text, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.primary)),
     );
   }
 
-  Widget _buildActionPill({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-    required bool isDark,
-  }) {
+  Widget _buildActionPill({required IconData icon, required String label, required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         height: 48,
         decoration: BoxDecoration(
-          color: isDark ? AppTheme.darkBgElevated : Colors.white,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(26),
-          border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border),
+          border: Border.all(color: AppTheme.border),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.02),
@@ -372,16 +318,9 @@ class _DashboardHeroState extends State<DashboardHero> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 18, color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary),
+            Icon(icon, size: 18, color: AppTheme.primary),
             const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
-              ),
-            ),
+            Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
           ],
         ),
       ),

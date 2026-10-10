@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/features/dashboard/dashboard_hero.dart';
 import 'package:flow/features/dashboard/dashboard_summary.dart';
@@ -42,9 +41,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         .where((t) => t.type == TransactionType.expense)
         .fold(0.0, (sum, t) => sum + t.amount);
 
-    return Container(
-      color: state.isDarkMode ? AppTheme.darkBgBase : const Color(0xFFEBF3FE),
-      child: SingleChildScrollView(
+    return Scaffold(
+      backgroundColor: const Color(0xFFEBF3FE),
+      body: SingleChildScrollView(
         child: Column(
           children: [
             DashboardHero(
