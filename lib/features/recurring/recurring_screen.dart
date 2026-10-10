@@ -11,37 +11,49 @@ class RecurringScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.background,
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('LANGGANAN & TAGIHAN RUTIN', style: TextStyle(fontSize: 11, color: AppTheme.subtle, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
+            const Text(
+              'RECURRING BILLS & SUBSCRIPTIONS',
+              style: TextStyle(fontSize: 11, color: AppTheme.subtle, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+            ),
+            const SizedBox(height: 14),
             Expanded(
               child: state.recurring.isEmpty
-                  ? const Center(child: Text('Belum ada langganan rutin.', style: TextStyle(fontSize: 12, color: AppTheme.subtle)))
+                  ? const Center(child: Text('No recurring subscriptions recorded yet.', style: TextStyle(fontSize: 13, color: AppTheme.subtle)))
                   : ListView.builder(
                       itemCount: state.recurring.length,
                       itemBuilder: (_, idx) {
                         final r = state.recurring[idx];
                         return Container(
-                          margin: const EdgeInsets.only(bottom: 8),
+                          margin: const EdgeInsets.only(bottom: 10),
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: AppTheme.card,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: AppTheme.border),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.autorenew, color: AppTheme.primary, size: 22),
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: const BoxDecoration(
+                                  color: AppTheme.primarySoft,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.autorenew_rounded, color: AppTheme.primary, size: 20),
+                              ),
                               const SizedBox(width: 14),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(r.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white)),
+                                    Text(r.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                                    const SizedBox(height: 2),
                                     Text('${r.category} • ${r.interval.toUpperCase()}', style: const TextStyle(fontSize: 10, color: AppTheme.subtle)),
                                   ],
                                 ),
@@ -51,11 +63,11 @@ class RecurringScreen extends StatelessWidget {
                                 children: [
                                   Text(
                                     CurrencyFormatter.format(r.amount, currency: state.currency),
-                                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white),
+                                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
                                   ),
                                   Switch(
                                     value: r.isActive,
-                                    activeColor: AppTheme.income,
+                                    activeColor: AppTheme.primary,
                                     onChanged: (_) => state.toggleRecurring(r.id),
                                   ),
                                 ],

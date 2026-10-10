@@ -19,30 +19,30 @@ class DebtsScreen extends StatelessWidget {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (context, setState) => Dialog(
-          backgroundColor: AppTheme.card,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(22),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text('Catat Hutang / Piutang', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
-                const SizedBox(height: 12),
+                const Text('Log Debt / Loan', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                const SizedBox(height: 14),
                 Row(
                   children: [
                     Expanded(
                       child: GestureDetector(
                         onTap: () => setState(() => type = 'receivable'),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          padding: const EdgeInsets.symmetric(vertical: 9),
                           decoration: BoxDecoration(
-                            color: type == 'receivable' ? AppTheme.income.withValues(alpha: 0.2) : AppTheme.surface,
-                            borderRadius: BorderRadius.circular(8),
+                            color: type == 'receivable' ? AppTheme.income.withValues(alpha: 0.12) : const Color(0xFFF6F9FD),
+                            borderRadius: BorderRadius.circular(10),
                             border: Border.all(color: type == 'receivable' ? AppTheme.income : AppTheme.border),
                           ),
                           alignment: Alignment.center,
-                          child: const Text('Piutang (Dipinjam)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white)),
+                          child: Text('Lent to (Owed)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: type == 'receivable' ? AppTheme.income : AppTheme.subtle)),
                         ),
                       ),
                     ),
@@ -51,42 +51,42 @@ class DebtsScreen extends StatelessWidget {
                       child: GestureDetector(
                         onTap: () => setState(() => type = 'payable'),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          padding: const EdgeInsets.symmetric(vertical: 9),
                           decoration: BoxDecoration(
-                            color: type == 'payable' ? AppTheme.expense.withValues(alpha: 0.2) : AppTheme.surface,
-                            borderRadius: BorderRadius.circular(8),
+                            color: type == 'payable' ? AppTheme.expense.withValues(alpha: 0.12) : const Color(0xFFF6F9FD),
+                            borderRadius: BorderRadius.circular(10),
                             border: Border.all(color: type == 'payable' ? AppTheme.expense : AppTheme.border),
                           ),
                           alignment: Alignment.center,
-                          child: const Text('Hutang (Meminjam)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white)),
+                          child: Text('Borrowed', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: type == 'payable' ? AppTheme.expense : AppTheme.subtle)),
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
                 TextField(
                   controller: nameController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(labelText: 'Nama Pihak / Teman', filled: true, fillColor: AppTheme.surface),
+                  style: const TextStyle(color: AppTheme.textPrimary),
+                  decoration: const InputDecoration(labelText: 'Contact / Person Name', filled: true, fillColor: Color(0xFFF6F9FD)),
                 ),
                 const SizedBox(height: 10),
                 TextField(
                   controller: amountController,
                   keyboardType: TextInputType.number,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(labelText: 'Nominal (Rp)', filled: true, fillColor: AppTheme.surface),
+                  style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold),
+                  decoration: const InputDecoration(labelText: 'Amount (Rp)', filled: true, fillColor: Color(0xFFF6F9FD)),
                 ),
                 const SizedBox(height: 10),
                 TextField(
                   controller: noteController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(labelText: 'Catatan', filled: true, fillColor: AppTheme.surface),
+                  style: const TextStyle(color: AppTheme.textPrimary),
+                  decoration: const InputDecoration(labelText: 'Note (Optional)', filled: true, fillColor: Color(0xFFF6F9FD)),
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 22),
                 ElevatedButton(
                   onPressed: () {
-                    final amount = double.tryParse(amountController.text) ?? 0.0;
+                    final amount = double.tryParse(amountController.text.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0.0;
                     if (nameController.text.trim().isEmpty || amount <= 0) return;
                     state.addDebt(DebtModel(
                       id: 'debt_${DateTime.now().millisecondsSinceEpoch}',
@@ -99,8 +99,8 @@ class DebtsScreen extends StatelessWidget {
                     ));
                     Navigator.of(context).pop();
                   },
-                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary),
-                  child: const Text('Simpan Catatan', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), elevation: 0),
+                  child: const Text('Save Record', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
                 ),
               ],
             ),
@@ -113,38 +113,39 @@ class DebtsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.background,
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('CATATAN PINJAMAN', style: TextStyle(fontSize: 11, color: AppTheme.subtle, fontWeight: FontWeight.bold)),
+                const Text('DEBT CONTACTS', style: TextStyle(fontSize: 11, color: AppTheme.subtle, fontWeight: FontWeight.bold)),
                 ElevatedButton.icon(
                   onPressed: () => _openAddDebtDialog(context),
                   icon: const Icon(Icons.add, size: 16, color: Colors.white),
-                  label: const Text('Tambah', style: TextStyle(color: Colors.white, fontSize: 12)),
-                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary),
+                  label: const Text('Add', style: TextStyle(color: Colors.white, fontSize: 12)),
+                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
             Expanded(
               child: state.debts.isEmpty
-                  ? const Center(child: Text('Belum ada catatan hutang/piutang.', style: TextStyle(fontSize: 12, color: AppTheme.subtle)))
+                  ? const Center(child: Text('No debt records yet.', style: TextStyle(fontSize: 13, color: AppTheme.subtle)))
                   : ListView.builder(
                       itemCount: state.debts.length,
                       itemBuilder: (_, idx) {
                         final d = state.debts[idx];
                         final isReceivable = d.type == 'receivable';
                         return Container(
-                          margin: const EdgeInsets.only(bottom: 8),
+                          margin: const EdgeInsets.only(bottom: 10),
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: AppTheme.card,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: AppTheme.border),
                           ),
                           child: Row(
                             children: [
@@ -154,8 +155,8 @@ class DebtsScreen extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(d.personName, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white)),
-                                    Text(isReceivable ? 'Piutang' : 'Hutang', style: TextStyle(fontSize: 10, color: isReceivable ? AppTheme.income : AppTheme.expense)),
+                                    Text(d.personName, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                                    Text(isReceivable ? 'Lent' : 'Borrowed', style: TextStyle(fontSize: 10, color: isReceivable ? AppTheme.income : AppTheme.expense)),
                                   ],
                                 ),
                               ),
@@ -164,16 +165,16 @@ class DebtsScreen extends StatelessWidget {
                                 children: [
                                   Text(
                                     CurrencyFormatter.format(d.amount, currency: state.currency),
-                                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: isReceivable ? AppTheme.income : AppTheme.expense),
+                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isReceivable ? AppTheme.income : AppTheme.expense),
                                   ),
                                   if (!d.isSettled)
                                     TextButton(
                                       onPressed: () => state.settleDebt(d.id),
                                       style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(50, 20)),
-                                      child: const Text('Tandai Lunas', style: TextStyle(fontSize: 10, color: AppTheme.income)),
+                                      child: const Text('Mark Settled', style: TextStyle(fontSize: 11, color: AppTheme.income, fontWeight: FontWeight.bold)),
                                     )
                                   else
-                                    const Text('Lunas', style: TextStyle(fontSize: 10, color: AppTheme.subtle)),
+                                    const Text('Settled', style: TextStyle(fontSize: 11, color: AppTheme.subtle)),
                                 ],
                               ),
                             ],

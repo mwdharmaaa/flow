@@ -14,15 +14,15 @@ class GoalsScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: AppTheme.card,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Nabung ke Target', style: TextStyle(color: Colors.white, fontSize: 16)),
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Add Savings', style: TextStyle(color: AppTheme.textPrimary, fontSize: 16, fontWeight: FontWeight.bold)),
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.number,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold),
           decoration: const InputDecoration(
-            labelText: 'Nominal Setoran',
+            labelText: 'Deposit Amount',
             prefixText: 'Rp ',
             labelStyle: TextStyle(color: AppTheme.subtle),
           ),
@@ -30,10 +30,10 @@ class GoalsScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Batal', style: TextStyle(color: AppTheme.subtle)),
+            child: const Text('Cancel', style: TextStyle(color: AppTheme.subtle)),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary),
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary, elevation: 0),
             onPressed: () {
               final val = double.tryParse(controller.text.replaceAll(RegExp(r'[^0-9.]'), ''));
               if (val != null && val > 0) {
@@ -41,7 +41,7 @@ class GoalsScreen extends StatelessWidget {
               }
               Navigator.pop(context);
             },
-            child: const Text('Setor', style: TextStyle(color: Colors.white)),
+            child: const Text('Deposit', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -54,20 +54,17 @@ class GoalsScreen extends StatelessWidget {
     final totalSaved = state.goals.fold(0.0, (sum, g) => sum + g.savedAmount);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Target Keuangan & Celengan'),
-        backgroundColor: AppTheme.background,
-      ),
+      backgroundColor: AppTheme.background,
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: AppTheme.card,
-                borderRadius: BorderRadius.circular(16),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
                 border: Border.all(color: AppTheme.border),
               ),
               child: Row(
@@ -76,15 +73,15 @@ class GoalsScreen extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Total Dana Terkumpul', style: TextStyle(fontSize: 11, color: AppTheme.subtle)),
+                      const Text('Total Savings Accumulated', style: TextStyle(fontSize: 11, color: AppTheme.subtle)),
                       const SizedBox(height: 4),
                       Text(
                         CurrencyFormatter.format(totalSaved, currency: state.currency),
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppTheme.textPrimary),
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Dari total target: ${CurrencyFormatter.format(totalTarget, currency: state.currency)}',
+                        'Total target: ${CurrencyFormatter.format(totalTarget, currency: state.currency)}',
                         style: const TextStyle(fontSize: 11, color: AppTheme.subtle),
                       ),
                     ],
@@ -97,39 +94,40 @@ class GoalsScreen extends StatelessWidget {
                       );
                     },
                     icon: const Icon(Icons.add, size: 16, color: Colors.white),
-                    label: const Text('Buat Target', style: TextStyle(color: Colors.white, fontSize: 12)),
+                    label: const Text('Create', style: TextStyle(color: Colors.white, fontSize: 12)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primary,
+                      elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             Text(
-              'DAFTAR TARGET (${state.goals.length})',
+              'SAVINGS GOALS (${state.goals.length})',
               style: const TextStyle(fontSize: 11, color: AppTheme.subtle, fontWeight: FontWeight.bold, letterSpacing: 0.5),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             Expanded(
               child: state.goals.isEmpty
                   ? Center(
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 20),
                         decoration: BoxDecoration(
-                          color: AppTheme.card.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: AppTheme.border.withValues(alpha: 0.4)),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(color: AppTheme.border),
                         ),
                         child: const Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(Icons.savings_outlined, size: 36, color: AppTheme.subtle),
                             SizedBox(height: 10),
-                            Text('Belum ada target keuangan', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white70)),
+                            Text('No savings goals yet', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
                             SizedBox(height: 4),
-                            Text('Buat celengan untuk rencana liburan, dana darurat, atau impianmu', style: TextStyle(fontSize: 11, color: AppTheme.subtle), textAlign: TextAlign.center),
+                            Text('Create a savings target for emergency funds, travel, or dreams', style: TextStyle(fontSize: 11, color: AppTheme.subtle), textAlign: TextAlign.center),
                           ],
                         ),
                       ),
@@ -143,9 +141,9 @@ class GoalsScreen extends StatelessWidget {
                           margin: const EdgeInsets.only(bottom: 10),
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: AppTheme.card,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: AppTheme.border),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,7 +151,7 @@ class GoalsScreen extends StatelessWidget {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(g.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
+                                  Text(g.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
                                   IconButton(
                                     icon: const Icon(Icons.delete_outline, size: 16, color: AppTheme.subtle),
                                     onPressed: () => state.deleteGoal(g.id),
@@ -165,7 +163,7 @@ class GoalsScreen extends StatelessWidget {
                               const SizedBox(height: 8),
                               LinearProgressIndicator(
                                 value: g.progress,
-                                backgroundColor: AppTheme.surface,
+                                backgroundColor: AppTheme.primarySoft,
                                 valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primary),
                                 minHeight: 6,
                                 borderRadius: BorderRadius.circular(3),
@@ -185,7 +183,7 @@ class GoalsScreen extends StatelessWidget {
                                       minimumSize: Size.zero,
                                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                     ),
-                                    child: const Text('Nabung +', style: TextStyle(fontSize: 11, color: AppTheme.primary, fontWeight: FontWeight.bold)),
+                                    child: const Text('Deposit +', style: TextStyle(fontSize: 11, color: AppTheme.primary, fontWeight: FontWeight.bold)),
                                   ),
                                 ],
                               ),
