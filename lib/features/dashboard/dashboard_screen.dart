@@ -42,7 +42,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         .fold(0.0, (sum, t) => sum + t.amount);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFEBF3FE),
+      backgroundColor: state.isDarkMode ? AppTheme.darkBgBase : const Color(0xFFEBF3FE),
       body: SingleChildScrollView(
         child: Column(
           children: [
