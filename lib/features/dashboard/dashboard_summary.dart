@@ -26,10 +26,16 @@ class DashboardSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = state.isDarkMode;
+    final textPrimary = isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary;
+    final textSubtle = isDark ? AppTheme.darkTextSecondary : AppTheme.subtle;
+    final bgElevated = isDark ? AppTheme.darkBgElevated : Colors.white;
+    final borderSubtle = isDark ? AppTheme.darkBorderSubtle : AppTheme.border;
+
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      decoration: BoxDecoration(
+        color: isDark ? AppTheme.darkBgSurface : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
       child: Column(
@@ -39,12 +45,12 @@ class DashboardSummary extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Summary',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
-                  color: AppTheme.textPrimary,
+                  color: textPrimary,
                 ),
               ),
               Row(
@@ -52,8 +58,9 @@ class DashboardSummary extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFF4EB),
+                      color: isDark ? AppTheme.darkBgElevated : const Color(0xFFFFF4EB),
                       borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: isDark ? borderSubtle : Colors.transparent),
                     ),
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
@@ -69,10 +76,10 @@ class DashboardSummary extends StatelessWidget {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: AppTheme.border.withValues(alpha: 0.4),
+                      color: isDark ? AppTheme.darkBgElevated : AppTheme.border.withValues(alpha: 0.4),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.notifications_none_rounded, size: 18, color: AppTheme.textPrimary),
+                    child: Icon(Icons.notifications_none_rounded, size: 18, color: textPrimary),
                   ),
                 ],
               ),
@@ -84,9 +91,9 @@ class DashboardSummary extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: bgElevated,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppTheme.border),
+              border: Border.all(color: borderSubtle),
             ),
             child: Row(
               children: [
@@ -94,28 +101,32 @@ class DashboardSummary extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Total balance', style: TextStyle(fontSize: 11, color: AppTheme.subtle)),
+                      Text('Total balance', style: TextStyle(fontSize: 11, color: textSubtle)),
                       const SizedBox(height: 4),
                       Text(
                         CurrencyFormatter.format(state.totalBalance, currency: state.currency),
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: textPrimary),
                       ),
                     ],
                   ),
                 ),
-                Container(width: 1, height: 36, color: AppTheme.border),
+                Container(width: 1, height: 36, color: borderSubtle),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Budget left', style: TextStyle(fontSize: 11, color: AppTheme.subtle)),
+                      Text('Budget left', style: TextStyle(fontSize: 11, color: textSubtle)),
                       const SizedBox(height: 4),
                       GestureDetector(
                         onTap: onSeeAllBudgets,
                         child: Text(
                           state.budgets.isEmpty ? 'Set up a budget' : 'View budget',
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.primary),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary,
+                          ),
                         ),
                       ),
                     ],
@@ -123,7 +134,6 @@ class DashboardSummary extends StatelessWidget {
                 ),
               ],
             ),
-          ),
           const SizedBox(height: 22),
 
           // Latest records
@@ -280,13 +290,28 @@ class DashboardSummary extends StatelessWidget {
   }
 
   Widget _buildSectionHeader(String title, VoidCallback onTap, {String actionText = 'All'}) {
+    final isDark = state.isDarkMode;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+            color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+          ),
+        ),
         GestureDetector(
           onTap: onTap,
-          child: Text(actionText, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.subtle)),
+          child: Text(
+            actionText,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle,
+            ),
+          ),
         ),
       ],
     );
@@ -299,30 +324,45 @@ class DashboardSummary extends StatelessWidget {
     required String buttonLabel,
     required VoidCallback onTap,
   }) {
+    final isDark = state.isDarkMode;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppTheme.darkBgElevated : Colors.white,
         borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : Colors.transparent),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
-            decoration: const BoxDecoration(
-              color: AppTheme.primarySoft,
+            decoration: BoxDecoration(
+              color: isDark ? AppTheme.darkBgSurface : AppTheme.primarySoft,
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, size: 16, color: AppTheme.primary),
+            child: Icon(icon, size: 16, color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+                  ),
+                ),
                 const SizedBox(height: 2),
-                Text(subtitle, style: const TextStyle(fontSize: 10, color: AppTheme.subtle)),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle,
+                  ),
+                ),
               ],
             ),
           ),
@@ -333,7 +373,14 @@ class DashboardSummary extends StatelessWidget {
               minimumSize: Size.zero,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-            child: Text(buttonLabel, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.primary)),
+            child: Text(
+              buttonLabel,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary,
+              ),
+            ),
           ),
         ],
       ),

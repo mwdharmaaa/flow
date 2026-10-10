@@ -15,18 +15,24 @@ class BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final navBg = isDark ? AppTheme.darkBgElevated : AppTheme.surface;
+    final navBorder = isDark ? AppTheme.darkBorderSubtle : AppTheme.border;
+    final activeColor = isDark ? AppTheme.darkAccentPrimary : AppTheme.primary;
+    final inactiveColor = isDark ? AppTheme.darkTextSecondary : AppTheme.subtle;
+
     return Container(
       color: Colors.transparent,
       padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 8),
       child: Container(
         height: 66,
         decoration: BoxDecoration(
-          color: AppTheme.surface,
+          color: navBg,
           borderRadius: BorderRadius.circular(34),
-          border: Border.all(color: AppTheme.border),
+          border: Border.all(color: navBorder),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05),
               blurRadius: 18,
               offset: const Offset(0, 6),
             ),
@@ -40,12 +46,16 @@ class BottomNavBar extends StatelessWidget {
               icon: Icons.home_outlined,
               activeIcon: Icons.home_rounded,
               label: 'Home',
+              activeColor: activeColor,
+              inactiveColor: inactiveColor,
             ),
             _buildNavItem(
               index: 1,
               icon: Icons.bar_chart_outlined,
               activeIcon: Icons.bar_chart_rounded,
               label: 'Reports',
+              activeColor: activeColor,
+              inactiveColor: inactiveColor,
             ),
             // Center Floating Action Button
             GestureDetector(
@@ -53,14 +63,14 @@ class BottomNavBar extends StatelessWidget {
               child: Container(
                 width: 48,
                 height: 48,
-                decoration: const BoxDecoration(
-                  color: AppTheme.primary,
+                decoration: BoxDecoration(
+                  color: activeColor,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Color(0x401D61E0),
+                      color: activeColor.withValues(alpha: 0.35),
                       blurRadius: 10,
-                      offset: Offset(0, 4),
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
@@ -76,12 +86,16 @@ class BottomNavBar extends StatelessWidget {
               icon: Icons.pie_chart_outline_rounded,
               activeIcon: Icons.pie_chart_rounded,
               label: 'Budget',
+              activeColor: activeColor,
+              inactiveColor: inactiveColor,
             ),
             _buildNavItem(
               index: 3,
               icon: Icons.account_balance_wallet_outlined,
               activeIcon: Icons.account_balance_wallet_rounded,
               label: 'Wallets',
+              activeColor: activeColor,
+              inactiveColor: inactiveColor,
             ),
           ],
         ),
@@ -94,6 +108,8 @@ class BottomNavBar extends StatelessWidget {
     required IconData icon,
     required IconData activeIcon,
     required String label,
+    required Color activeColor,
+    required Color inactiveColor,
   }) {
     final isSelected = currentIndex == index;
     return GestureDetector(
@@ -108,7 +124,7 @@ class BottomNavBar extends StatelessWidget {
             Icon(
               isSelected ? activeIcon : icon,
               size: 23,
-              color: isSelected ? AppTheme.primary : AppTheme.subtle,
+              color: isSelected ? activeColor : inactiveColor,
             ),
             const SizedBox(height: 3),
             Text(
@@ -116,7 +132,7 @@ class BottomNavBar extends StatelessWidget {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                color: isSelected ? AppTheme.primary : AppTheme.subtle,
+                color: isSelected ? activeColor : inactiveColor,
               ),
             ),
           ],

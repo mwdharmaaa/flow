@@ -38,9 +38,11 @@ class _FlowAppState extends State<FlowApp> {
       title: 'Flow',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: _appState.isDarkMode ? ThemeMode.dark : ThemeMode.light,
       builder: (context, child) {
         return Container(
-          color: const Color(0xFFE9F0FA),
+          color: _appState.isDarkMode ? AppTheme.darkBgBase : const Color(0xFFE9F0FA),
           alignment: Alignment.center,
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 500),
@@ -112,19 +114,22 @@ class FlowMainScaffold extends StatelessWidget {
         activeView = DashboardScreen(state: state);
     }
 
+    final isDark = state.isDarkMode;
+
     return Scaffold(
+      backgroundColor: isDark ? AppTheme.darkBgBase : const Color(0xFFEBF3FE),
       appBar: isSubView
           ? AppBar(
-              backgroundColor: AppTheme.background,
+              backgroundColor: isDark ? AppTheme.darkBgBase : AppTheme.background,
               elevation: 0,
               leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
+                icon: Icon(Icons.arrow_back, color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary),
                 onPressed: () => state.setTabIndex(0),
               ),
               title: Text(
                 _getSubViewTitle(state.currentTabIndex),
-                style: const TextStyle(
-                  color: AppTheme.textPrimary,
+                style: TextStyle(
+                  color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
