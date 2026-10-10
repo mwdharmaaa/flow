@@ -10,6 +10,7 @@ import 'package:flow/features/debts/debts_screen.dart';
 import 'package:flow/features/recurring/recurring_screen.dart';
 import 'package:flow/features/goals/goals_screen.dart';
 import 'package:flow/features/transactions/add_transaction_dialog.dart';
+import 'package:flow/features/sidebar/flow_sidebar.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,14 +39,14 @@ class _FlowAppState extends State<FlowApp> {
       title: 'Flow',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: _appState.isDarkMode ? ThemeMode.dark : ThemeMode.light,
       builder: (context, child) {
+        final isDark = _appState.isDarkMode;
         return Container(
-          color: const Color(0xFFE9F0FA),
-          alignment: Alignment.center,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 500),
-            child: child ?? const SizedBox(),
-          ),
+          color: isDark ? AppTheme.darkBgBase : const Color(0xFFF2F6FC),
+          alignment: Alignment.topCenter,
+          child: child ?? const SizedBox(),
         );
       },
       home: FlowMainScaffold(state: _appState),
@@ -83,6 +84,7 @@ class FlowMainScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = state.isDarkMode;
     final isSubView = state.currentTabIndex > 3;
 
     Widget activeView;
@@ -113,25 +115,32 @@ class FlowMainScaffold extends StatelessWidget {
     }
 
     return Scaffold(
+      backgroundColor: isDark ? AppTheme.darkBgBase : const Color(0xFFEBF3FE),
+      drawer: FlowSidebar(state: state),
       appBar: isSubView
           ? AppBar(
-              backgroundColor: AppTheme.background,
+              backgroundColor: isDark ? AppTheme.darkBgBase : AppTheme.background,
               elevation: 0,
               leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
+                icon: Icon(Icons.arrow_back, color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary),
                 onPressed: () => state.setTabIndex(0),
               ),
               title: Text(
                 _getSubViewTitle(state.currentTabIndex),
-                style: const TextStyle(
-                  color: AppTheme.textPrimary,
+                style: TextStyle(
+                  color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             )
           : null,
-      body: activeView,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 820),
+          child: activeView,
+        ),
+      ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: state.currentTabIndex <= 3 ? state.currentTabIndex : 0,
         onTap: (idx) => state.setTabIndex(idx),

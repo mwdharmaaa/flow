@@ -10,7 +10,14 @@ class ChatMessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUser = message.isUser;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final maxW = MediaQuery.of(context).size.width * 0.78;
+    final bubbleBg = isUser
+        ? (isDark ? AppTheme.darkAccentPrimary : AppTheme.primary)
+        : (isDark ? AppTheme.darkBgElevated : const Color(0xFFF2F6FC));
+    final textColor = isUser
+        ? Colors.white
+        : (isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary);
 
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -19,7 +26,7 @@ class ChatMessageBubble extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         constraints: BoxConstraints(maxWidth: maxW),
         decoration: BoxDecoration(
-          color: isUser ? AppTheme.primary : const Color(0xFFF2F6FC),
+          color: bubbleBg,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(16),
             topRight: const Radius.circular(16),
@@ -31,7 +38,7 @@ class ChatMessageBubble extends StatelessWidget {
           message.text,
           style: TextStyle(
             fontSize: 13,
-            color: isUser ? Colors.white : AppTheme.textPrimary,
+            color: textColor,
             height: 1.35,
           ),
         ),
