@@ -1,0 +1,10 @@
+{
+  "appId": "com.flow.finance",
+  "appName": "Flow",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "android": {
+    "backgroundColor": "#0B0D14",
+    "allowMixedContent": false
+  }
+}
