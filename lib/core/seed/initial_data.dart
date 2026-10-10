@@ -11,7 +11,7 @@ class InitialData {
           name: 'Dompet Utama',
           type: 'cash',
           balance: 0.0,
-          colorValue: 0xFF3B82F6,
+          colorValue: 0xFF00B5DD,
         ),
       ];
 

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static const Color background = Color(0xFF0F1117);
-  static const Color surface = Color(0xFF161922);
-  static const Color card = Color(0xFF1D2230);
-  static const Color cardHover = Color(0xFF262C3D);
-  static const Color border = Color(0xFF2A3144);
-  static const Color subtle = Color(0xFF7E8B9F);
+  static const Color background = Color(0xFF0B0F17);
+  static const Color surface = Color(0xFF131A26);
+  static const Color card = Color(0xFF161F2E);
+  static const Color cardHover = Color(0xFF1D283B);
+  static const Color border = Color(0xFF202C3F);
+  static const Color subtle = Color(0xFF8A99AD);
 
-  static const Color primary = Color(0xFF3B82F6);
-  static const Color primaryHover = Color(0xFF2563EB);
-  static const Color income = Color(0xFF10B981);
-  static const Color expense = Color(0xFFF43F5E);
-  static const Color transfer = Color(0xFF8B5CF6);
+  static const Color primary = Color(0xFF00B5DD);
+  static const Color primaryHover = Color(0xFF0098BA);
+  static const Color income = Color(0xFF22C55E);
+  static const Color expense = Color(0xFFEF4444);
+  static const Color transfer = Color(0xFF00B5DD);
   static const Color warning = Color(0xFFF59E0B);
 
   static ThemeData get darkTheme {

@@ -7,6 +7,7 @@ import 'package:flow/models/transaction_model.dart';
 import 'package:flow/models/budget_model.dart';
 import 'package:flow/models/debt_model.dart';
 import 'package:flow/models/recurring_model.dart';
+import 'package:flow/models/goal_model.dart';
 
 class AppState extends ChangeNotifier {
   int _currentTabIndex = 0;
@@ -17,6 +18,7 @@ class AppState extends ChangeNotifier {
   List<BudgetModel> _budgets = [];
   List<DebtModel> _debts = [];
   List<RecurringModel> _recurring = [];
+  List<GoalModel> _goals = [];
 
   int get currentTabIndex => _currentTabIndex;
   String get currency => _currency;
@@ -26,6 +28,7 @@ class AppState extends ChangeNotifier {
   List<BudgetModel> get budgets => _budgets;
   List<DebtModel> get debts => _debts;
   List<RecurringModel> get recurring => _recurring;
+  List<GoalModel> get goals => _goals;
 
   double get totalBalance => _accounts
       .where((a) => !a.isExcludedFromTotal)
@@ -92,6 +95,21 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void adjustAccountBalance(String id, double newBalance) {
+    final idx = _accounts.indexWhere((a) => a.id == id);
+    if (idx != -1) {
+      _accounts[idx] = _accounts[idx].copyWith(balance: newBalance);
+      _saveState();
+      notifyListeners();
+    }
+  }
+
+  void deleteAccount(String id) {
+    _accounts.removeWhere((a) => a.id == id);
+    _saveState();
+    notifyListeners();
+  }
+
   void addBudget(BudgetModel bgt) {
     _budgets.add(bgt);
     _saveState();
@@ -128,12 +146,35 @@ class AppState extends ChangeNotifier {
     }
   }
 
+  void addGoal(GoalModel goal) {
+    _goals.add(goal);
+    _saveState();
+    notifyListeners();
+  }
+
+  void updateGoalSavedAmount(String id, double deltaAmount) {
+    final idx = _goals.indexWhere((g) => g.id == id);
+    if (idx != -1) {
+      final updated = (_goals[idx].savedAmount + deltaAmount).clamp(0.0, double.infinity);
+      _goals[idx] = _goals[idx].copyWith(savedAmount: updated);
+      _saveState();
+      notifyListeners();
+    }
+  }
+
+  void deleteGoal(String id) {
+    _goals.removeWhere((g) => g.id == id);
+    _saveState();
+    notifyListeners();
+  }
+
   void resetToDefaults() {
     _accounts = InitialData.accounts;
     _transactions = InitialData.transactions;
     _budgets = InitialData.budgets;
     _debts = InitialData.debts;
     _recurring = InitialData.recurring;
+    _goals = [];
     _saveState();
     notifyListeners();
   }
@@ -181,6 +222,14 @@ class AppState extends ChangeNotifier {
         _recurring = InitialData.recurring;
       }
 
+      final goalJson = prefs.getString('flow_goals');
+      if (goalJson != null) {
+        final List list = jsonDecode(goalJson);
+        _goals = list.map((e) => GoalModel.fromJson(e)).toList();
+      } else {
+        _goals = [];
+      }
+
       _currency = prefs.getString('flow_currency') ?? 'IDR';
       notifyListeners();
     } catch (_) {
@@ -196,6 +245,7 @@ class AppState extends ChangeNotifier {
       await prefs.setString('flow_budgets', jsonEncode(_budgets.map((e) => e.toJson()).toList()));
       await prefs.setString('flow_debts', jsonEncode(_debts.map((e) => e.toJson()).toList()));
       await prefs.setString('flow_recurring', jsonEncode(_recurring.map((e) => e.toJson()).toList()));
+      await prefs.setString('flow_goals', jsonEncode(_goals.map((e) => e.toJson()).toList()));
       await prefs.setString('flow_currency', _currency);
     } catch (_) {}
   }
