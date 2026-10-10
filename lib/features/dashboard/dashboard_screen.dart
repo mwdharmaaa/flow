@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/features/dashboard/dashboard_hero.dart';
 import 'package:flow/features/dashboard/dashboard_summary.dart';
