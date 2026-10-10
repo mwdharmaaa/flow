@@ -1,205 +1,227 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/formatters/currency_formatter.dart';
 import 'package:flow/state/app_state.dart';
-import 'package:flow/models/transaction_model.dart';
+import 'package:flow/features/transactions/add_transaction_dialog.dart';
 
-class AnalyticsScreen extends StatefulWidget {
+class AnalyticsScreen extends StatelessWidget {
   final AppState state;
 
   const AnalyticsScreen({super.key, required this.state});
 
-  @override
-  State<AnalyticsScreen> createState() => _AnalyticsScreenState();
-}
-
-class _AnalyticsScreenState extends State<AnalyticsScreen> {
-  TransactionType _selectedType = TransactionType.expense;
-
-  static const List<Color> _categoryColors = [
-    AppTheme.primary,
-    Color(0xFFF43F5E),
-    Color(0xFF10B981),
-    Color(0xFFF59E0B),
-    Color(0xFF8B5CF6),
-    Color(0xFF06B6D4),
-    Color(0xFFEC4899),
-  ];
+  void _openAddTransaction(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AddTransactionDialog(
+        accounts: state.accounts,
+        onSave: (tx) => state.addTransaction(tx),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final state = widget.state;
-    final isExpense = _selectedType == TransactionType.expense;
-    final txs = state.transactions.where((t) => t.type == _selectedType).toList();
-    final totalAmount = isExpense ? state.totalExpense : state.totalIncome;
-
-    final Map<String, double> categoryTotals = {};
-    for (var tx in txs) {
-      categoryTotals[tx.category] = (categoryTotals[tx.category] ?? 0.0) + tx.amount;
-    }
-    final sorted = categoryTotals.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    final now = DateTime.now();
+    final monthLabel = DateFormat("MMM ''yy", 'en_US').format(now);
+    final hasData = state.totalExpense > 0;
 
     return Scaffold(
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Monee Style Tab Switcher
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: AppTheme.card,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppTheme.border),
-              ),
-              child: Row(
+      backgroundColor: AppTheme.background,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header Row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    child: _buildToggleTab(
-                      TransactionType.expense,
-                      'Pengeluaran',
-                      AppTheme.expense,
-                    ),
-                  ),
-                  Expanded(
-                    child: _buildToggleTab(
-                      TransactionType.income,
-                      'Pemasukan',
-                      AppTheme.income,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Summary Card
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: AppTheme.card,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppTheme.border),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    isExpense ? 'Total Pengeluaran Tercatat' : 'Total Pemasukan Tercatat',
-                    style: const TextStyle(fontSize: 11, color: AppTheme.subtle),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    CurrencyFormatter.format(totalAmount, currency: state.currency),
+                  const Text(
+                    'Reports',
                     style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: isExpense ? AppTheme.expense : AppTheme.income,
+                      fontSize: 30,
+                      fontWeight: FontWeight.w900,
+                      color: AppTheme.textPrimary,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primarySoft,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Text(
+                      'Monthly',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.primary,
+                      ),
                     ),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 20),
+              const SizedBox(height: 18),
 
-            Text(
-              'DISTRIBUSI KATEGORI (${sorted.length})',
-              style: const TextStyle(fontSize: 11, color: AppTheme.subtle, fontWeight: FontWeight.bold, letterSpacing: 0.5),
-            ),
-            const SizedBox(height: 10),
-
-            if (sorted.isEmpty)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 20),
-                decoration: BoxDecoration(
-                  color: AppTheme.card.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppTheme.border.withValues(alpha: 0.4)),
-                ),
-                child: Center(
-                  child: Text(
-                    'Belum ada transaksi ${isExpense ? 'pengeluaran' : 'pemasukan'}',
-                    style: const TextStyle(fontSize: 12, color: AppTheme.subtle),
+              // Subtitle Row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Expenses',
+                    style: TextStyle(fontSize: 14, color: AppTheme.subtle),
                   ),
-                ),
-              )
-            else
-              ...List.generate(sorted.length, (idx) {
-                final entry = sorted[idx];
-                final percent = totalAmount > 0 ? (entry.value / totalAmount) : 0.0;
-                final color = _categoryColors[idx % _categoryColors.length];
-
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppTheme.card,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+                  Text(
+                    monthLabel,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textPrimary,
+                    ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-                              const SizedBox(width: 8),
-                              Text(entry.key, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
-                            ],
-                          ),
-                          Text(
-                            '${(percent * 100).toStringAsFixed(1)}% • ${CurrencyFormatter.format(entry.value, currency: state.currency)}',
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
-                          ),
-                        ],
+                ],
+              ),
+              const SizedBox(height: 6),
+
+              // Huge Amount
+              Text(
+                hasData
+                    ? CurrencyFormatter.format(state.totalExpense, currency: state.currency)
+                    : 'Rp0',
+                style: TextStyle(
+                  fontSize: 38,
+                  fontWeight: FontWeight.w900,
+                  color: hasData ? AppTheme.textPrimary : const Color(0xFFA3B8D8),
+                  letterSpacing: -1.0,
+                ),
+              ),
+              const SizedBox(height: 28),
+
+              // Skeleton or Live Chart
+              _buildChartIllustration(hasData),
+              const SizedBox(height: 36),
+
+              // Empty / Prompt State
+              Center(
+                child: Column(
+                  children: [
+                    const Text(
+                      'Your report shows up once you log\nsomething',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.textPrimary,
+                        height: 1.3,
                       ),
-                      const SizedBox(height: 8),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: LinearProgressIndicator(
-                          value: percent,
-                          backgroundColor: AppTheme.surface,
-                          valueColor: AlwaysStoppedAnimation(color),
-                          minHeight: 5,
+                    ),
+                    const SizedBox(height: 12),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 24),
+                      child: Text(
+                        'Daily trends, categories and the comparison with last month are put together automatically from your transactions.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: AppTheme.subtle,
+                          height: 1.4,
                         ),
                       ),
-                    ],
-                  ),
-                );
-              }),
-          ],
+                    ),
+                    const SizedBox(height: 28),
+                    ElevatedButton.icon(
+                      onPressed: () => _openAddTransaction(context),
+                      icon: const Icon(Icons.add, size: 18, color: AppTheme.primary),
+                      label: const Text(
+                        'Log a transaction',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.primary,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primarySoft,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 40),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildToggleTab(TransactionType type, String label, Color color) {
-    final isSelected = _selectedType == type;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedType = type),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.2) : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
-          border: isSelected ? Border.all(color: color, width: 1) : null,
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
-            color: isSelected ? Colors.white : AppTheme.subtle,
+  Widget _buildChartIllustration(bool hasData) {
+    const barHeights = [55.0, 85.0, 60.0, 115.0, 78.0, 135.0, 95.0];
+    return Column(
+      children: [
+        SizedBox(
+          height: 145,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: barHeights.map((h) {
+              return Container(
+                width: 32,
+                height: h,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE8EEF8),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              );
+            }).toList(),
           ),
         ),
-      ),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            const SizedBox(width: 8),
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: const Color(0xFFE8EEF8), width: 7),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 140,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEFF4FB),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  width: 90,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEFF4FB),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
