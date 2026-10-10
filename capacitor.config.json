@@ -3,8 +3,20 @@
   "appName": "Flow",
   "webDir": "dist",
   "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  },
   "android": {
     "backgroundColor": "#0B0D14",
-    "allowMixedContent": false
+    "allowMixedContent": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 300,
+      "launchAutoHide": true,
+      "backgroundColor": "#0B0D14",
+      "showSpinner": false
+    }
   }
 }
