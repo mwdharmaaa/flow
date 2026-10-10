@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/state/app_state.dart';
-import 'package:flow/widgets/layout/top_header_bar.dart';
 import 'package:flow/widgets/layout/bottom_nav_bar.dart';
 import 'package:flow/features/dashboard/dashboard_screen.dart';
 import 'package:flow/features/analytics/analytics_screen.dart';
@@ -11,6 +10,7 @@ import 'package:flow/features/settings/settings_screen.dart';
 import 'package:flow/features/debts/debts_screen.dart';
 import 'package:flow/features/recurring/recurring_screen.dart';
 import 'package:flow/features/goals/goals_screen.dart';
+import 'package:flow/features/transactions/add_transaction_dialog.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,10 +38,10 @@ class _FlowAppState extends State<FlowApp> {
     return MaterialApp(
       title: 'Flow',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme,
       builder: (context, child) {
         return Container(
-          color: const Color(0xFF070A10),
+          color: const Color(0xFFE9F0FA),
           alignment: Alignment.center,
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 500),
@@ -59,24 +59,26 @@ class FlowMainScaffold extends StatelessWidget {
 
   const FlowMainScaffold({super.key, required this.state});
 
-  String _getTitle(int index) {
+  void _openAddTransaction(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AddTransactionDialog(
+        accounts: state.accounts,
+        onSave: (tx) => state.addTransaction(tx),
+      ),
+    );
+  }
+
+  String _getSubViewTitle(int index) {
     switch (index) {
-      case 0:
-        return 'Flow';
-      case 1:
-        return 'Laporan & Analitik';
-      case 2:
-        return 'Anggaran Bulanan';
-      case 3:
-        return 'Dompet & Akun';
       case 4:
-        return 'Lainnya & Pengaturan';
+        return 'Wallets & Accounts';
       case 5:
-        return 'Hutang & Piutang';
+        return 'Debts & Loans';
       case 6:
-        return 'Tagihan Rutin';
+        return 'Recurring Bills';
       case 7:
-        return 'Target Keuangan & Celengan';
+        return 'Savings Goals';
       default:
         return 'Flow';
     }
@@ -84,7 +86,7 @@ class FlowMainScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = _getTitle(state.currentTabIndex);
+    final isSubView = state.currentTabIndex > 3;
 
     Widget activeView;
     switch (state.currentTabIndex) {
@@ -98,16 +100,17 @@ class FlowMainScaffold extends StatelessWidget {
         activeView = BudgetsScreen(state: state);
         break;
       case 3:
-        activeView = AccountsScreen(state: state);
-        break;
-      case 4:
         activeView = SettingsScreen(
           state: state,
-          onOpenAnalytics: () => state.setTabIndex(1),
+          onOpenWallets: () => state.setTabIndex(4),
           onOpenDebts: () => state.setTabIndex(5),
           onOpenRecurring: () => state.setTabIndex(6),
+          onOpenBudgets: () => state.setTabIndex(2),
           onOpenGoals: () => state.setTabIndex(7),
         );
+        break;
+      case 4:
+        activeView = AccountsScreen(state: state);
         break;
       case 5:
         activeView = DebtsScreen(state: state);
@@ -123,14 +126,29 @@ class FlowMainScaffold extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: TopHeaderBar(
-        title: title,
-        onBack: state.currentTabIndex > 4 ? () => state.setTabIndex(4) : null,
-      ),
+      appBar: isSubView
+          ? AppBar(
+              backgroundColor: AppTheme.background,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
+                onPressed: () => state.setTabIndex(3),
+              ),
+              title: Text(
+                _getSubViewTitle(state.currentTabIndex),
+                style: const TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            )
+          : null,
       body: activeView,
       bottomNavigationBar: BottomNavBar(
-        currentIndex: state.currentTabIndex,
+        currentIndex: state.currentTabIndex <= 3 ? state.currentTabIndex : 3,
         onTap: (idx) => state.setTabIndex(idx),
+        onAddTap: () => _openAddTransaction(context),
       ),
     );
   }
