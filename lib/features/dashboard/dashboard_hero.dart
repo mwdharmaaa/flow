@@ -65,17 +65,26 @@ class _DashboardHeroState extends State<DashboardHero> {
               // Logo
               GestureDetector(
                 onTap: () => widget.state.toggleDarkMode(),
+                behavior: HitTestBehavior.opaque,
                 child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      width: 28,
-                      height: 28,
+                      width: 30,
+                      height: 30,
                       decoration: BoxDecoration(
                         color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary,
                         shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: (isDark ? AppTheme.darkAccentPrimary : AppTheme.primary).withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: const Center(
-                        child: Icon(Icons.waves, color: Colors.white, size: 16),
+                        child: Icon(Icons.waves, color: Colors.white, size: 17),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -94,8 +103,6 @@ class _DashboardHeroState extends State<DashboardHero> {
               // Pills
               Row(
                 children: [
-                  _buildThemeTogglePill(isDark),
-                  const SizedBox(width: 6),
                   _buildPill(dayLabel, isDark),
                   const SizedBox(width: 6),
                   _buildBadgePill('Day $dayNum', isDark),
@@ -266,40 +273,6 @@ class _DashboardHeroState extends State<DashboardHero> {
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildThemeTogglePill(bool isDark) {
-    return GestureDetector(
-      onTap: () => widget.state.toggleDarkMode(),
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-        decoration: BoxDecoration(
-          color: isDark ? AppTheme.darkBgElevated : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-              size: 13,
-              color: isDark ? const Color(0xFFFBBF24) : AppTheme.primary,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              isDark ? 'Light' : 'Dark',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-                color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
