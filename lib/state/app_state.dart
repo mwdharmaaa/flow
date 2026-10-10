@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/seed/initial_data.dart';
 import 'package:flow/models/account_model.dart';
 import 'package:flow/models/transaction_model.dart';
@@ -12,6 +13,7 @@ import 'package:flow/models/goal_model.dart';
 class AppState extends ChangeNotifier {
   int _currentTabIndex = 0;
   String _currency = 'IDR';
+  bool _isDarkMode = false;
 
   List<AccountModel> _accounts = [];
   List<TransactionModel> _transactions = [];
@@ -22,6 +24,7 @@ class AppState extends ChangeNotifier {
 
   int get currentTabIndex => _currentTabIndex;
   String get currency => _currency;
+  bool get isDarkMode => _isDarkMode;
 
   List<AccountModel> get accounts => _accounts;
   List<TransactionModel> get transactions => _transactions;
@@ -53,6 +56,20 @@ class AppState extends ChangeNotifier {
 
   void setCurrency(String curr) {
     _currency = curr;
+    _saveState();
+    notifyListeners();
+  }
+
+  void toggleDarkMode() {
+    _isDarkMode = !_isDarkMode;
+    AppTheme.isDark = _isDarkMode;
+    _saveState();
+    notifyListeners();
+  }
+
+  void setDarkMode(bool val) {
+    _isDarkMode = val;
+    AppTheme.isDark = _isDarkMode;
     _saveState();
     notifyListeners();
   }
@@ -168,15 +185,41 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void resetToDefaults() {
-    _accounts = InitialData.accounts;
-    _transactions = InitialData.transactions;
-    _budgets = InitialData.budgets;
-    _debts = InitialData.debts;
-    _recurring = InitialData.recurring;
+  void resetAllFinancialData() {
+    _accounts = [
+      AccountModel(
+        id: 'acc_cash',
+        name: 'Cash',
+        type: 'cash',
+        balance: 0.0,
+        colorValue: 0xFF10B981,
+      ),
+      AccountModel(
+        id: 'acc_gopay',
+        name: 'GoPay',
+        type: 'ewallet',
+        balance: 0.0,
+        colorValue: 0xFF00AED6,
+      ),
+      AccountModel(
+        id: 'acc_jago',
+        name: 'Jago',
+        type: 'bank',
+        balance: 0.0,
+        colorValue: 0xFFFF8B00,
+      ),
+    ];
+    _transactions = [];
+    _budgets = [];
+    _debts = [];
+    _recurring = [];
     _goals = [];
     _saveState();
     notifyListeners();
+  }
+
+  void resetToDefaults() {
+    resetAllFinancialData();
   }
 
   Future<void> _loadState() async {
@@ -237,6 +280,8 @@ class AppState extends ChangeNotifier {
       }
 
       _currency = prefs.getString('flow_currency') ?? 'IDR';
+      _isDarkMode = prefs.getBool('flow_dark_mode') ?? false;
+      AppTheme.isDark = _isDarkMode;
       notifyListeners();
     } catch (_) {
       resetToDefaults();
@@ -253,6 +298,7 @@ class AppState extends ChangeNotifier {
       await prefs.setString('flow_recurring', jsonEncode(_recurring.map((e) => e.toJson()).toList()));
       await prefs.setString('flow_goals', jsonEncode(_goals.map((e) => e.toJson()).toList()));
       await prefs.setString('flow_currency', _currency);
+      await prefs.setBool('flow_dark_mode', _isDarkMode);
     } catch (_) {}
   }
 }
