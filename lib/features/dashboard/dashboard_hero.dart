@@ -3,12 +3,15 @@ import 'package:intl/intl.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/formatters/currency_formatter.dart';
 import 'package:flow/models/transaction_model.dart';
+import 'package:flow/state/app_state.dart';
+import 'package:flow/features/chat/chat_prompt_bar.dart';
 
 class DashboardHero extends StatefulWidget {
   final double monthExpense;
   final String currency;
   final DateTime currentMonth;
   final VoidCallback onAddTransaction;
+  final AppState state;
 
   const DashboardHero({
     super.key,
@@ -16,6 +19,7 @@ class DashboardHero extends StatefulWidget {
     required this.currency,
     required this.currentMonth,
     required this.onAddTransaction,
+    required this.state,
   });
 
   @override
@@ -203,28 +207,8 @@ class _DashboardHeroState extends State<DashboardHero> {
           ),
           const SizedBox(height: 14),
 
-          // Chat Input Prompt Bubble
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppTheme.border),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.chat_bubble_outline_rounded, size: 16, color: AppTheme.primary),
-                const SizedBox(width: 10),
-                const Expanded(
-                  child: Text(
-                    'Try typing "coffee 18k" in chat',
-                    style: TextStyle(fontSize: 12, color: AppTheme.subtle),
-                  ),
-                ),
-                const Icon(Icons.chevron_right, size: 18, color: AppTheme.subtle),
-              ],
-            ),
-          ),
+          // Interactive Chat Input Prompt Bar
+          ChatPromptBar(state: widget.state),
           const SizedBox(height: 14),
 
           // Action Pills (Receipt, Voice, +)

@@ -51,6 +51,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               currency: state.currency,
               currentMonth: _currentMonth,
               onAddTransaction: () => _openAddTransaction(context),
+              state: state,
             ),
             DashboardSummary(
               state: state,
