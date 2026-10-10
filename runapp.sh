@@ -2,13 +2,8 @@
 set -euo pipefail
 
 echo "=================================================="
-echo "  [*] Launching Flow Personal Finance Tracker"
+echo "  [*] Launching Flow Flutter Application"
 echo "=================================================="
 
-if [ ! -d "node_modules" ]; then
-  echo "[*] Installing dependencies..."
-  npm install
-fi
-
-echo "[*] Starting local dev server on http://localhost:3000..."
-npm run dev -- --host
+flutter pub get
+flutter run -d chrome || flutter run

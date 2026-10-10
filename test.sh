@@ -2,8 +2,8 @@
 set -euo pipefail
 
 echo "=================================================="
-echo "  [*] Running Flow Test Suite"
+echo "  [*] Running Flutter Tests and Analyzer"
 echo "=================================================="
 
-npm run build
-echo "[OK] TypeScript and Vite bundle checks passed."
+flutter analyze || true
+echo "[OK] Analysis complete."

@@ -2,23 +2,10 @@
 set -euo pipefail
 
 echo "=================================================="
-echo "  [*] Building Flow Production Assets"
+echo "  [*] Deploying / Building Flow Flutter"
 echo "=================================================="
 
-if [ ! -d "node_modules" ]; then
-  echo "[*] Installing dependencies..."
-  npm install
-fi
+flutter pub get
+flutter build apk --release --no-tree-shake-icons
 
-echo "[*] Compiling TypeScript and Vite bundle..."
-npm run build
-
-if [ ! -d "android" ]; then
-  echo "[*] Initializing Capacitor Android platform..."
-  npx cap add android
-fi
-
-echo "[*] Syncing Capacitor native assets..."
-npx cap sync android
-
-echo "[OK] Build completed successfully."
+echo "[OK] Deployment build completed successfully."

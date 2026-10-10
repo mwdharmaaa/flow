@@ -2,10 +2,10 @@
 set -euo pipefail
 
 echo "=================================================="
-echo "  [*] Clean Rebuilding Flow Assets"
+echo "  [*] Clean Rebuilding Flow Flutter"
 echo "=================================================="
 
-rm -rf dist
+rm -rf build
 bash deploy.sh
 
 echo "[OK] Redeployment completed successfully."

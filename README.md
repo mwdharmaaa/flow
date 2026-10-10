@@ -1,57 +1,38 @@
-# Flow - Personal Finance & Expense Tracker
+# Flow - Personal Finance & Expense Tracker (Flutter Native)
 
-Flow adalah aplikasi pencatat keuangan pribadi modern berarsitektur **100% Offline-First / Local Database**, dirancang dengan estetika Linear/Figma dark palette, zero-latency, dan mengedepankan privasi mutlak pengguna tanpa ketergantungan server luar.
-
----
-
-## Fitur Utama (Semua Fitur Bebas Tanpa Paywall)
-
-1. **Multi-Dompet & Rekening Tanpa Batas**
-   - Mendukung Uang Tunai (Cash), Rekening Bank (BCA, Mandiri, BRI, dll), E-Wallet (GoPay, OVO, DANA), Tabungan/Investasi, dan Kartu Kredit.
-   - Fitur transfer saldo antar dompet instan dengan penyesuaian saldo otomatis.
-
-2. **Pencatatan Transaksi Lengkap**
-   - Transaksi Pengeluaran, Pemasukan, dan Transfer Saldo.
-   - Filter real-time berdasarkan kategori, tipe transaksi, dan pencarian cepat.
-
-3. **Anggaran Bulanan & Indikator Batas**
-   - Buat batas anggaran bulanan per kategori tanpa batas.
-   - Progress bar indikator threshold (Aman < 70%, Perhatian 70-90%, Over Budget > 90%).
-
-4. **Analitik & Visualisasi Arus Kas**
-   - Grafik distribusi persentase pengeluaran per kategori.
-   - Visualisasi vertikal perbandingan arus kas pemasukan vs pengeluaran.
-
-5. **Catatan Hutang & Piutang (Debts & Loans)**
-   - Catat siapa yang meminjam uang (Piutang) dan uang yang dipinjam (Hutang).
-   - Pengingat tanggal jatuh tempo dan tombol pelunasan satu kali klik.
-
-6. **Transaksi Rutin & Langganan (Subscriptions)**
-   - Jadwal pengeluaran berulang (Netflix, Spotify, Wifi, Listrik, dsb).
-   - Periode harian, mingguan, bulanan, dan tahunan.
-
-7. **Cadangan & Ekspor Data Penuh**
-   - Ekspor riwayat transaksi ke format `.csv`.
-   - Backup dan restore seluruh basis data ke format `.json`.
+Flow adalah aplikasi manajemen keuangan pribadi modern berarsitektur **100% Offline-First / Local Storage**, dibangun menggunakan **Flutter & Dart**.
 
 ---
 
-## Panduan Menjalankan di Lokal
+## Karakteristik Utama
 
-### 1. Menjalankan Server Pengembangan Lokal
-Cukup jalankan satu baris perintah:
+1. **Tanpa Fitur Login (Zero Login)**
+   - Tidak ada formulir pendaftaran, email, password, atau autentikasi awan.
+   - Aplikasi langsung terbuka ke dasbor keuangan utama secara instan saat diluncurkan.
+
+2. **Bebas Paywall & Semua Fitur Terbuka**
+   - Multi-Dompet tanpa batas (Cash, Bank BCA, Mandiri, E-Wallet GoPay/OVO/DANA, Tabungan).
+   - Transfer saldo antar akun secara otomatis.
+   - Anggaran bulanan per kategori tanpa batasan jumlah.
+   - Analitik arus kas dan visualisasi distribusi pengeluaran.
+   - Pencatat hutang dan piutang dengan pelunasan instan.
+   - Tagihan rutin dan langganan (subscriptions).
+
+3. **Performa Native Skia / Impeller**
+   - Render antarmuka native 60/120 FPS tanpa WebView.
+   - Bebas masalah *white screen* atau *asset loading*.
+
+---
+
+## Menjalankan Proyek
+
 ```bash
-bash runapp.sh
-# atau
-npm run dev
+flutter pub get
+flutter run
 ```
-Akses aplikasi melalui browser di `http://localhost:3000`.
 
-### 2. Build dan Sinkronisasi Android
+Kompilasi APK mandiri:
 ```bash
-bash deploy.sh
+flutter build apk --release --no-tree-shake-icons
 ```
-
-### 3. Build APK Siap Pakai
-Workflow CI/CD GitHub Actions (`.github/workflows/build-apk.yml`) otomatis melakukan kompilasi APK saat kode di-push ke GitHub.
-File APK (`flow.apk`) dapat diunduh langsung dari tab **Actions / Releases** di repositori GitHub.
+Output APK berada di `build/app/outputs/flutter-apk/app-release.apk`.
