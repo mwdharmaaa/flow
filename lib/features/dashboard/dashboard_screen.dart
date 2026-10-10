@@ -4,7 +4,9 @@ import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/formatters/currency_formatter.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/features/transactions/transaction_card.dart';
+import 'package:flow/features/transactions/date_group_header.dart';
 import 'package:flow/features/transactions/add_transaction_dialog.dart';
+import 'package:flow/features/dashboard/sheet_month_year.dart';
 import 'package:flow/models/transaction_model.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -31,6 +33,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
+  void _openMonthYearPicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => SheetMonthYear(
+        initialDate: _currentMonth,
+        onSelect: (newMonth) {
+          setState(() {
+            _currentMonth = newMonth;
+          });
+        },
+      ),
+    );
+  }
+
   void _openAddTransaction(BuildContext context, [TransactionType type = TransactionType.expense]) {
     showDialog(
       context: context,
@@ -50,6 +67,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final monthTransactions = state.transactions.where((tx) {
       return tx.date.year == _currentMonth.year && tx.date.month == _currentMonth.month;
     }).toList();
+
+    // Group transactions by date (Monee item_header_date structure)
+    final Map<DateTime, List<TransactionModel>> groupedByDate = {};
+    for (var tx in monthTransactions) {
+      final key = DateTime(tx.date.year, tx.date.month, tx.date.day);
+      groupedByDate.putIfAbsent(key, () => []).add(tx);
+    }
+    final sortedDates = groupedByDate.keys.toList()..sort((a, b) => b.compareTo(a));
 
     final monthIncome = monthTransactions
         .where((t) => t.type == TransactionType.income)
@@ -75,9 +100,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   icon: const Icon(Icons.chevron_left, color: Colors.white70),
                   onPressed: _previousMonth,
                 ),
-                Text(
-                  monthLabel,
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+                GestureDetector(
+                  onTap: _openMonthYearPicker,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppTheme.card,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: AppTheme.border.withValues(alpha: 0.6)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          monthLabel,
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.arrow_drop_down, color: AppTheme.primary, size: 18),
+                      ],
+                    ),
+                  ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.chevron_right, color: Colors.white70),
@@ -206,15 +249,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ],
                 ),
               )
-            else
-              ...monthTransactions.map(
-                (tx) => TransactionCard(
-                  transaction: tx,
-                  accounts: state.accounts,
-                  currency: state.currency,
-                  onDelete: () => state.deleteTransaction(tx.id),
+            else ...[
+              for (var date in sortedDates) ...[
+                Builder(
+                  builder: (_) {
+                    final dayTxs = groupedByDate[date]!;
+                    final dayNet = dayTxs.fold(0.0, (sum, t) {
+                      if (t.type == TransactionType.income) return sum + t.amount;
+                      if (t.type == TransactionType.expense) return sum - t.amount;
+                      return sum;
+                    });
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        DateGroupHeader(
+                          date: date,
+                          netAmount: dayNet,
+                          currency: state.currency,
+                        ),
+                        ...dayTxs.map(
+                          (tx) => TransactionCard(
+                            transaction: tx,
+                            accounts: state.accounts,
+                            currency: state.currency,
+                            onDelete: () => state.deleteTransaction(tx.id),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
-              ),
+              ],
+            ],
           ],
         ),
       ),
