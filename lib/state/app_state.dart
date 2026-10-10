@@ -12,6 +12,7 @@ import 'package:flow/models/goal_model.dart';
 class AppState extends ChangeNotifier {
   int _currentTabIndex = 0;
   String _currency = 'IDR';
+  bool _isDarkMode = false;
 
   List<AccountModel> _accounts = [];
   List<TransactionModel> _transactions = [];
@@ -22,6 +23,7 @@ class AppState extends ChangeNotifier {
 
   int get currentTabIndex => _currentTabIndex;
   String get currency => _currency;
+  bool get isDarkMode => _isDarkMode;
 
   List<AccountModel> get accounts => _accounts;
   List<TransactionModel> get transactions => _transactions;
@@ -53,6 +55,12 @@ class AppState extends ChangeNotifier {
 
   void setCurrency(String curr) {
     _currency = curr;
+    _saveState();
+    notifyListeners();
+  }
+
+  void toggleDarkMode([bool? value]) {
+    _isDarkMode = value ?? !_isDarkMode;
     _saveState();
     notifyListeners();
   }
@@ -112,6 +120,23 @@ class AppState extends ChangeNotifier {
 
   void addBudget(BudgetModel bgt) {
     _budgets.add(bgt);
+    _saveState();
+    notifyListeners();
+  }
+
+  void deleteBudget(String id) {
+    _budgets.removeWhere((b) => b.id == id);
+    _saveState();
+    notifyListeners();
+  }
+
+  void resetAllFinancialData() {
+    _transactions = [];
+    _budgets = [];
+    _debts = [];
+    _recurring = [];
+    _goals = [];
+    _accounts = _accounts.map((a) => a.copyWith(balance: 0.0)).toList();
     _saveState();
     notifyListeners();
   }
@@ -237,6 +262,7 @@ class AppState extends ChangeNotifier {
       }
 
       _currency = prefs.getString('flow_currency') ?? 'IDR';
+      _isDarkMode = prefs.getBool('flow_dark_mode') ?? false;
       notifyListeners();
     } catch (_) {
       resetToDefaults();
@@ -253,6 +279,7 @@ class AppState extends ChangeNotifier {
       await prefs.setString('flow_recurring', jsonEncode(_recurring.map((e) => e.toJson()).toList()));
       await prefs.setString('flow_goals', jsonEncode(_goals.map((e) => e.toJson()).toList()));
       await prefs.setString('flow_currency', _currency);
+      await prefs.setBool('flow_dark_mode', _isDarkMode);
     } catch (_) {}
   }
 }
