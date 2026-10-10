@@ -134,6 +134,7 @@ class DashboardSummary extends StatelessWidget {
                 ),
               ],
             ),
+          ),
           const SizedBox(height: 22),
 
           // Latest records

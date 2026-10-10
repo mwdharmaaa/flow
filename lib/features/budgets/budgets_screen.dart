@@ -6,6 +6,7 @@ import 'package:flow/state/app_state.dart';
 import 'package:flow/features/budgets/widgets/budget_circular_ring.dart';
 import 'package:flow/features/budgets/widgets/budget_category_tile.dart';
 import 'package:flow/features/budgets/add_budget_dialog.dart';
+import 'package:flow/models/budget_model.dart';
 
 class BudgetsScreen extends StatefulWidget {
   final AppState state;
