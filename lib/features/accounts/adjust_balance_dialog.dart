@@ -40,11 +40,11 @@ class _AdjustBalanceDialogState extends State<AdjustBalanceDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: AppTheme.card,
+      backgroundColor: Colors.white,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(22),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -52,12 +52,12 @@ class _AdjustBalanceDialogState extends State<AdjustBalanceDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Sesuaikan Saldo',
-                  style: const TextStyle(
-                    fontSize: 16,
+                const Text(
+                  'Adjust Balance',
+                  style: TextStyle(
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: AppTheme.textPrimary,
                   ),
                 ),
                 IconButton(
@@ -68,42 +68,43 @@ class _AdjustBalanceDialogState extends State<AdjustBalanceDialog> {
             ),
             const SizedBox(height: 8),
             Text(
-              '${widget.account.name} (Saldo saat ini: ${CurrencyFormatter.format(widget.account.balance, currency: widget.currency)})',
+              '${widget.account.name} (Current: ${CurrencyFormatter.format(widget.account.balance, currency: widget.currency)})',
               style: const TextStyle(fontSize: 12, color: AppTheme.subtle),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
             TextField(
               controller: _controller,
               keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
               decoration: InputDecoration(
-                labelText: 'Saldo Baru Sebenarnya',
+                labelText: 'Actual New Balance',
                 labelStyle: const TextStyle(color: AppTheme.subtle),
                 filled: true,
-                fillColor: AppTheme.surface,
+                fillColor: const Color(0xFFF6F9FD),
                 prefixText: '${widget.currency} ',
                 prefixStyle: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
                   borderSide: const BorderSide(color: AppTheme.border),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
                   borderSide: const BorderSide(color: AppTheme.primary),
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 22),
             ElevatedButton(
               onPressed: _submit,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primary,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                elevation: 0,
               ),
               child: const Text(
-                'Perbarui Saldo',
-                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                'Update Balance',
+                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 14),
               ),
             ),
           ],

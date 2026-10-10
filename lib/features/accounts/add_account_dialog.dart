@@ -15,10 +15,10 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
   final _nameController = TextEditingController();
   final _balanceController = TextEditingController();
   String _type = 'bank';
-  int _colorValue = 0xFF3B82F6;
+  int _colorValue = 0xFF1D61E0;
 
   final List<int> _colors = const [
-    0xFF3B82F6,
+    0xFF1D61E0,
     0xFF10B981,
     0xFF8B5CF6,
     0xFFF59E0B,
@@ -29,7 +29,7 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
   void _submit() {
     final name = _nameController.text.trim();
     if (name.isEmpty) return;
-    final balance = double.tryParse(_balanceController.text) ?? 0.0;
+    final balance = double.tryParse(_balanceController.text.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0.0;
 
     final acc = AccountModel(
       id: 'acc_${DateTime.now().millisecondsSinceEpoch}',
@@ -46,10 +46,10 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: AppTheme.card,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(22),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -57,27 +57,27 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Tambah Dompet Baru', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                const Text('New Wallet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
                 IconButton(icon: const Icon(Icons.close, size: 20, color: AppTheme.subtle), onPressed: () => Navigator.of(context).pop()),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
             TextField(
               controller: _nameController,
-              style: const TextStyle(color: Colors.white),
-              decoration: _inputDecoration('Nama Dompet / Rekening'),
+              style: const TextStyle(color: AppTheme.textPrimary),
+              decoration: _inputDecoration('Wallet Name'),
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               value: _type,
-              dropdownColor: AppTheme.card,
-              style: const TextStyle(color: Colors.white, fontSize: 13),
-              decoration: _inputDecoration('Tipe Akun'),
+              dropdownColor: Colors.white,
+              style: const TextStyle(color: AppTheme.textPrimary, fontSize: 13),
+              decoration: _inputDecoration('Account Type'),
               items: const [
-                DropdownMenuItem(value: 'cash', child: Text('Uang Tunai / Cash')),
-                DropdownMenuItem(value: 'bank', child: Text('Rekening Bank')),
-                DropdownMenuItem(value: 'ewallet', child: Text('E-Wallet (GoPay, OVO, DANA)')),
-                DropdownMenuItem(value: 'investment', child: Text('Investasi / Tabungan')),
+                DropdownMenuItem(value: 'cash', child: Text('Cash')),
+                DropdownMenuItem(value: 'bank', child: Text('Bank Account')),
+                DropdownMenuItem(value: 'ewallet', child: Text('E-Wallet (GoPay, OVO, etc.)')),
+                DropdownMenuItem(value: 'investment', child: Text('Savings / Investment')),
               ],
               onChanged: (val) => setState(() => _type = val!),
             ),
@@ -85,12 +85,12 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
             TextField(
               controller: _balanceController,
               keyboardType: TextInputType.number,
-              style: const TextStyle(color: Colors.white),
-              decoration: _inputDecoration('Saldo Awal (Rp)'),
+              style: const TextStyle(color: AppTheme.textPrimary),
+              decoration: _inputDecoration('Initial Balance (Rp)'),
             ),
-            const SizedBox(height: 12),
-            const Text('Pilih Warna Aset', style: TextStyle(fontSize: 11, color: AppTheme.subtle)),
-            const SizedBox(height: 6),
+            const SizedBox(height: 14),
+            const Text('Color Accent', style: TextStyle(fontSize: 11, color: AppTheme.subtle, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: _colors.map((c) {
@@ -98,26 +98,27 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
                 return GestureDetector(
                   onTap: () => setState(() => _colorValue = c),
                   child: Container(
-                    width: 28,
-                    height: 28,
+                    width: 32,
+                    height: 32,
                     decoration: BoxDecoration(
                       color: Color(c),
                       shape: BoxShape.circle,
-                      border: isSelected ? Border.all(color: Colors.white, width: 2) : null,
+                      border: isSelected ? Border.all(color: AppTheme.textPrimary, width: 2) : null,
                     ),
                   ),
                 );
               }).toList(),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 22),
             ElevatedButton(
               onPressed: _submit,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primary,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                elevation: 0,
               ),
-              child: const Text('Simpan Dompet', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+              child: const Text('Save Wallet', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 14)),
             ),
           ],
         ),
@@ -130,10 +131,10 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
       labelText: label,
       labelStyle: const TextStyle(color: AppTheme.subtle, fontSize: 12),
       filled: true,
-      fillColor: AppTheme.surface,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppTheme.border)),
-      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppTheme.border)),
+      fillColor: const Color(0xFFF6F9FD),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppTheme.border)),
+      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppTheme.border)),
     );
   }
 }
