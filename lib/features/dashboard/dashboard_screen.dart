@@ -1,104 +1,213 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:flow/core/theme/app_theme.dart';
+import 'package:flow/core/formatters/currency_formatter.dart';
 import 'package:flow/state/app_state.dart';
-import 'package:flow/features/dashboard/balance_card.dart';
-import 'package:flow/features/dashboard/cash_flow_card.dart';
-import 'package:flow/features/dashboard/quick_actions_grid.dart';
 import 'package:flow/features/transactions/transaction_card.dart';
 import 'package:flow/features/transactions/add_transaction_dialog.dart';
 import 'package:flow/models/transaction_model.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   final AppState state;
-  final VoidCallback onNavigateToTransactions;
-  final VoidCallback onNavigateToAnalytics;
-  final VoidCallback onNavigateToDebts;
-  final VoidCallback onNavigateToRecurring;
 
-  const DashboardScreen({
-    super.key,
-    required this.state,
-    required this.onNavigateToTransactions,
-    required this.onNavigateToAnalytics,
-    required this.onNavigateToDebts,
-    required this.onNavigateToRecurring,
-  });
+  const DashboardScreen({super.key, required this.state});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  DateTime _currentMonth = DateTime(DateTime.now().year, DateTime.now().month);
+
+  void _previousMonth() {
+    setState(() {
+      _currentMonth = DateTime(_currentMonth.year, _currentMonth.month - 1);
+    });
+  }
+
+  void _nextMonth() {
+    setState(() {
+      _currentMonth = DateTime(_currentMonth.year, _currentMonth.month + 1);
+    });
+  }
 
   void _openAddTransaction(BuildContext context, [TransactionType type = TransactionType.expense]) {
     showDialog(
       context: context,
       builder: (_) => AddTransactionDialog(
-        accounts: state.accounts,
+        accounts: widget.state.accounts,
         initialType: type,
-        onSave: (tx) => state.addTransaction(tx),
+        onSave: (tx) => widget.state.addTransaction(tx),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final recentTransactions = state.transactions.take(5).toList();
+    final state = widget.state;
+
+    // Filter transactions for current month
+    final monthTransactions = state.transactions.where((tx) {
+      return tx.date.year == _currentMonth.year && tx.date.month == _currentMonth.month;
+    }).toList();
+
+    final monthIncome = monthTransactions
+        .where((t) => t.type == TransactionType.income)
+        .fold(0.0, (sum, t) => sum + t.amount);
+
+    final monthExpense = monthTransactions
+        .where((t) => t.type == TransactionType.expense)
+        .fold(0.0, (sum, t) => sum + t.amount);
+
+    final monthNet = monthIncome - monthExpense;
+    final monthLabel = DateFormat('MMMM yyyy', 'id_ID').format(_currentMonth);
 
     return Scaffold(
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            BalanceCard(
-              totalBalance: state.totalBalance,
-              accountsCount: state.accounts.length,
-              currency: state.currency,
-            ),
-            const SizedBox(height: 16),
-            CashFlowCard(
-              income: state.totalIncome,
-              expense: state.totalExpense,
-              currency: state.currency,
-            ),
-            const SizedBox(height: 20),
-            QuickActionsGrid(
-              onTransfer: () => _openAddTransaction(context, TransactionType.transfer),
-              onAnalytics: onNavigateToAnalytics,
-              onDebts: onNavigateToDebts,
-              onRecurring: onNavigateToRecurring,
-            ),
-            const SizedBox(height: 24),
+            // Month Selector Bar
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'TRANSAKSI TERAKHIR',
-                  style: TextStyle(fontSize: 11, color: AppTheme.subtle, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                IconButton(
+                  icon: const Icon(Icons.chevron_left, color: Colors.white70),
+                  onPressed: _previousMonth,
                 ),
-                GestureDetector(
-                  onTap: onNavigateToTransactions,
-                  child: const Row(
-                    children: [
-                      Text('Lihat Semua', style: TextStyle(fontSize: 11, color: AppTheme.primary, fontWeight: FontWeight.bold)),
-                      SizedBox(width: 4),
-                      Icon(Icons.arrow_forward_ios, size: 10, color: AppTheme.primary),
-                    ],
-                  ),
+                Text(
+                  monthLabel,
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.chevron_right, color: Colors.white70),
+                  onPressed: _nextMonth,
                 ),
               ],
             ),
-            const SizedBox(height: 10),
-            if (recentTransactions.isEmpty)
+            const SizedBox(height: 8),
+
+            // Monee Style Cash Flow Overview Card
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppTheme.card,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: AppTheme.border),
+              ),
+              child: Column(
+                children: [
+                  const Text('Total Saldo Bersih', style: TextStyle(fontSize: 12, color: AppTheme.subtle)),
+                  const SizedBox(height: 6),
+                  Text(
+                    CurrencyFormatter.format(monthNet, currency: state.currency),
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w800,
+                      color: monthNet >= 0 ? Colors.white : AppTheme.expense,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Divider(color: AppTheme.border, height: 1),
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppTheme.income.withValues(alpha: 0.15),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.south_west, size: 16, color: AppTheme.income),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('Pemasukan', style: TextStyle(fontSize: 11, color: AppTheme.subtle)),
+                                  Text(
+                                    CurrencyFormatter.format(monthIncome, currency: state.currency),
+                                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.income),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(width: 1, height: 32, color: AppTheme.border),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppTheme.expense.withValues(alpha: 0.15),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.north_east, size: 16, color: AppTheme.expense),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('Pengeluaran', style: TextStyle(fontSize: 11, color: AppTheme.subtle)),
+                                  Text(
+                                    CurrencyFormatter.format(monthExpense, currency: state.currency),
+                                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.expense),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 18),
+
+            // Transactions Header & List
+            if (monthTransactions.isEmpty)
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
                 decoration: BoxDecoration(
-                  color: AppTheme.card,
+                  color: AppTheme.card.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppTheme.border.withValues(alpha: 0.5)),
+                  border: Border.all(color: AppTheme.border.withValues(alpha: 0.4)),
                 ),
-                child: const Center(
-                  child: Text('Belum ada transaksi.', style: TextStyle(fontSize: 12, color: AppTheme.subtle)),
+                child: Column(
+                  children: [
+                    Icon(Icons.receipt_long_outlined, size: 40, color: AppTheme.subtle.withValues(alpha: 0.5)),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Belum ada transaksi di bulan ini',
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white70),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Ketuk tombol + di bawah untuk mencatat transaksi',
+                      style: TextStyle(fontSize: 11, color: AppTheme.subtle),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               )
             else
-              ...recentTransactions.map(
+              ...monthTransactions.map(
                 (tx) => TransactionCard(
                   transaction: tx,
                   accounts: state.accounts,

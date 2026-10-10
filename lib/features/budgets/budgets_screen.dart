@@ -71,9 +71,30 @@ class BudgetsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Expanded(
-              child: ListView.builder(
-                itemCount: state.budgets.length,
-                itemBuilder: (_, idx) {
+              child: state.budgets.isEmpty
+                  ? Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 20),
+                        decoration: BoxDecoration(
+                          color: AppTheme.card.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: AppTheme.border.withValues(alpha: 0.4)),
+                        ),
+                        child: const Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.track_changes_outlined, size: 36, color: AppTheme.subtle),
+                            SizedBox(height: 10),
+                            Text('Belum ada anggaran bulanan', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white70)),
+                            SizedBox(height: 4),
+                            Text('Ketuk tombol Tambah untuk membuat batasan pengeluaran', style: TextStyle(fontSize: 11, color: AppTheme.subtle), textAlign: TextAlign.center),
+                          ],
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: state.budgets.length,
+                      itemBuilder: (_, idx) {
                   final b = state.budgets[idx];
                   final percent = (b.spent / b.monthlyLimit).clamp(0.0, 1.0);
                   final isOver = b.spent > b.monthlyLimit;

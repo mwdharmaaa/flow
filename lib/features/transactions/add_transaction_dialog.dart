@@ -3,6 +3,27 @@ import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/models/transaction_model.dart';
 import 'package:flow/models/account_model.dart';
 
+class CategoryItem {
+  final String name;
+  final IconData icon;
+  final Color color;
+
+  const CategoryItem(this.name, this.icon, this.color);
+}
+
+const List<CategoryItem> kDefaultCategories = [
+  CategoryItem('Makanan', Icons.restaurant, Color(0xFFF43F5E)),
+  CategoryItem('Belanja', Icons.shopping_bag, Color(0xFFEC4899)),
+  CategoryItem('Transportasi', Icons.directions_car, Color(0xFF3B82F6)),
+  CategoryItem('Tagihan', Icons.receipt, Color(0xFFEAB308)),
+  CategoryItem('Hiburan', Icons.movie, Color(0xFF8B5CF6)),
+  CategoryItem('Kesehatan', Icons.local_hospital, Color(0xFF10B981)),
+  CategoryItem('Pendidikan', Icons.school, Color(0xFF06B6D4)),
+  CategoryItem('Gaji', Icons.payments, Color(0xFF10B981)),
+  CategoryItem('Investasi', Icons.trending_up, Color(0xFF6366F1)),
+  CategoryItem('Lainnya', Icons.more_horiz, Color(0xFF64748B)),
+];
+
 class AddTransactionDialog extends StatefulWidget {
   final List<AccountModel> accounts;
   final TransactionType initialType;
@@ -26,21 +47,8 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
 
   late String _selectedAccountId;
   late String _selectedDestAccountId;
-  String _selectedCategory = 'Makanan & Minuman';
+  String _selectedCategory = kDefaultCategories.first.name;
   DateTime _selectedDate = DateTime.now();
-
-  final List<String> _categories = [
-    'Makanan & Minuman',
-    'Transportasi',
-    'Belanja',
-    'Hiburan & Langganan',
-    'Tagihan & Utilitas',
-    'Kesehatan',
-    'Pendidikan',
-    'Gaji Bulanan',
-    'Investasi',
-    'Lain-lain',
-  ];
 
   @override
   void initState() {
@@ -51,7 +59,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   }
 
   void _submit() {
-    final amount = double.tryParse(_amountController.text);
+    final amount = double.tryParse(_amountController.text.replaceAll(RegExp(r'[^0-9.]'), ''));
     if (amount == null || amount <= 0 || _selectedAccountId.isEmpty) return;
 
     final tx = TransactionModel(
@@ -60,7 +68,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
       amount: amount,
       accountId: _selectedAccountId,
       destinationAccountId: _type == TransactionType.transfer ? _selectedDestAccountId : null,
-      category: _type == TransactionType.transfer ? 'Transfer Saldo' : _selectedCategory,
+      category: _type == TransactionType.transfer ? 'Transfer' : _selectedCategory,
       date: _selectedDate,
       note: _noteController.text.trim(),
       createdAt: DateTime.now().millisecondsSinceEpoch,
@@ -74,6 +82,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: AppTheme.card,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -95,9 +104,9 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  _buildTypeTab(TransactionType.expense, 'Keluar', AppTheme.expense),
+                  _buildTypeTab(TransactionType.expense, 'Pengeluaran', AppTheme.expense),
                   const SizedBox(width: 6),
-                  _buildTypeTab(TransactionType.income, 'Masuk', AppTheme.income),
+                  _buildTypeTab(TransactionType.income, 'Pemasukan', AppTheme.income),
                   const SizedBox(width: 6),
                   _buildTypeTab(TransactionType.transfer, 'Transfer', AppTheme.transfer),
                 ],
@@ -106,15 +115,67 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               TextField(
                 controller: _amountController,
                 keyboardType: TextInputType.number,
-                style: const TextStyle(color: Colors.white),
-                decoration: _inputDecoration('Nominal (Rp)', Icons.attach_money),
+                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                decoration: InputDecoration(
+                  prefixText: 'Rp ',
+                  prefixStyle: const TextStyle(color: Colors.white70, fontSize: 18),
+                  hintText: '0',
+                  hintStyle: const TextStyle(color: AppTheme.subtle),
+                  filled: true,
+                  fillColor: AppTheme.surface,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppTheme.border)),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppTheme.border)),
+                ),
               ),
+              if (_type != TransactionType.transfer) ...[
+                const SizedBox(height: 16),
+                const Text('Pilih Kategori', style: TextStyle(fontSize: 12, color: AppTheme.subtle, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                SizedBox(
+                  height: 80,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: kDefaultCategories.length,
+                    itemBuilder: (_, idx) {
+                      final cat = kDefaultCategories[idx];
+                      final isSelected = _selectedCategory == cat.name;
+                      return GestureDetector(
+                        onTap: () => setState(() => _selectedCategory = cat.name),
+                        child: Container(
+                          width: 65,
+                          margin: const EdgeInsets.only(right: 8),
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: cat.color.withValues(alpha: isSelected ? 0.3 : 0.12),
+                                  shape: BoxShape.circle,
+                                  border: isSelected ? Border.all(color: cat.color, width: 2) : null,
+                                ),
+                                child: Icon(cat.icon, size: 20, color: cat.color),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                cat.name,
+                                style: TextStyle(fontSize: 10, color: isSelected ? Colors.white : AppTheme.subtle, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 value: _selectedAccountId,
                 dropdownColor: AppTheme.card,
                 style: const TextStyle(color: Colors.white, fontSize: 13),
-                decoration: _inputDecoration(_type == TransactionType.transfer ? 'Dari Akun' : 'Akun Dompet', Icons.account_balance_wallet),
+                decoration: _inputDecoration(_type == TransactionType.transfer ? 'Dari Dompet' : 'Akun Dompet', Icons.account_balance_wallet),
                 items: widget.accounts.map((a) => DropdownMenuItem(value: a.id, child: Text(a.name))).toList(),
                 onChanged: (val) => setState(() => _selectedAccountId = val!),
               ),
@@ -124,19 +185,9 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                   value: _selectedDestAccountId,
                   dropdownColor: AppTheme.card,
                   style: const TextStyle(color: Colors.white, fontSize: 13),
-                  decoration: _inputDecoration('Ke Akun Tujuan', Icons.move_to_inbox),
+                  decoration: _inputDecoration('Ke Dompet Tujuan', Icons.move_to_inbox),
                   items: widget.accounts.where((a) => a.id != _selectedAccountId).map((a) => DropdownMenuItem(value: a.id, child: Text(a.name))).toList(),
                   onChanged: (val) => setState(() => _selectedDestAccountId = val!),
-                ),
-              ] else ...[
-                const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  value: _selectedCategory,
-                  dropdownColor: AppTheme.card,
-                  style: const TextStyle(color: Colors.white, fontSize: 13),
-                  decoration: _inputDecoration('Kategori', Icons.category),
-                  items: _categories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
-                  onChanged: (val) => setState(() => _selectedCategory = val!),
                 ),
               ],
               const SizedBox(height: 12),
@@ -177,11 +228,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
           alignment: Alignment.center,
           child: Text(
             label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              color: isSelected ? color : AppTheme.subtle,
-            ),
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isSelected ? color : AppTheme.subtle),
           ),
         ),
       ),

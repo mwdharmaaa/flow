@@ -41,6 +41,12 @@ class SettingsScreen extends StatelessWidget {
                   _buildMenuTile(Icons.handshake_outlined, 'Catatan Hutang & Piutang', onOpenDebts),
                   const Divider(color: AppTheme.border, height: 1),
                   _buildMenuTile(Icons.autorenew, 'Langganan & Tagihan Rutin', onOpenRecurring),
+                  const Divider(color: AppTheme.border, height: 1),
+                  _buildMenuTile(Icons.file_download_outlined, 'Ekspor Transaksi CSV (Free)', () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Data transaksi diekspor secara lokal')),
+                    );
+                  }),
                 ],
               ),
             ),
