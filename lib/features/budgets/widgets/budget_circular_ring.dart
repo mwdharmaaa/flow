@@ -17,9 +17,9 @@ class BudgetCircularRing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final validLimit = limit > 0 ? limit : 200000.0;
-    final validSpent = spent > 0 ? spent : 15000.0;
-    final percentage = (validSpent / validLimit * 100).clamp(0, 100).toInt();
+    final validLimit = limit;
+    final validSpent = spent;
+    final percentage = validLimit > 0 ? (validSpent / validLimit * 100).clamp(0, 100).toInt() : 0;
     final remaining = (validLimit - validSpent).clamp(0.0, double.infinity);
     final daysLeft = math.max(1, 31 - DateTime.now().day);
     final perDay = remaining / daysLeft;

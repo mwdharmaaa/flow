@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flow/core/theme/app_theme.dart';
+import 'package:flow/core/formatters/currency_formatter.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/features/budgets/widgets/budget_circular_ring.dart';
 import 'package:flow/features/budgets/widgets/budget_category_tile.dart';
@@ -33,10 +34,6 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
     final totalLimit = state.budgets.fold(0.0, (sum, b) => sum + b.monthlyLimit);
     final totalSpent = state.budgets.fold(0.0, (sum, b) => sum + b.spent);
 
-    // If no budgets recorded yet, fallback gracefully to sample preview so user immediately sees photo_6219746036780044502_y.jpg
-    final displayLimit = totalLimit > 0 ? totalLimit : 200000.0;
-    final displaySpent = totalSpent > 0 ? totalSpent : (state.totalExpense > 0 ? state.totalExpense : 15000.0);
-
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
@@ -66,13 +63,17 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                         color: AppTheme.primarySoft,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(Icons.edit_outlined, size: 14, color: AppTheme.primary),
-                          SizedBox(width: 4),
+                          Icon(
+                            state.budgets.isEmpty ? Icons.add : Icons.edit_outlined,
+                            size: 14,
+                            color: AppTheme.primary,
+                          ),
+                          const SizedBox(width: 4),
                           Text(
-                            'Edit',
-                            style: TextStyle(
+                            state.budgets.isEmpty ? 'New' : 'Edit',
+                            style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
                               color: AppTheme.primary,
@@ -86,55 +87,50 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Month Navigator (< October 2026 >)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.chevron_left, size: 20, color: AppTheme.textPrimary),
-                  const SizedBox(width: 8),
-                  Text(
-                    monthName,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.textPrimary,
+              if (state.budgets.isEmpty) ...[
+                // Empty state matching photo_6219746036780044497_y.jpg
+                _buildEmptyState(context),
+              ] else ...[
+                // Active state matching photo_6219746036780044502_y.jpg
+                // Month Navigator (< October 2026 >)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.chevron_left, size: 20, color: AppTheme.textPrimary),
+                    const SizedBox(width: 8),
+                    Text(
+                      monthName,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.textPrimary,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Icon(Icons.chevron_right, size: 20, color: AppTheme.textPrimary),
-                ],
-              ),
-              const SizedBox(height: 28),
-
-              // Circular Progress Ring
-              BudgetCircularRing(
-                spent: displaySpent,
-                limit: displayLimit,
-                currency: state.currency,
-              ),
-              const SizedBox(height: 36),
-
-              // By Category Section
-              const Text(
-                'By category',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
+                    const SizedBox(width: 8),
+                    const Icon(Icons.chevron_right, size: 20, color: AppTheme.textPrimary),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 28),
 
-              if (state.budgets.isEmpty)
-                BudgetCategoryTile(
-                  category: 'Food & Drink',
-                  spent: displaySpent,
-                  limit: displayLimit,
+                // Circular Progress Ring
+                BudgetCircularRing(
+                  spent: totalSpent,
+                  limit: totalLimit,
                   currency: state.currency,
-                  icon: Icons.restaurant_rounded,
-                  iconBgColor: const Color(0xFF9E3615),
-                )
-              else
+                ),
+                const SizedBox(height: 36),
+
+                // By Category Section
+                const Text(
+                  'By category',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
                 ...state.budgets.map((b) => Padding(
                       padding: const EdgeInsets.only(bottom: 14),
                       child: BudgetCategoryTile(
@@ -146,59 +142,166 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                         iconBgColor: Color(b.colorValue),
                       ),
                     )),
-              const SizedBox(height: 36),
+                const SizedBox(height: 36),
 
-              // Last 6 Months Section
-              const Text(
-                'Last 6 months',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 6),
-              RichText(
-                text: const TextSpan(
-                  style: TextStyle(fontSize: 12, color: AppTheme.subtle),
-                  children: [
-                    TextSpan(text: 'Oct (in progress) • Rp15K • '),
-                    TextSpan(
-                      text: 'Rp185K left',
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF10B981)),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 18),
-
-              // Dotted Budget Guide Line
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'budget Rp200K',
-                    style: TextStyle(fontSize: 10, color: AppTheme.subtle),
+                // Last 6 Months Section
+                const Text(
+                  'Last 6 months',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textPrimary,
                   ),
-                  const SizedBox(height: 6),
-                  Container(
-                    height: 1,
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Color(0xFFC8D7ED),
-                          width: 1,
-                          style: BorderStyle.solid,
+                ),
+                const SizedBox(height: 6),
+                RichText(
+                  text: TextSpan(
+                    style: const TextStyle(fontSize: 12, color: AppTheme.subtle),
+                    children: [
+                      TextSpan(
+                        text: 'Oct (in progress) • ${CurrencyFormatter.format(totalSpent, currency: state.currency)} • ',
+                      ),
+                      TextSpan(
+                        text: '${CurrencyFormatter.format((totalLimit - totalSpent).clamp(0.0, double.infinity), currency: state.currency)} left',
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF10B981)),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 18),
+
+                // Dotted Budget Guide Line
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'budget ${CurrencyFormatter.format(totalLimit, currency: state.currency)}',
+                      style: const TextStyle(fontSize: 10, color: AppTheme.subtle),
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      height: 1,
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Color(0xFFC8D7ED),
+                            width: 1,
+                            style: BorderStyle.solid,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+              ],
               const SizedBox(height: 40),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    return Column(
+      children: [
+        // Skeleton Bar Illustration
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          child: Column(
+            children: [
+              _buildSkeletonRow(130, 70),
+              const SizedBox(height: 12),
+              _buildFullSkeletonBar(),
+              const SizedBox(height: 18),
+              _buildSkeletonRow(160, 70),
+              const SizedBox(height: 12),
+              _buildFullSkeletonBar(),
+              const SizedBox(height: 18),
+              _buildSkeletonRow(110, 70),
+            ],
+          ),
+        ),
+        const SizedBox(height: 48),
+
+        const Text(
+          'No budget yet',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: AppTheme.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 10),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 32),
+          child: Text(
+            'Set a spending limit per category. Flow lets you know\nwhen you get close to it.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 13,
+              color: AppTheme.subtle,
+              height: 1.4,
+            ),
+          ),
+        ),
+        const SizedBox(height: 28),
+        ElevatedButton.icon(
+          onPressed: () => _openAddOrEditBudget(context),
+          icon: const Icon(Icons.add, size: 18, color: Colors.white),
+          label: const Text(
+            'Create a budget',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppTheme.primary,
+            elevation: 0,
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+          ),
+        ),
+        const SizedBox(height: 40),
+      ],
+    );
+  }
+
+  Widget _buildSkeletonRow(double leftWidth, double rightWidth) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Container(
+          width: leftWidth,
+          height: 10,
+          decoration: BoxDecoration(
+            color: const Color(0xFFE8EEF8),
+            borderRadius: BorderRadius.circular(5),
+          ),
+        ),
+        Container(
+          width: rightWidth,
+          height: 10,
+          decoration: BoxDecoration(
+            color: const Color(0xFFE8EEF8),
+            borderRadius: BorderRadius.circular(5),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFullSkeletonBar() {
+    return Container(
+      width: double.infinity,
+      height: 10,
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8EEF8),
+        borderRadius: BorderRadius.circular(5),
       ),
     );
   }

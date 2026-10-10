@@ -22,9 +22,9 @@ class BudgetCategoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final validLimit = limit > 0 ? limit : 200000.0;
-    final validSpent = spent > 0 ? spent : 15000.0;
-    final percent = (validSpent / validLimit).clamp(0.0, 1.0);
+    final validLimit = limit;
+    final validSpent = spent;
+    final percent = validLimit > 0 ? (validSpent / validLimit).clamp(0.0, 1.0) : 0.0;
     final percentageInt = (percent * 100).toInt();
 
     return Row(

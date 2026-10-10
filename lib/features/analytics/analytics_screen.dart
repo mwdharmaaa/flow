@@ -24,7 +24,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     final state = widget.state;
     final monthLabel = DateFormat("MMM ''yy", 'en_US').format(_currentMonth);
 
-    final displayExpense = state.totalExpense > 0 ? state.totalExpense : 15000.0;
+    final displayExpense = state.totalExpense;
     final displayIncome = state.totalIncome;
 
     return Scaffold(
@@ -128,8 +128,12 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               // Comparison Subtitle
               Text(
                 _selectedTabIndex == 0
-                    ? 'of ${CurrencyFormatter.format(displayIncome, currency: state.currency)} income • -${CurrencyFormatter.format(displayExpense, currency: state.currency)} left'
-                    : '${CurrencyFormatter.format(displayExpense, currency: state.currency)} spent • -${CurrencyFormatter.format(displayExpense, currency: state.currency)} left',
+                    ? (displayExpense > 0
+                        ? 'of ${CurrencyFormatter.format(displayIncome, currency: state.currency)} income • -${CurrencyFormatter.format(displayExpense, currency: state.currency)} left'
+                        : 'of ${CurrencyFormatter.format(displayIncome, currency: state.currency)} income')
+                    : (displayExpense > 0
+                        ? '${CurrencyFormatter.format(displayExpense, currency: state.currency)} spent • -${CurrencyFormatter.format(displayExpense, currency: state.currency)} left'
+                        : 'No expenses recorded yet'),
                 style: const TextStyle(fontSize: 12, color: AppTheme.subtle),
               ),
               const SizedBox(height: 28),

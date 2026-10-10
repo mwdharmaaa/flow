@@ -17,8 +17,6 @@ class AnalyticsSixMonthsChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const months = ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'];
-    final displayExpense = expenseOct > 0 ? expenseOct : 15000.0;
-    final displayIncome = incomeOct;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,7 +47,7 @@ class AnalyticsSixMonthsChart extends StatelessWidget {
 
         // Subtitle
         Text(
-          'Oct (in progress) • in ${CurrencyFormatter.format(displayIncome, currency: currency)} • out ${CurrencyFormatter.format(displayExpense, currency: currency)}',
+          'Oct (in progress) • in ${CurrencyFormatter.format(incomeOct, currency: currency)} • out ${CurrencyFormatter.format(expenseOct, currency: currency)}',
           style: const TextStyle(fontSize: 12, color: AppTheme.subtle),
         ),
         const SizedBox(height: 20),
@@ -59,7 +57,7 @@ class AnalyticsSixMonthsChart extends StatelessWidget {
           height: 140,
           child: CustomPaint(
             size: const Size(double.infinity, 140),
-            painter: SixMonthsChartPainter(),
+            painter: SixMonthsChartPainter(hasExpense: expenseOct > 0),
           ),
         ),
 
@@ -84,6 +82,10 @@ class AnalyticsSixMonthsChart extends StatelessWidget {
 }
 
 class SixMonthsChartPainter extends CustomPainter {
+  final bool hasExpense;
+
+  SixMonthsChartPainter({required this.hasExpense});
+
   @override
   void paint(Canvas canvas, Size size) {
     final w = size.width;
@@ -98,7 +100,6 @@ class SixMonthsChartPainter extends CustomPainter {
       w * 0.95,
     ];
 
-    // Baseline Y
     final baseY = h;
 
     // Draw Blue Income Line (flat along base)
@@ -115,13 +116,15 @@ class SixMonthsChartPainter extends CustomPainter {
       ..strokeWidth = 2.5
       ..style = PaintingStyle.stroke;
 
+    final octY = hasExpense ? 20.0 : baseY;
+
     final path = Path();
     path.moveTo(xSteps[0], baseY);
     path.lineTo(xSteps[1], baseY);
     path.lineTo(xSteps[2], baseY);
     path.lineTo(xSteps[3], baseY);
     path.lineTo(xSteps[4], baseY);
-    path.lineTo(xSteps[5], 20); // Rising up to Oct!
+    path.lineTo(xSteps[5], octY);
     canvas.drawPath(path, orangePaint);
 
     // Draw Orange Dots
@@ -133,9 +136,13 @@ class SixMonthsChartPainter extends CustomPainter {
       canvas.drawCircle(Offset(xSteps[i], baseY), 2.5, dotWhite);
     }
     // High dot on Oct
-    canvas.drawCircle(Offset(xSteps[5], 20), 6.5, dotPaint);
+    canvas.drawCircle(Offset(xSteps[5], octY), hasExpense ? 6.5 : 4.5, dotPaint);
+    if (!hasExpense) {
+      canvas.drawCircle(Offset(xSteps[5], octY), 2.5, dotWhite);
+    }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant SixMonthsChartPainter oldDelegate) =>
+      oldDelegate.hasExpense != hasExpense;
 }

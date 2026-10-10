@@ -182,6 +182,12 @@ class AppState extends ChangeNotifier {
   Future<void> _loadState() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      if (!prefs.containsKey('flow_v3_zero_reset')) {
+        await prefs.clear();
+        await prefs.setBool('flow_v3_zero_reset', true);
+        resetToDefaults();
+        return;
+      }
       final accJson = prefs.getString('flow_accounts');
       if (accJson != null) {
         final List list = jsonDecode(accJson);

@@ -35,10 +35,10 @@ class AnalyticsDailyChart extends StatelessWidget {
     final totalSpent = dailySpend.values.fold(0.0, (sum, v) => sum + v);
     final maxSpent = dailySpend.values.isNotEmpty
         ? dailySpend.values.reduce((a, b) => a > b ? a : b)
-        : 15000.0;
-    final chartMax = maxSpent > 0 ? maxSpent : 15000.0;
+        : 10000.0;
+    final chartMax = maxSpent > 0 ? maxSpent : 10000.0;
 
-    final todaySpent = dailySpend[now.day] ?? (transactions.isEmpty ? 15000.0 : 0.0);
+    final todaySpent = dailySpend[now.day] ?? 0.0;
     final activeDay = now.day;
 
     return Column(
@@ -82,10 +82,7 @@ class AnalyticsDailyChart extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: List.generate(daysInMonth, (i) {
                   final day = i + 1;
-                  double amount = dailySpend[day] ?? 0.0;
-                  if (transactions.isEmpty && day == activeDay) {
-                    amount = 15000.0;
-                  }
+                  final amount = dailySpend[day] ?? 0.0;
 
                   final barHeight = (amount / chartMax * 75).clamp(amount > 0 ? 8.0 : 0.0, 75.0);
                   final isActive = day == activeDay;
@@ -145,7 +142,7 @@ class AnalyticsDailyChart extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '---- avg ${CurrencyFormatter.format(totalSpent > 0 ? (totalSpent / daysInMonth) : 2000.0, currency: currency)}/day',
+              '---- avg ${CurrencyFormatter.format(totalSpent > 0 ? (totalSpent / daysInMonth) : 0.0, currency: currency)}/day',
               style: const TextStyle(fontSize: 11, color: AppTheme.subtle),
             ),
             Row(
