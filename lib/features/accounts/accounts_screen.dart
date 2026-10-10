@@ -26,19 +26,19 @@ class AccountsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.bg,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Wallets',
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.w900,
-                  color: AppTheme.textPrimary,
+                  color: AppTheme.text,
                   letterSpacing: -0.5,
                 ),
               ),
@@ -47,9 +47,9 @@ class AccountsScreen extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppTheme.cardColor,
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: AppTheme.border),
+                  border: Border.all(color: AppTheme.borderColor),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -57,11 +57,11 @@ class AccountsScreen extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Total Net Balance', style: TextStyle(fontSize: 11, color: AppTheme.subtle)),
+                        Text('Total Net Balance', style: TextStyle(fontSize: 11, color: AppTheme.subtleColor)),
                         const SizedBox(height: 4),
                         Text(
                           CurrencyFormatter.format(state.totalBalance, currency: state.currency),
-                          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppTheme.textPrimary),
+                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppTheme.text),
                         ),
                         const SizedBox(height: 4),
                         const Text('100% Offline Local', style: TextStyle(fontSize: 11, color: AppTheme.income, fontWeight: FontWeight.bold)),
@@ -77,7 +77,7 @@ class AccountsScreen extends StatelessWidget {
                       icon: const Icon(Icons.add, size: 16, color: Colors.white),
                       label: const Text('Add', style: TextStyle(color: Colors.white, fontSize: 12)),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primary,
+                        backgroundColor: AppTheme.primaryColor,
                         elevation: 0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
@@ -88,7 +88,7 @@ class AccountsScreen extends StatelessWidget {
               const SizedBox(height: 24),
               Text(
                 'WALLETS & ACCOUNTS (${state.accounts.length})',
-                style: const TextStyle(fontSize: 11, color: AppTheme.subtle, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                style: TextStyle(fontSize: 11, color: AppTheme.subtleColor, fontWeight: FontWeight.bold, letterSpacing: 0.5),
               ),
               const SizedBox(height: 12),
               Expanded(
@@ -100,9 +100,9 @@ class AccountsScreen extends StatelessWidget {
                       margin: const EdgeInsets.only(bottom: 10),
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppTheme.cardColor,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppTheme.border),
+                        border: Border.all(color: AppTheme.borderColor),
                       ),
                       child: Row(
                         children: [
@@ -119,9 +119,9 @@ class AccountsScreen extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(acc.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                                Text(acc.name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.text)),
                                 const SizedBox(height: 2),
-                                Text(acc.type.toUpperCase(), style: const TextStyle(fontSize: 10, color: AppTheme.subtle)),
+                                Text(acc.type.toUpperCase(), style: TextStyle(fontSize: 10, color: AppTheme.subtleColor)),
                               ],
                             ),
                           ),
@@ -130,7 +130,7 @@ class AccountsScreen extends StatelessWidget {
                             children: [
                               Text(
                                 CurrencyFormatter.format(acc.balance, currency: state.currency),
-                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.text),
                               ),
                               const SizedBox(height: 4),
                               GestureDetector(
@@ -147,12 +147,12 @@ class AccountsScreen extends StatelessWidget {
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                   decoration: BoxDecoration(
-                                    color: AppTheme.primarySoft,
+                                    color: AppTheme.primarySoftColor,
                                     borderRadius: BorderRadius.circular(6),
                                   ),
-                                  child: const Text(
+                                  child: Text(
                                     'Adjust',
-                                    style: TextStyle(fontSize: 10, color: AppTheme.primary, fontWeight: FontWeight.bold),
+                                    style: TextStyle(fontSize: 10, color: AppTheme.primaryColor, fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),

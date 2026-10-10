@@ -26,10 +26,12 @@ class DashboardSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = state.isDarkMode;
+
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      decoration: BoxDecoration(
+        color: isDark ? AppTheme.darkBgSurface : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
       child: Column(
@@ -39,12 +41,12 @@ class DashboardSummary extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Summary',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
-                  color: AppTheme.textPrimary,
+                  color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
                 ),
               ),
               Row(
@@ -52,8 +54,9 @@ class DashboardSummary extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFF4EB),
+                      color: isDark ? AppTheme.darkBgElevated : const Color(0xFFFFF4EB),
                       borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : Colors.transparent),
                     ),
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
@@ -69,10 +72,10 @@ class DashboardSummary extends StatelessWidget {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: AppTheme.border.withValues(alpha: 0.4),
+                      color: isDark ? AppTheme.darkBgElevated : AppTheme.border.withValues(alpha: 0.4),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.notifications_none_rounded, size: 18, color: AppTheme.textPrimary),
+                    child: Icon(Icons.notifications_none_rounded, size: 18, color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary),
                   ),
                 ],
               ),
@@ -84,9 +87,9 @@ class DashboardSummary extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark ? AppTheme.darkBgElevated : Colors.white,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppTheme.border),
+              border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border),
             ),
             child: Row(
               children: [
@@ -94,28 +97,28 @@ class DashboardSummary extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Total balance', style: TextStyle(fontSize: 11, color: AppTheme.subtle)),
+                      Text('Total balance', style: TextStyle(fontSize: 11, color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle)),
                       const SizedBox(height: 4),
                       Text(
                         CurrencyFormatter.format(state.totalBalance, currency: state.currency),
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary),
                       ),
                     ],
                   ),
                 ),
-                Container(width: 1, height: 36, color: AppTheme.border),
+                Container(width: 1, height: 36, color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Budget left', style: TextStyle(fontSize: 11, color: AppTheme.subtle)),
+                      Text('Budget left', style: TextStyle(fontSize: 11, color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle)),
                       const SizedBox(height: 4),
                       GestureDetector(
                         onTap: onSeeAllBudgets,
                         child: Text(
                           state.budgets.isEmpty ? 'Set up a budget' : 'View budget',
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.primary),
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary),
                         ),
                       ),
                     ],
@@ -245,19 +248,23 @@ class DashboardSummary extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
-              color: AppTheme.primarySoft,
+              color: isDark ? AppTheme.darkBgElevated : AppTheme.primarySoft,
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : Colors.transparent),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Expanded(
+                Expanded(
                   child: Row(
                     children: [
-                      Icon(Icons.chat_bubble_outline_rounded, size: 16, color: AppTheme.primary),
-                      SizedBox(width: 8),
+                      Icon(Icons.chat_bubble_outline_rounded, size: 16, color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary),
+                      const SizedBox(width: 8),
                       Expanded(
-                        child: Text('How do you like the new Flow?', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
+                        child: Text(
+                          'How do you like the new Flow?',
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary),
+                        ),
                       ),
                     ],
                   ),
@@ -265,11 +272,14 @@ class DashboardSummary extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark ? AppTheme.darkBgSurface : Colors.white,
                     borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: AppTheme.border),
+                    border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border),
                   ),
-                  child: const Text('Send feedback', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                  child: Text(
+                    'Send feedback',
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary),
+                  ),
                 ),
               ],
             ),
@@ -280,13 +290,28 @@ class DashboardSummary extends StatelessWidget {
   }
 
   Widget _buildSectionHeader(String title, VoidCallback onTap, {String actionText = 'All'}) {
+    final isDark = state.isDarkMode;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+            color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+          ),
+        ),
         GestureDetector(
           onTap: onTap,
-          child: Text(actionText, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.subtle)),
+          child: Text(
+            actionText,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: isDark ? AppTheme.darkAccentPrimary : AppTheme.subtle,
+            ),
+          ),
         ),
       ],
     );
@@ -299,30 +324,45 @@ class DashboardSummary extends StatelessWidget {
     required String buttonLabel,
     required VoidCallback onTap,
   }) {
+    final isDark = state.isDarkMode;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppTheme.darkBgElevated : Colors.white,
         borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
-            decoration: const BoxDecoration(
-              color: AppTheme.primarySoft,
+            decoration: BoxDecoration(
+              color: isDark ? AppTheme.darkAccentSubtle : AppTheme.primarySoft,
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, size: 16, color: AppTheme.primary),
+            child: Icon(icon, size: 16, color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+                  ),
+                ),
                 const SizedBox(height: 2),
-                Text(subtitle, style: const TextStyle(fontSize: 10, color: AppTheme.subtle)),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle,
+                  ),
+                ),
               ],
             ),
           ),
@@ -333,7 +373,14 @@ class DashboardSummary extends StatelessWidget {
               minimumSize: Size.zero,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-            child: Text(buttonLabel, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.primary)),
+            child: Text(
+              buttonLabel,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary,
+              ),
+            ),
           ),
         ],
       ),
@@ -341,13 +388,14 @@ class DashboardSummary extends StatelessWidget {
   }
 
   Widget _buildWalletCard(AccountModel account) {
-    Color bg = const Color(0xFFF0FDF4); // mint
+    final isDark = state.isDarkMode;
+    Color bg = isDark ? AppTheme.darkBgElevated : const Color(0xFFF0FDF4); // mint
     Color iconColor = const Color(0xFF10B981);
     if (account.name.toLowerCase().contains('gopay')) {
-      bg = const Color(0xFFFFF1F2);
+      bg = isDark ? AppTheme.darkBgElevated : const Color(0xFFFFF1F2);
       iconColor = const Color(0xFF00AED6);
     } else if (account.name.toLowerCase().contains('jago')) {
-      bg = const Color(0xFFFFFBEB);
+      bg = isDark ? AppTheme.darkBgElevated : const Color(0xFFFFFBEB);
       iconColor = const Color(0xFFFF8B00);
     }
 
@@ -357,7 +405,9 @@ class DashboardSummary extends StatelessWidget {
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.border.withValues(alpha: 0.5)),
+        border: Border.all(
+          color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border.withValues(alpha: 0.5),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -374,11 +424,22 @@ class DashboardSummary extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(account.name, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+              Text(
+                account.name,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? AppTheme.darkTextSecondary : AppTheme.textPrimary,
+                ),
+              ),
               const SizedBox(height: 2),
               Text(
                 CurrencyFormatter.format(account.balance, currency: state.currency),
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.textPrimary),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+                ),
               ),
             ],
           ),
