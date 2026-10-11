@@ -18,9 +18,17 @@ Flow adalah aplikasi manajemen keuangan pribadi modern berarsitektur **100% Offl
    - Pencatat hutang dan piutang dengan pelunasan instan.
    - Tagihan rutin dan langganan (subscriptions).
 
-3. **Performa Native Skia / Impeller**
+3. **Deteksi Struk Belanja (Receipt OCR Scanner)**
+   - Pindai nota belanja dan ekstrak merchant, line items, PPN, serta total expense secara otomatis.
+   - Pilihan preset struk ritel Indonesia (Indomaret, Alfamart, Kopi Kenangan, Restoran Padang) dan parser teks nota.
+
+4. **Interaksi Suara Hands-Free (Voice Input & Voice Output)**
+   - Voice Input: Pencatatan pengeluaran via ucapan suara dengan visualisasi gelombang frekuensi.
+   - Voice Output: Audio feedback (TTS) otomatis yang mengonfirmasi transaksi dan total struk secara verbal.
+
+5. **Performa Native Skia / Impeller**
    - Render antarmuka native 60/120 FPS tanpa WebView.
-   - Bebas masalah *white screen* atau *asset loading*.
+   - Bebas masalah white screen atau asset loading lag.
 
 ---
 
