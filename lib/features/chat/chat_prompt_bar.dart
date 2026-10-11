@@ -50,18 +50,15 @@ class _ChatPromptBarState extends State<ChatPromptBar> {
 
     final results = NlpTransactionParser.parseAll(text);
     if (results.isNotEmpty) {
-      final defaultAccountId = widget.state.accounts.isNotEmpty
-          ? widget.state.accounts.first.id
-          : 'acc_cash';
-
       final now = DateTime.now();
       for (var i = 0; i < results.length; i++) {
         final result = results[i];
+        final accountId = widget.state.resolveOrCreateAccountId(result.walletName);
         final newTx = TransactionModel(
           id: '${now.millisecondsSinceEpoch}_$i',
           type: result.type,
           amount: result.amount,
-          accountId: defaultAccountId,
+          accountId: accountId,
           category: result.category,
           date: now,
           note: result.title,
