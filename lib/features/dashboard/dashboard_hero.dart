@@ -75,18 +75,21 @@ class _DashboardHeroState extends State<DashboardHero> {
                       width: 30,
                       height: 30,
                       decoration: BoxDecoration(
-                        color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary,
+                        color: isDark ? const Color(0xFF1E293B) : Colors.white,
                         shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                        ),
                         boxShadow: [
                           BoxShadow(
-                            color: (isDark ? AppTheme.darkAccentPrimary : AppTheme.primary).withValues(alpha: 0.3),
+                            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.06),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
                         ],
                       ),
                       child: const Center(
-                        child: Icon(Icons.waves, color: Colors.white, size: 17),
+                        child: FlutterLogo(size: 18),
                       ),
                     ),
                     const SizedBox(width: 8),
