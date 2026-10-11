@@ -36,10 +36,9 @@ class DashboardSummary extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppTheme.darkBgSurface : Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        color: isDark ? const Color(0xFF09090B) : Colors.white,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
+      padding: const EdgeInsets.fromLTRB(18, 4, 18, 110),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

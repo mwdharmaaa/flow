@@ -93,6 +93,7 @@ class AccountsScreen extends StatelessWidget {
               const SizedBox(height: 12),
               Expanded(
                 child: ListView.builder(
+                  padding: const EdgeInsets.only(bottom: 110),
                   itemCount: state.accounts.length,
                   itemBuilder: (_, idx) {
                     final acc = state.accounts[idx];

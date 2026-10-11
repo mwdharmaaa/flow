@@ -20,10 +20,11 @@ class BottomNavBar extends StatelessWidget {
     final navBorder = isDark ? AppTheme.darkBorderSubtle : AppTheme.border;
     final activeColor = isDark ? AppTheme.darkAccentPrimary : AppTheme.primary;
     final inactiveColor = isDark ? AppTheme.darkTextSecondary : AppTheme.subtle;
+    final bottomInset = MediaQuery.of(context).padding.bottom;
 
     return Container(
       color: Colors.transparent,
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 8),
+      padding: EdgeInsets.fromLTRB(16, 8, 16, 16 + bottomInset),
       child: Container(
         height: 66,
         decoration: BoxDecoration(

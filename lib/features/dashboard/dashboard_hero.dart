@@ -274,6 +274,14 @@ class _DashboardHeroState extends State<DashboardHero> {
               ),
             ],
           ),
+          const SizedBox(height: 12),
+          Center(
+            child: Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: isDark ? AppTheme.darkTextSecondary : const Color(0xFF94A3B8),
+              size: 20,
+            ),
+          ),
         ],
       ),
     );

@@ -36,9 +36,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         .where((t) => t.type == TransactionType.expense)
         .fold(0.0, (sum, t) => sum + t.amount);
 
-    return Scaffold(
-      backgroundColor: state.isDarkMode ? AppTheme.darkBgBase : const Color(0xFFEBF3FE),
-      body: SingleChildScrollView(
+    final isDark = state.isDarkMode;
+
+    return Container(
+      color: isDark ? const Color(0xFF09090B) : Colors.white,
+      child: SingleChildScrollView(
         child: Column(
           children: [
             DashboardHero(

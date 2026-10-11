@@ -135,6 +135,7 @@ class DebtsScreen extends StatelessWidget {
               child: state.debts.isEmpty
                   ? const Center(child: Text('No debt records yet.', style: TextStyle(fontSize: 13, color: AppTheme.subtle)))
                   : ListView.builder(
+                      padding: const EdgeInsets.only(bottom: 110),
                       itemCount: state.debts.length,
                       itemBuilder: (_, idx) {
                         final d = state.debts[idx];

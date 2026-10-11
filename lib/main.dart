@@ -112,7 +112,8 @@ class FlowMainScaffold extends StatelessWidget {
     final isDark = state.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark ? AppTheme.darkBgBase : const Color(0xFFEBF3FE),
+      backgroundColor: isDark ? AppTheme.darkBgBase : Colors.white,
+      extendBody: true,
       appBar: isSubView
           ? AppBar(
               backgroundColor: isDark ? AppTheme.darkBgBase : AppTheme.background,
@@ -131,11 +132,24 @@ class FlowMainScaffold extends StatelessWidget {
               ),
             )
           : null,
-      body: activeView,
-      bottomNavigationBar: BottomNavBar(
-        currentIndex: state.currentTabIndex <= 3 ? state.currentTabIndex : 0,
-        onTap: (idx) => state.setTabIndex(idx),
-        onAddTap: () => _openAddTransaction(context),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Content layer (scrolls behind floating nav bar)
+          activeView,
+
+          // Floating Navigation Bar (rendered on topmost layer)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: BottomNavBar(
+              currentIndex: state.currentTabIndex <= 3 ? state.currentTabIndex : 0,
+              onTap: (idx) => state.setTabIndex(idx),
+              onAddTap: () => _openAddTransaction(context),
+            ),
+          ),
+        ],
       ),
     );
   }
