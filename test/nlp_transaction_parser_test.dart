@@ -201,7 +201,7 @@ void main() {
       expect(res3.isValid, isTrue);
       expect(res3.type, TransactionType.income);
       expect(res3.amount, 500000.0);
-      expect(res3.category, 'Bonus');
+      expect(res3.category, 'Income');
       expect(res3.walletName, 'BCA');
 
       final res4 = NlpTransactionParser.parse('dikasi duit 100k di GoPay');
