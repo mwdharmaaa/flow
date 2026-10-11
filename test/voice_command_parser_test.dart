@@ -97,5 +97,31 @@ void main() {
         expect(res.isCommand, isFalse, reason: 'Should not be command: "$text"');
       }
     });
+
+    test('parses addOrUpdateBudget commands for wallets and categories', () {
+      final res1 = VoiceCommandParser.parse('tambah budget di gopay 500k');
+      expect(res1.isCommand, isTrue);
+      expect(res1.type, VoiceCommandType.addOrUpdateBudget);
+      expect(res1.targetWallet, 'GoPay');
+      expect(res1.targetAmount, 500000.0);
+
+      final res2 = VoiceCommandParser.parse('tambah budget 1jt di bca');
+      expect(res2.isCommand, isTrue);
+      expect(res2.type, VoiceCommandType.addOrUpdateBudget);
+      expect(res2.targetWallet, 'BCA');
+      expect(res2.targetAmount, 1000000.0);
+
+      final res3 = VoiceCommandParser.parse('tambah budget makanan 300k');
+      expect(res3.isCommand, isTrue);
+      expect(res3.type, VoiceCommandType.addOrUpdateBudget);
+      expect(res3.targetCategory, 'Food');
+      expect(res3.targetAmount, 300000.0);
+
+      final res4 = VoiceCommandParser.parse('tambah budget transport 150rb');
+      expect(res4.isCommand, isTrue);
+      expect(res4.type, VoiceCommandType.addOrUpdateBudget);
+      expect(res4.targetCategory, 'Transport');
+      expect(res4.targetAmount, 150000.0);
+    });
   });
 }
