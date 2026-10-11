@@ -55,34 +55,13 @@ class _FlowAppState extends State<FlowApp> {
   }
 }
 
-class FlowMainScaffold extends StatefulWidget {
+class FlowMainScaffold extends StatelessWidget {
   final AppState state;
 
   const FlowMainScaffold({super.key, required this.state});
 
-  @override
-  State<FlowMainScaffold> createState() => _FlowMainScaffoldState();
-}
-
-class _FlowMainScaffoldState extends State<FlowMainScaffold> {
-  late final List<Widget> _cachedViews;
-
-  @override
-  void initState() {
-    super.initState();
-    _cachedViews = [
-      DashboardScreen(state: widget.state),
-      AnalyticsScreen(state: widget.state),
-      BudgetsScreen(state: widget.state),
-      AccountsScreen(state: widget.state),
-      DebtsScreen(state: widget.state),
-      RecurringScreen(state: widget.state),
-      GoalsScreen(state: widget.state),
-    ];
-  }
-
   void _openAddTransaction(BuildContext context) {
-    LogOptionsModal.show(context, widget.state);
+    LogOptionsModal.show(context, state);
   }
 
   String _getSubViewTitle(int index) {
@@ -101,9 +80,8 @@ class _FlowMainScaffoldState extends State<FlowMainScaffold> {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: widget.state,
+      listenable: state,
       builder: (context, _) {
-        final state = widget.state;
         final isSubView = state.currentTabIndex > 3;
         final isDark = state.isDarkMode;
 
@@ -133,8 +111,16 @@ class _FlowMainScaffoldState extends State<FlowMainScaffold> {
             children: [
               // Content layer cached across tab switches with IndexedStack
               IndexedStack(
-                index: state.currentTabIndex.clamp(0, _cachedViews.length - 1),
-                children: _cachedViews,
+                index: state.currentTabIndex.clamp(0, 6),
+                children: [
+                  DashboardScreen(state: state),
+                  AnalyticsScreen(state: state),
+                  BudgetsScreen(state: state),
+                  AccountsScreen(state: state),
+                  DebtsScreen(state: state),
+                  RecurringScreen(state: state),
+                  GoalsScreen(state: state),
+                ],
               ),
 
               // Floating Navigation Bar (isolated with RepaintBoundary)
