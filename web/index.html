@@ -5,11 +5,13 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="description" content="Flow - Personal Finance & Expense Tracker">
+  <meta name="theme-color" content="#09090b">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="flow">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
@@ -19,8 +21,79 @@
 
   <title>flow</title>
   <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #09090b;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    #flow-loader {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #09090b;
+      z-index: 99999;
+      transition: opacity 0.25s ease-out;
+    }
+    .flow-logo {
+      width: 52px;
+      height: 52px;
+      animation: flow-pulse 1.8s ease-in-out infinite;
+    }
+    .flow-bar {
+      margin-top: 24px;
+      width: 120px;
+      height: 3px;
+      background: #18181b;
+      border-radius: 99px;
+      overflow: hidden;
+      position: relative;
+    }
+    .flow-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 45%;
+      background: #1d61e0;
+      border-radius: 99px;
+      animation: flow-slide 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+    @keyframes flow-pulse {
+      0%, 100% { transform: scale(1); opacity: 0.95; }
+      50% { transform: scale(1.04); opacity: 1; }
+    }
+    @keyframes flow-slide {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(280%); }
+    }
+  </style>
 </head>
 <body>
+  <div id="flow-loader">
+    <svg class="flow-logo" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="#1D61E0"/>
+      <path d="M 23 43 C 30 36.5, 43 36.5, 50 43 C 57 49.5, 70 49.5, 77 43" fill="none" stroke="#FFFFFF" stroke-width="7.5" stroke-linecap="round"/>
+      <path d="M 23 57 C 30 50.5, 43 50.5, 50 57 C 57 63.5, 70 63.5, 77 57" fill="none" stroke="#FFFFFF" stroke-width="7.5" stroke-linecap="round"/>
+    </svg>
+    <div class="flow-bar"></div>
+  </div>
+  <script>
+    window.addEventListener('flutter-first-frame', function() {
+      var loader = document.getElementById('flow-loader');
+      if (loader) {
+        loader.style.opacity = '0';
+        setTimeout(function() { loader.remove(); }, 250);
+      }
+    });
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
