@@ -36,8 +36,9 @@ jobs:
 
       - name: Scaffold Flutter Web Platform
         run: |
-          rm -rf web
-          flutter create . --org com.flow --project-name flow --platforms=web
+          if [ ! -d "web" ]; then
+            flutter create . --org com.flow --project-name flow --platforms=web
+          fi
           rm -f test/widget_test.dart
 
       - name: Install Dependencies
