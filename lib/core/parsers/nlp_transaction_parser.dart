@@ -1,4 +1,5 @@
 import 'package:flow/models/transaction_model.dart';
+import 'package:flow/core/parsers/indonesian_number_parser.dart';
 
 class ParsedTransactionResult {
   final double amount;
@@ -69,7 +70,8 @@ class NlpTransactionParser {
     final cleanInput = input.trim();
     if (cleanInput.isEmpty) return ParsedTransactionResult.invalid;
 
-    final lower = cleanInput.toLowerCase();
+    final normalized = IndonesianNumberParser.normalize(cleanInput);
+    final lower = normalized.toLowerCase();
 
     // 1. Extract Amount
     final amountMatch = RegExp(
