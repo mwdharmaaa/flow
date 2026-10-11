@@ -6,6 +6,6 @@ echo "  [*] Deploying / Building Flow Flutter"
 echo "=================================================="
 
 flutter pub get
-flutter build apk --release --no-tree-shake-icons
+flutter build apk --release --split-per-abi || flutter build apk --release --no-tree-shake-icons
 
 echo "[OK] Deployment build completed successfully."
