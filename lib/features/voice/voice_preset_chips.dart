@@ -6,14 +6,14 @@ class VoicePresetChips extends StatelessWidget {
   final bool isDark;
 
   static const List<String> suggestions = [
-    'Matcha 28k',
-    'Dapet duit 30k',
-    'Dikasi duit 8k',
-    'Tambahin ke saldo 100k',
-    'Hapus semua history saya',
-    'Balikin semua history',
-    'Hapus histori hari ini',
+    'Nemu duit di jalan 50k',
+    'Dikasi duit 100k di GoPay',
+    'Tambah budget di GoPay 500k',
+    'Tambah budget makanan 300k',
     'Matcha 28k dan esteh 3k',
+    'Hapus histori hari ini',
+    'Balikin semua history',
+    'Hapus semua history saya',
   ];
 
   const VoicePresetChips({
