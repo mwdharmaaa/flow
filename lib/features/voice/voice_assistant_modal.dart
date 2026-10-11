@@ -3,6 +3,7 @@ import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/parsers/nlp_transaction_parser.dart';
 import 'package:flow/core/formatters/currency_formatter.dart';
 import 'package:flow/core/services/voice_service.dart';
+import 'package:flow/core/services/speech/speech_recognition_service.dart';
 import 'package:flow/models/transaction_model.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/features/voice/voice_waveform_visualizer.dart';
@@ -34,34 +35,70 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
 
   @override
   void dispose() {
+    SpeechRecognitionService.instance.stopListening();
     _transcriptController.dispose();
     super.dispose();
   }
 
-  void _toggleListening([String? simulatedVoice]) async {
-    if (simulatedVoice != null) {
+  void _toggleListening([String? presetVoice]) {
+    if (presetVoice != null) {
+      SpeechRecognitionService.instance.stopListening();
       setState(() {
-        _isListening = true;
-        _transcriptController.text = simulatedVoice;
+        _isListening = false;
+        _transcriptController.text = presetVoice;
       });
-      await Future.delayed(const Duration(milliseconds: 700));
-      _processTranscript(simulatedVoice);
+      _processTranscript(presetVoice);
+      return;
+    }
+
+    if (_isListening) {
+      SpeechRecognitionService.instance.stopListening();
+      setState(() => _isListening = false);
+      if (_transcriptController.text.isNotEmpty &&
+          !_transcriptController.text.startsWith('Mendengarkan')) {
+        _processTranscript(_transcriptController.text);
+      }
       return;
     }
 
     setState(() {
-      _isListening = !_isListening;
-      if (_isListening) {
-        _transcriptController.text = 'Mendengarkan suara Anda...';
-      }
+      _isListening = true;
+      _transcriptController.text = 'Mendengarkan... Silakan bicara';
     });
 
-    if (_isListening) {
-      await Future.delayed(const Duration(milliseconds: 1400));
-      if (!mounted) return;
-      const autoSample = 'Kopi kenangan 22k';
-      _processTranscript(autoSample);
-    }
+    SpeechRecognitionService.instance.startListening(
+      onResult: (text, isFinal) {
+        if (!mounted) return;
+        setState(() {
+          _transcriptController.text = text;
+        });
+        if (isFinal) {
+          _processTranscript(text);
+          setState(() => _isListening = false);
+        }
+      },
+      onError: (err) {
+        if (!mounted) return;
+        setState(() => _isListening = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(err),
+            backgroundColor: AppTheme.expense,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      },
+      onDone: () {
+        if (!mounted) return;
+        if (_isListening) {
+          setState(() => _isListening = false);
+          if (_transcriptController.text.isNotEmpty &&
+              !_transcriptController.text.startsWith('Mendengarkan')) {
+            _processTranscript(_transcriptController.text);
+          }
+        }
+      },
+    );
   }
 
   void _processTranscript(String text) {
