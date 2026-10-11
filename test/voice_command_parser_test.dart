@@ -59,6 +59,29 @@ void main() {
       expect(res3.targetDate?.month, 10);
     });
 
+    test('parses restore and undo history commands correctly', () {
+      final restoreInputs = [
+        'balikin semua history',
+        'balikin semua histori',
+        'balikin semua riwayat',
+        'balikin histori saya',
+        'kembalikan semua history',
+        'kembalikan semua riwayat',
+        'pulihkan semua history',
+        'pulihkan riwayat',
+        'restore history',
+        'undo',
+        'undo hapus',
+        'batalkan hapus',
+      ];
+
+      for (final text in restoreInputs) {
+        final res = VoiceCommandParser.parse(text);
+        expect(res.isCommand, isTrue, reason: 'Failed for "$text"');
+        expect(res.type, VoiceCommandType.restoreHistory, reason: 'Type mismatch for "$text"');
+      }
+    });
+
     test('does not misidentify transactions as commands', () {
       final nonCommands = [
         'matcha 28k',

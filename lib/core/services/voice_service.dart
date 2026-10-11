@@ -92,4 +92,9 @@ class VoiceService {
     if (count <= 0) return 'Tidak ada transaksi pada $dateStr.';
     return '$count transaksi pada $dateStr berhasil dihapus.';
   }
+
+  String formatRestoreFeedback(int count) {
+    if (count <= 0) return 'Tidak ada riwayat transaksi yang dapat dipulihkan.';
+    return '$count riwayat transaksi berhasil dipulihkan.';
+  }
 }

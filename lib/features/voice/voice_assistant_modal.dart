@@ -435,6 +435,24 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
     );
   }
 
+  void _executeRestore() {
+    final restoredCount = widget.state.restoreLastDeletedTransactions();
+    Navigator.of(context).pop();
+
+    if (_speakResponse) {
+      VoiceService.instance.speak(VoiceService.instance.formatRestoreFeedback(restoredCount));
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$restoredCount riwayat transaksi berhasil dipulihkan.'),
+        backgroundColor: AppTheme.income,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
   void _executeDeleteAll() {
     final deletedCount = widget.state.clearAllTransactions();
     Navigator.of(context).pop();
@@ -473,11 +491,13 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
   }
 
   Widget _buildCommandCard(bool isDark) {
+    final isRestore = _detectedCommand.type == VoiceCommandType.restoreHistory;
     final isDeleteAll = _detectedCommand.type == VoiceCommandType.deleteAllHistory;
     final totalHistoryCount = widget.state.transactions.length;
+    final restorableCount = widget.state.restorableCount;
 
     List<TransactionModel> matchingTxs = [];
-    if (!isDeleteAll && _detectedCommand.targetDate != null) {
+    if (!isDeleteAll && !isRestore && _detectedCommand.targetDate != null) {
       final tDate = _detectedCommand.targetDate!;
       matchingTxs = widget.state.transactions
           .where((tx) =>
@@ -487,7 +507,11 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
           .toList();
     }
 
-    final int targetCount = isDeleteAll ? totalHistoryCount : matchingTxs.length;
+    final int targetCount = isRestore
+        ? restorableCount
+        : (isDeleteAll ? totalHistoryCount : matchingTxs.length);
+
+    final actionColor = isRestore ? AppTheme.income : AppTheme.expense;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -495,7 +519,7 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
         color: isDark ? AppTheme.darkBgElevated : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppTheme.expense.withValues(alpha: 0.4),
+          color: actionColor.withValues(alpha: 0.4),
           width: 1.5,
         ),
       ),
@@ -507,12 +531,12 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppTheme.expense.withValues(alpha: 0.15),
+                  color: actionColor.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.delete_sweep_rounded,
-                  color: AppTheme.expense,
+                child: Icon(
+                  isRestore ? Icons.restore_rounded : Icons.delete_sweep_rounded,
+                  color: actionColor,
                   size: 20,
                 ),
               ),
@@ -526,7 +550,7 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        color: AppTheme.expense,
+                        color: actionColor,
                         letterSpacing: 0.3,
                       ),
                     ),
@@ -546,13 +570,17 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
           ),
           const SizedBox(height: 12),
           Text(
-            isDeleteAll
-                ? (totalHistoryCount > 0
-                    ? 'Terdapat $totalHistoryCount transaksi yang tersimpan. Menghapus histori akan menyelaraskan kembali saldo akun Anda.'
-                    : 'Tidak ada riwayat transaksi yang tersimpan.')
-                : (matchingTxs.isNotEmpty
-                    ? 'Ditemukan ${matchingTxs.length} transaksi pada tanggal tersebut.'
-                    : 'Tidak ada transaksi yang tercatat pada tanggal tersebut.'),
+            isRestore
+                ? (restorableCount > 0
+                    ? 'Terdapat $restorableCount transaksi yang dapat dipulihkan. Transaksi akan dikembalikan dan saldo akun akan diselaraskan kembali.'
+                    : 'Tidak ada riwayat transaksi yang dapat dipulihkan.')
+                : (isDeleteAll
+                    ? (totalHistoryCount > 0
+                        ? 'Terdapat $totalHistoryCount transaksi yang tersimpan. Menghapus histori akan menyelaraskan kembali saldo akun Anda.'
+                        : 'Tidak ada riwayat transaksi yang tersimpan.')
+                    : (matchingTxs.isNotEmpty
+                        ? 'Ditemukan ${matchingTxs.length} transaksi pada tanggal tersebut.'
+                        : 'Tidak ada transaksi yang tercatat pada tanggal tersebut.')),
             style: TextStyle(
               fontSize: 12,
               color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle,
@@ -634,21 +662,29 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
                 child: ElevatedButton.icon(
                   onPressed: targetCount > 0
                       ? () {
-                          if (isDeleteAll) {
+                          if (isRestore) {
+                            _executeRestore();
+                          } else if (isDeleteAll) {
                             _executeDeleteAll();
                           } else {
                             _executeDeleteByDate(_detectedCommand.targetDate!);
                           }
                         }
                       : null,
-                  icon: const Icon(Icons.delete_outline, size: 18, color: Colors.white),
+                  icon: Icon(
+                    isRestore ? Icons.restore_rounded : Icons.delete_outline,
+                    size: 18,
+                    color: Colors.white,
+                  ),
                   label: Text(
-                    targetCount > 0 ? 'Konfirmasi Hapus ($targetCount)' : 'Tidak Ada Data',
+                    targetCount > 0
+                        ? (isRestore ? 'Konfirmasi Pulihkan ($targetCount)' : 'Konfirmasi Hapus ($targetCount)')
+                        : 'Tidak Ada Data',
                     style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.expense,
-                    disabledBackgroundColor: AppTheme.expense.withValues(alpha: 0.4),
+                    backgroundColor: actionColor,
+                    disabledBackgroundColor: actionColor.withValues(alpha: 0.4),
                     padding: const EdgeInsets.symmetric(vertical: 11),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),

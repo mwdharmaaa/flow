@@ -32,6 +32,12 @@ class AppState extends ChangeNotifier {
   List<RecurringModel> get recurring => _recurring;
   List<GoalModel> get goals => _goals;
 
+  List<TransactionModel> _lastDeletedBackup = [];
+  List<TransactionModel> get lastDeletedBackup => _lastDeletedBackup;
+  int get restorableCount => _lastDeletedBackup.isNotEmpty
+      ? _lastDeletedBackup.length
+      : (_transactions.isEmpty ? InitialData.transactions.length : 0);
+
   double get totalBalance => _accounts
       .where((a) => !a.isExcludedFromTotal)
       .fold(0.0, (sum, a) => sum + a.balance);
@@ -114,6 +120,7 @@ class AppState extends ChangeNotifier {
         }
       }
 
+      _lastDeletedBackup = [tx];
       _transactions.removeAt(txIndex);
       _saveState();
       notifyListeners();
@@ -122,6 +129,8 @@ class AppState extends ChangeNotifier {
 
   int clearAllTransactions({bool revertBalances = true}) {
     final count = _transactions.length;
+    _lastDeletedBackup = List.from(_transactions);
+
     if (revertBalances) {
       for (final tx in _transactions) {
         final accIndex = _accounts.indexWhere((a) => a.id == tx.accountId);
@@ -157,6 +166,7 @@ class AppState extends ChangeNotifier {
     ).toList();
 
     if (toRemove.isEmpty) return 0;
+    _lastDeletedBackup = List.from(toRemove);
 
     if (revertBalances) {
       for (final tx in toRemove) {
@@ -189,6 +199,49 @@ class AppState extends ChangeNotifier {
     _saveState();
     notifyListeners();
     return toRemove.length;
+  }
+
+  int restoreLastDeletedTransactions({bool adjustBalances = true}) {
+    List<TransactionModel> toRestore = [];
+    if (_lastDeletedBackup.isNotEmpty) {
+      toRestore = List.from(_lastDeletedBackup);
+      _lastDeletedBackup.clear();
+    } else if (_transactions.isEmpty) {
+      toRestore = List.from(InitialData.transactions);
+    }
+
+    if (toRestore.isEmpty) return 0;
+
+    final existingIds = _transactions.map((t) => t.id).toSet();
+    final uniqueToRestore = toRestore.where((t) => !existingIds.contains(t.id)).toList();
+    if (uniqueToRestore.isEmpty) return 0;
+
+    if (adjustBalances) {
+      for (final tx in uniqueToRestore) {
+        final accIndex = _accounts.indexWhere((a) => a.id == tx.accountId);
+        if (accIndex != -1) {
+          final acc = _accounts[accIndex];
+          if (tx.type == TransactionType.expense || tx.type == TransactionType.transfer) {
+            _accounts[accIndex] = acc.copyWith(balance: acc.balance - tx.amount);
+          } else if (tx.type == TransactionType.income) {
+            _accounts[accIndex] = acc.copyWith(balance: acc.balance + tx.amount);
+          }
+        }
+
+        if (tx.type == TransactionType.transfer && tx.destinationAccountId != null) {
+          final destIndex = _accounts.indexWhere((a) => a.id == tx.destinationAccountId);
+          if (destIndex != -1) {
+            final dest = _accounts[destIndex];
+            _accounts[destIndex] = dest.copyWith(balance: dest.balance + tx.amount);
+          }
+        }
+      }
+    }
+
+    _transactions.insertAll(0, uniqueToRestore);
+    _saveState();
+    notifyListeners();
+    return uniqueToRestore.length;
   }
 
   void addAccount(AccountModel acc) {

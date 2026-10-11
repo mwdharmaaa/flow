@@ -3,6 +3,7 @@ import 'package:flow/core/parsers/indonesian_number_parser.dart';
 enum VoiceCommandType {
   deleteAllHistory,
   deleteHistoryByDate,
+  restoreHistory,
   unknown,
 }
 
@@ -42,6 +43,11 @@ class VoiceCommandParser {
     'desember': 12, 'des': 12, 'december': 12, 'dec': 12,
   };
 
+  static final RegExp _restorePattern = RegExp(
+    r'\b(?:balikin|kembalikan|pulihkan|restore|undo|batalkan)\s+(?:semua\s+|seluruh\s+)?(?:history|histori|riwayat|transaksi|catatan|data|penghapusan|hapus)(?:\s+saya)?\b|\b(?:undo|restore)\b',
+    caseSensitive: false,
+  );
+
   static final RegExp _deleteAllPattern = RegExp(
     r'\b(?:hapus|hilangkan|bersihkan|reset|delete|clear)\s+(?:semua|seluruh|total)\s+(?:history|histori|riwayat|transaksi|catatan)(?:\s+saya)?\b|\b(?:hapus|hilangkan|bersihkan|reset|delete|clear)\s+(?:history|histori|riwayat|transaksi)\s+(?:semua|seluruh|total)\b|\b(?:reset|bersihkan)\s+(?:history|histori|riwayat|transaksi)\b',
     caseSensitive: false,
@@ -67,7 +73,16 @@ class VoiceCommandParser {
 
     final lower = clean.toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
 
-    // 1. Check Delete All History
+    // 1. Check Restore / Undo History
+    if (_restorePattern.hasMatch(lower)) {
+      return const VoiceCommandResult(
+        type: VoiceCommandType.restoreHistory,
+        description: 'Pulihkan riwayat transaksi yang dihapus',
+        isCommand: true,
+      );
+    }
+
+    // 2. Check Delete All History
     if (_deleteAllPattern.hasMatch(lower)) {
       return const VoiceCommandResult(
         type: VoiceCommandType.deleteAllHistory,

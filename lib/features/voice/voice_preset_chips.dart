@@ -11,9 +11,9 @@ class VoicePresetChips extends StatelessWidget {
     'Dikasi duit 8k',
     'Tambahin ke saldo 100k',
     'Hapus semua history saya',
+    'Balikin semua history',
     'Hapus histori hari ini',
     'Matcha 28k dan esteh 3k',
-    'Gaji pokok 5jt',
   ];
 
   const VoicePresetChips({
