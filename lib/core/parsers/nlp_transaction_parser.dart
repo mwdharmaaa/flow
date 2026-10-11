@@ -7,6 +7,7 @@ class ParsedTransactionResult {
   final TransactionType type;
   final String title;
   final bool isValid;
+  final String? walletName;
 
   const ParsedTransactionResult({
     required this.amount,
@@ -14,6 +15,7 @@ class ParsedTransactionResult {
     required this.type,
     required this.title,
     required this.isValid,
+    this.walletName,
   });
 
   static const ParsedTransactionResult invalid = ParsedTransactionResult(
@@ -22,6 +24,7 @@ class ParsedTransactionResult {
     type: TransactionType.expense,
     title: '',
     isValid: false,
+    walletName: null,
   );
 }
 
@@ -69,10 +72,13 @@ class NlpTransactionParser {
       'gaji', 'salary', 'upah', 'honor', 'gajian'
     ],
     'Bonus': [
-      'bonus', 'thr', 'tip', 'cuan', 'cashback', 'reimburse', 'reward', 'komisi'
+      'bonus', 'thr', 'tip', 'cuan', 'cashback', 'reimburse', 'reward', 'komisi',
+      'uang tip', 'uang rokok', 'undian', 'giveaway'
     ],
     'Gifts Received': [
-      'dikasi', 'dikasih', 'hadiah', 'uang jajan', 'duit jajan', 'angpao', 'pemberian'
+      'dikasi', 'dikasih', 'hadiah', 'uang jajan', 'duit jajan', 'angpao',
+      'pemberian', 'diberi', 'diberikan', 'amplop', 'salam tempel', 'uang saku',
+      'duit saku'
     ],
     'Sales': [
       'jualan', 'hasil jualan', 'laku', 'omset', 'omzet', 'penjualan'
@@ -84,12 +90,15 @@ class NlpTransactionParser {
       'dividen', 'profit', 'crypto', 'saham', 'reksadana', 'bunga bank'
     ],
     'Income': [
-      'dapet duit', 'dapat duit', 'dapet uang', 'dapat uang', 'pemasukan',
-      'income', 'tambahin ke saldo', 'tambah ke saldo', 'tambah saldo',
-      'tambahin saldo', 'masuk saldo', 'masuk ke saldo', 'saldo masuk',
-      'uang masuk', 'duit masuk', 'transferan masuk', 'terima transfer',
-      'terima uang', 'dapat transferan', 'dapet transferan',
-      'dapat kiriman', 'dapet kiriman'
+      'nemu duit', 'nemu uang', 'menemukan uang', 'nemu rejeki', 'nemu rezeki',
+      'rejeki nomplok', 'uang kaget', 'dapat rejeki', 'dapet rejeki',
+      'dapat rezeki', 'dapet rezeki', 'nemu', 'dapet duit', 'dapat duit',
+      'dapet uang', 'dapat uang', 'pemasukan', 'income', 'tambahin ke saldo',
+      'tambah ke saldo', 'tambah saldo', 'tambahin saldo', 'isi saldo',
+      'top up', 'masuk saldo', 'masuk ke saldo', 'saldo masuk', 'uang masuk',
+      'duit masuk', 'transferan masuk', 'terima transfer', 'terima uang',
+      'dapat transferan', 'dapet transferan', 'dapat kiriman', 'dapet kiriman',
+      'refund'
     ],
   };
 
@@ -102,6 +111,40 @@ class NlpTransactionParser {
     'Investment',
     'Income',
   };
+
+  static const Map<String, String> _knownWallets = {
+    'cash': 'Cash',
+    'tunai': 'Cash',
+    'dompet': 'Cash',
+    'kantong': 'Cash',
+    'gopay': 'GoPay',
+    'go-pay': 'GoPay',
+    'go pay': 'GoPay',
+    'jago': 'Jago',
+    'bank jago': 'Jago',
+    'bca': 'BCA',
+    'mandiri': 'Mandiri',
+    'dana': 'DANA',
+    'ovo': 'OVO',
+    'shopeepay': 'ShopeePay',
+    'spay': 'ShopeePay',
+    'bri': 'BRI',
+    'bni': 'BNI',
+    'seabank': 'SeaBank',
+    'jenius': 'Jenius',
+    'bsi': 'BSI',
+    'cimb': 'CIMB',
+  };
+
+  static final RegExp _walletPrepositionPattern = RegExp(
+    r'\b(?:di|ke|pakai|pake|lewat|masuk\s+ke|masukin\s+ke)\s+(?:wallet\s+|dompet\s+|rekening\s+|akun\s+)?(cash|tunai|dompet|kantong|gopay|go-pay|go\s+pay|jago|bca|mandiri|dana|ovo|shopeepay|spay|bri|bni|seabank|jenius|bsi|cimb)\b|\b(?:wallet|dompet)\s+([a-zA-Z0-9]+)\b',
+    caseSensitive: false,
+  );
+
+  static final RegExp _leadingPronounPattern = RegExp(
+    r'^(?:aku|saya|kita|gue|gua)\s+',
+    caseSensitive: false,
+  );
 
   static final RegExp _amountPattern = RegExp(
     r'(?:rp\.?\s*)?(\d+(?:[.,]\d+)?)\s*(k|rb|ribu|jt|juta|m|mio|million)?\b',
@@ -124,7 +167,7 @@ class NlpTransactionParser {
   );
 
   static final RegExp _incomePattern = RegExp(
-    r'\b(?:dapet\s+duit|dapat\s+duit|dapet\s+uang|dapat\s+uang|dikasi\s+duit|dikasih\s+duit|dikasi\s+uang|dikasih\s+uang|dikasi|dikasih|tambahin\s+(?:ke\s+)?saldo|tambah\s+(?:ke\s+)?saldo|masuk\s+(?:ke\s+)?saldo|saldo\s+masuk|uang\s+masuk|duit\s+masuk|pemasukan|income|gaji|salary|upah|honor|bonus|thr|cuan|komisi|cashback|reimburse|angpao|uang\s+jajan|duit\s+jajan|transferan(?:\s+masuk)?|terima\s+(?:transfer|uang)|dapet\s+transfer|dapat\s+transfer|hasil\s+jualan|laku|dividen|profit)\b',
+    r'\b(?:nemu\s+(?:duit|uang|rejeki|rezeki)(?:\s+di\s+jalan)?|menemukan\s+uang|uang\s+di\s+jalan|duit\s+di\s+jalan|rejeki\s+nomplok|uang\s+kaget|dapet\s+(?:duit|uang|rejeki|rezeki)|dapat\s+(?:duit|uang|rejeki|rezeki)|dikasi\s+(?:duit|uang)|dikasih\s+(?:duit|uang)|dikasi|dikasih|diberi\s+(?:uang|duit)|diberikan\s+(?:uang|duit)|amplop(?:an)?|salam\s+tempel|uang\s+saku|duit\s+saku|uang\s+jajan|duit\s+jajan|uang\s+tip|dapat\s+tip|dapet\s+tip|tambahin\s+(?:ke\s+)?saldo|tambah\s+(?:ke\s+)?saldo|isi\s+(?:ke\s+)?saldo|top\s*up|masuk\s+(?:ke\s+)?saldo|saldo\s+masuk|uang\s+masuk|duit\s+masuk|pemasukan|income|gaji|salary|upah|honor|bonus|thr|cuan|komisi|cashback|reimburse(?:ment)?|angpao|transferan(?:\s+masuk)?|terima\s+(?:transfer|uang)|dapet\s+transfer|dapat\s+transfer|hasil\s+jualan|laku|dividen|profit|refund)\b',
     caseSensitive: false,
   );
 
@@ -247,11 +290,25 @@ class NlpTransactionParser {
 
     final finalAmount = rawNum * multiplier;
 
-    String itemTitle = lower
-        .replaceAll(amountMatch.group(0)!, '')
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim();
+    // Extract target wallet if present (e.g. "di gopay", "pake bca", "masuk ke cash")
+    String? detectedWallet;
+    final walletMatch = _walletPrepositionPattern.firstMatch(lower);
+    if (walletMatch != null) {
+      final rawW = (walletMatch.group(1) ?? walletMatch.group(2) ?? '').toLowerCase();
+      if (_knownWallets.containsKey(rawW)) {
+        detectedWallet = _knownWallets[rawW];
+      } else if (rawW.isNotEmpty && rawW != 'jalan') {
+        detectedWallet = rawW[0].toUpperCase() + rawW.substring(1).toLowerCase();
+      }
+    }
 
+    String itemTitle = lower.replaceAll(amountMatch.group(0)!, '');
+    if (walletMatch != null && detectedWallet != null) {
+      itemTitle = itemTitle.replaceAll(walletMatch.group(0)!, '');
+    }
+
+    itemTitle = itemTitle.replaceAll(RegExp(r'\s+'), ' ').trim();
+    itemTitle = itemTitle.replaceFirst(_leadingPronounPattern, '').trim();
     itemTitle = itemTitle.replaceFirst(_leadingConjunctionPattern, '').trim();
     itemTitle = itemTitle.replaceFirst(_leadingActionVerbPattern, '').trim();
     if (itemTitle.isEmpty) {
@@ -286,6 +343,7 @@ class NlpTransactionParser {
       type: detectedType,
       title: formattedTitle,
       isValid: true,
+      walletName: detectedWallet,
     );
   }
 
