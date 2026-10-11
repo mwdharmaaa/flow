@@ -26,10 +26,10 @@ class LogOptionsModal extends StatelessWidget {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
     return Container(
-      padding: EdgeInsets.fromLTRB(20, 12, 20, 24 + bottomInset),
+      padding: EdgeInsets.fromLTRB(20, 10, 20, 24 + bottomInset),
       decoration: BoxDecoration(
         color: isDark ? AppTheme.darkBgBase : Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -37,11 +37,11 @@ class LogOptionsModal extends StatelessWidget {
         children: [
           Center(
             child: Container(
-              width: 40,
+              width: 44,
               height: 4,
-              margin: const EdgeInsets.only(bottom: 14),
+              margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
-                color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border,
+                color: isDark ? AppTheme.darkBorderSubtle : const Color(0xFFCBD5E1),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -52,23 +52,31 @@ class LogOptionsModal extends StatelessWidget {
               Text(
                 'How do you want to log it?',
                 style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: isDark ? AppTheme.darkTextPrimary : const Color(0xFF0F172A),
+                  letterSpacing: -0.3,
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.close_rounded, size: 20),
-                color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle,
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                onPressed: () => Navigator.of(context).pop(),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: isDark ? AppTheme.darkBgElevated : const Color(0xFFF1F5F9),
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.close_rounded, size: 18),
+                  color: isDark ? AppTheme.darkTextPrimary : const Color(0xFF0F172A),
+                  padding: EdgeInsets.zero,
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
+          _buildDivider(isDark),
           _buildOptionTile(
-            context: context,
             icon: Icons.chat_bubble_outline_rounded,
             title: 'Type',
             subtitle: 'Chat to Moni as usual: "lunch 5k".',
@@ -80,7 +88,6 @@ class LogOptionsModal extends StatelessWidget {
           ),
           _buildDivider(isDark),
           _buildOptionTile(
-            context: context,
             icon: Icons.mic_none_rounded,
             title: 'Speak',
             subtitle: '"Coffee 28k, fuel 50k."',
@@ -92,7 +99,6 @@ class LogOptionsModal extends StatelessWidget {
           ),
           _buildDivider(isDark),
           _buildOptionTile(
-            context: context,
             icon: Icons.receipt_long_outlined,
             title: 'Receipt photo',
             subtitle: 'Point at the receipt, Moni reads the rest.',
@@ -104,7 +110,6 @@ class LogOptionsModal extends StatelessWidget {
           ),
           _buildDivider(isDark),
           _buildOptionTile(
-            context: context,
             icon: Icons.edit_outlined,
             title: 'Manual',
             subtitle: 'Fill in the form yourself, transfers included.',
@@ -116,7 +121,6 @@ class LogOptionsModal extends StatelessWidget {
           ),
           _buildDivider(isDark),
           _buildOptionTile(
-            context: context,
             icon: Icons.people_outline_rounded,
             title: 'Debts',
             subtitle: 'Lend to a friend, or log what you owe.',
@@ -125,6 +129,58 @@ class LogOptionsModal extends StatelessWidget {
               Navigator.of(context).pop();
               state.setTabIndex(4);
             },
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Text(
+                'Auto',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: isDark ? AppTheme.darkTextSecondary : const Color(0xFF64748B),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: isDark ? AppTheme.darkBgElevated : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isDark ? AppTheme.darkBorderSubtle : const Color(0xFFE2E8F0),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.notifications_none_rounded,
+                      size: 16,
+                      color: isDark ? AppTheme.darkTextSecondary : const Color(0xFF64748B),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Notifications',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? AppTheme.darkTextPrimary : const Color(0xFF1E293B),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      width: 7,
+                      height: 7,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isDark ? AppTheme.darkBorderSubtle : const Color(0xFFCBD5E1),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -140,7 +196,6 @@ class LogOptionsModal extends StatelessWidget {
   }
 
   Widget _buildOptionTile({
-    required BuildContext context,
     required IconData icon,
     required String title,
     required String subtitle,
@@ -149,22 +204,19 @@ class LogOptionsModal extends StatelessWidget {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+        padding: const EdgeInsets.symmetric(vertical: 14),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: isDark ? AppTheme.darkBgElevated : const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(
-                icon,
-                size: 20,
-                color: isDark ? AppTheme.darkTextPrimary : const Color(0xFF2563EB),
+            SizedBox(
+              width: 32,
+              child: Center(
+                child: Icon(
+                  icon,
+                  size: 24,
+                  color: const Color(0xFF2563EB),
+                ),
               ),
             ),
             const SizedBox(width: 14),
@@ -175,17 +227,18 @@ class LogOptionsModal extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+                      color: isDark ? AppTheme.darkTextPrimary : const Color(0xFF0F172A),
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 3),
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: 12,
-                      color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                      color: isDark ? AppTheme.darkTextSecondary : const Color(0xFF64748B),
                     ),
                   ),
                 ],

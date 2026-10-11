@@ -95,10 +95,10 @@ class _ChooseCategoryModalState extends State<ChooseCategoryModal> {
 
     return Container(
       constraints: BoxConstraints(maxHeight: maxHeight),
-      padding: EdgeInsets.fromLTRB(16, 12, 16, 20 + bottomInset),
+      padding: EdgeInsets.fromLTRB(20, 10, 20, 24 + bottomInset),
       decoration: BoxDecoration(
         color: isDark ? AppTheme.darkBgBase : Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -106,11 +106,11 @@ class _ChooseCategoryModalState extends State<ChooseCategoryModal> {
         children: [
           Center(
             child: Container(
-              width: 40,
+              width: 44,
               height: 4,
-              margin: const EdgeInsets.only(bottom: 12),
+              margin: const EdgeInsets.only(bottom: 14),
               decoration: BoxDecoration(
-                color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border,
+                color: isDark ? AppTheme.darkBorderSubtle : const Color(0xFFCBD5E1),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -121,37 +121,42 @@ class _ChooseCategoryModalState extends State<ChooseCategoryModal> {
               Text(
                 'Choose category',
                 style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: isDark ? AppTheme.darkTextPrimary : const Color(0xFF0F172A),
+                  letterSpacing: -0.3,
                 ),
               ),
               TextButton(
                 onPressed: () {},
                 style: TextButton.styleFrom(
                   visualDensity: VisualDensity.compact,
-                  foregroundColor: AppTheme.primary,
+                  padding: EdgeInsets.zero,
+                  foregroundColor: const Color(0xFF2563EB),
                 ),
-                child: const Text('Manage', style: TextStyle(fontWeight: FontWeight.w700)),
+                child: const Text(
+                  'Manage',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           _buildSegmentedTabs(isDark),
           const SizedBox(height: 12),
           _buildSearchBar(isDark),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           Expanded(
             child: ListView(
               children: [
                 if (_activeTab == TransactionType.expense && _searchQuery.isEmpty) ...[
                   _buildSectionHeader('Recently used', isDark),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
                   _buildRecentlyUsedRow(isDark),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 18),
                 ],
                 _buildSectionHeader('All categories', isDark),
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
                 ..._buildCategoryItems(isDark),
               ],
             ),
@@ -163,11 +168,11 @@ class _ChooseCategoryModalState extends State<ChooseCategoryModal> {
 
   Widget _buildSegmentedTabs(bool isDark) {
     return Container(
-      height: 40,
-      padding: const EdgeInsets.all(3),
+      height: 46,
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: isDark ? AppTheme.darkBgElevated : const Color(0xFFF1F5F9),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         children: [
@@ -191,11 +196,11 @@ class _ChooseCategoryModalState extends State<ChooseCategoryModal> {
             color: isSelected
                 ? (isDark ? AppTheme.darkBgBase : Colors.white)
                 : Colors.transparent,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(12),
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                      color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
                       blurRadius: 4,
                       offset: const Offset(0, 1),
                     ),
@@ -205,11 +210,11 @@ class _ChooseCategoryModalState extends State<ChooseCategoryModal> {
           child: Text(
             title,
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
               color: isSelected
-                  ? (isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary)
-                  : (isDark ? AppTheme.darkTextSecondary : AppTheme.subtle),
+                  ? (isDark ? AppTheme.darkTextPrimary : const Color(0xFF0F172A))
+                  : (isDark ? AppTheme.darkTextSecondary : const Color(0xFF64748B)),
             ),
           ),
         ),
@@ -219,36 +224,36 @@ class _ChooseCategoryModalState extends State<ChooseCategoryModal> {
 
   Widget _buildSearchBar(bool isDark) {
     return Container(
-      height: 44,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      height: 46,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: isDark ? AppTheme.darkBgElevated : const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? AppTheme.darkBorderSubtle : const Color(0xFFE2E8F0),
+          color: isDark ? AppTheme.darkBorderSubtle : const Color(0xFFF1F5F9),
         ),
       ),
       child: Row(
         children: [
           Icon(
             Icons.search_rounded,
-            size: 18,
-            color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle,
+            size: 19,
+            color: isDark ? AppTheme.darkTextSecondary : const Color(0xFF64748B),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
           Expanded(
             child: TextField(
               controller: _searchController,
               onChanged: (val) => setState(() => _searchQuery = val.trim()),
               style: TextStyle(
                 fontSize: 13,
-                color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+                color: isDark ? AppTheme.darkTextPrimary : const Color(0xFF0F172A),
               ),
               decoration: InputDecoration(
                 hintText: 'Search categories',
                 hintStyle: TextStyle(
                   fontSize: 13,
-                  color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle,
+                  color: isDark ? AppTheme.darkTextSecondary : const Color(0xFF94A3B8),
                 ),
                 border: InputBorder.none,
                 isDense: true,
@@ -265,7 +270,7 @@ class _ChooseCategoryModalState extends State<ChooseCategoryModal> {
               child: Icon(
                 Icons.close_rounded,
                 size: 16,
-                color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle,
+                color: isDark ? AppTheme.darkTextSecondary : const Color(0xFF64748B),
               ),
             ),
         ],
@@ -279,7 +284,7 @@ class _ChooseCategoryModalState extends State<ChooseCategoryModal> {
       style: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w600,
-        color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle,
+        color: isDark ? AppTheme.darkTextSecondary : const Color(0xFF64748B),
       ),
     );
   }
@@ -292,21 +297,21 @@ class _ChooseCategoryModalState extends State<ChooseCategoryModal> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 44,
-            height: 44,
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
               color: recent.color,
               shape: BoxShape.circle,
             ),
-            child: Icon(recent.icon, color: Colors.white, size: 20),
+            child: Icon(recent.icon, color: Colors.white, size: 22),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Text(
             recent.name,
             style: TextStyle(
-              fontSize: 11,
+              fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle,
+              color: isDark ? AppTheme.darkTextPrimary : const Color(0xFF1E293B),
             ),
           ),
         ],
@@ -329,17 +334,19 @@ class _ChooseCategoryModalState extends State<ChooseCategoryModal> {
           ),
           if (cat.subCategories.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.only(left: 22),
+              padding: const EdgeInsets.only(left: 20),
               child: IntrinsicHeight(
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Container(
-                      width: 2,
+                      width: 1.5,
                       margin: const EdgeInsets.only(top: 2, bottom: 8),
-                      color: cat.color.withValues(alpha: 0.35),
+                      color: isDark
+                          ? AppTheme.darkBorderSubtle
+                          : const Color(0xFFCBD5E1),
                     ),
-                    const SizedBox(width: 14),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         children: cat.subCategories.map((sub) {
@@ -360,6 +367,7 @@ class _ChooseCategoryModalState extends State<ChooseCategoryModal> {
             ),
           Divider(
             height: 1,
+            thickness: 1,
             color: isDark ? AppTheme.darkBorderSubtle : const Color(0xFFF1F5F9),
           ),
         ],
@@ -383,22 +391,22 @@ class _ChooseCategoryModalState extends State<ChooseCategoryModal> {
         child: Row(
           children: [
             Container(
-              width: isSub ? 32 : 38,
-              height: isSub ? 32 : 38,
+              width: isSub ? 32 : 40,
+              height: isSub ? 32 : 40,
               decoration: BoxDecoration(
                 color: color,
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: Colors.white, size: isSub ? 16 : 19),
+              child: Icon(icon, color: Colors.white, size: isSub ? 16 : 20),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 14),
             Expanded(
               child: Text(
                 title,
                 style: TextStyle(
-                  fontSize: isSub ? 13 : 14,
+                  fontSize: isSub ? 13 : 15,
                   fontWeight: isSub ? FontWeight.w500 : FontWeight.w600,
-                  color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+                  color: isDark ? AppTheme.darkTextPrimary : const Color(0xFF0F172A),
                 ),
               ),
             ),

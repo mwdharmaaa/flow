@@ -31,7 +31,7 @@ class CategoryHierarchyData {
     CategoryItemData(
       name: 'Restaurants',
       icon: Icons.restaurant,
-      color: Color(0xFF9E2A2B),
+      color: Color(0xFF9E1B1E),
     ),
   ];
 
@@ -39,51 +39,51 @@ class CategoryHierarchyData {
     CategoryItemData(
       name: 'Shopping',
       icon: Icons.checkroom,
-      color: Color(0xFF9B1D64),
+      color: Color(0xFF9E0059),
       subCategories: [
         SubCategoryItem(
           name: 'Clothes',
           icon: Icons.checkroom,
-          color: Color(0xFF9B1D64),
+          color: Color(0xFF9E0059),
         ),
         SubCategoryItem(
           name: 'Online Shopping',
           icon: Icons.local_shipping,
-          color: Color(0xFFD9384E),
+          color: Color(0xFFE11D48),
         ),
         SubCategoryItem(
           name: 'Gadgets & Electronics',
           icon: Icons.phone_android,
-          color: Color(0xFF800E26),
+          color: Color(0xFF831843),
         ),
       ],
     ),
     CategoryItemData(
       name: 'Groceries',
       icon: Icons.shopping_basket,
-      color: Color(0xFF0077B6),
+      color: Color(0xFF0891B2),
     ),
     CategoryItemData(
       name: 'Entertainment',
       icon: Icons.sports_esports,
-      color: Color(0xFFF58220),
+      color: Color(0xFFD97706),
     ),
     CategoryItemData(
       name: 'Investment',
       icon: Icons.savings,
-      color: Color(0xFF001B48),
+      color: Color(0xFF0F172A),
       subCategories: [
         SubCategoryItem(
           name: 'Gold',
           icon: Icons.view_module,
-          color: Color(0xFFC59B27),
+          color: Color(0xFF1E1B4B),
         ),
       ],
     ),
     CategoryItemData(
       name: 'Restaurants',
       icon: Icons.restaurant,
-      color: Color(0xFF9E2A2B),
+      color: Color(0xFF9E1B1E),
     ),
     CategoryItemData(
       name: 'Transport',
@@ -111,42 +111,42 @@ class CategoryHierarchyData {
     CategoryItemData(
       name: 'Business',
       icon: Icons.business_center,
-      color: Color(0xFF1B4332),
+      color: Color(0xFF064E3B),
     ),
     CategoryItemData(
       name: 'Bonus',
       icon: Icons.card_giftcard,
-      color: Color(0xFFE76F51),
+      color: Color(0xFFD97706),
     ),
     CategoryItemData(
       name: 'Salary',
       icon: Icons.payments,
-      color: Color(0xFF2A9D8F),
+      color: Color(0xFF0D9488),
     ),
     CategoryItemData(
       name: 'Investment',
       icon: Icons.trending_up,
-      color: Color(0xFF0077B6),
+      color: Color(0xFF0284C7),
     ),
     CategoryItemData(
       name: 'Gifts Received',
       icon: Icons.volunteer_activism,
-      color: Color(0xFF8338EC),
+      color: Color(0xFF9333EA),
     ),
     CategoryItemData(
       name: 'Sales',
       icon: Icons.sell,
-      color: Color(0xFFE63946),
+      color: Color(0xFFE11D48),
     ),
     CategoryItemData(
       name: 'Loans',
-      icon: Icons.account_balance,
-      color: Color(0xFF1D3557),
+      icon: Icons.credit_card,
+      color: Color(0xFF1E40AF),
     ),
     CategoryItemData(
-      name: 'Other Income',
+      name: 'All Categories',
       icon: Icons.extension,
-      color: Color(0xFF6C757D),
+      color: Color(0xFF64748B),
     ),
   ];
 
@@ -154,17 +154,17 @@ class CategoryHierarchyData {
     CategoryItemData(
       name: 'Cash Withdrawal',
       icon: Icons.atm,
-      color: Color(0xFF9E2A2B),
+      color: Color(0xFFB91C1C),
     ),
     CategoryItemData(
       name: 'Top Up',
       icon: Icons.keyboard_double_arrow_up,
-      color: Color(0xFF2A9D8F),
+      color: Color(0xFF059669),
     ),
     CategoryItemData(
       name: 'Transfer',
       icon: Icons.arrow_forward,
-      color: Color(0xFFE76F51),
+      color: Color(0xFFEA580C),
     ),
   ];
 }
