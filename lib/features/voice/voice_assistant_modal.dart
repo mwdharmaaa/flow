@@ -30,7 +30,7 @@ class VoiceAssistantModal extends StatefulWidget {
 class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
   final TextEditingController _transcriptController = TextEditingController();
   bool _isListening = false;
-  ParsedTransactionResult? _parsedResult;
+  List<ParsedTransactionResult> _parsedResults = [];
   bool _speakResponse = true;
 
   @override
@@ -72,10 +72,7 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
         setState(() {
           _transcriptController.text = text;
         });
-        if (isFinal) {
-          _processTranscript(text);
-          setState(() => _isListening = false);
-        }
+        _processTranscript(text);
       },
       onError: (err) {
         if (!mounted) return;
@@ -102,49 +99,56 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
   }
 
   void _processTranscript(String text) {
-    final result = NlpTransactionParser.parse(text);
+    final results = NlpTransactionParser.parseAll(text);
     setState(() {
-      _isListening = false;
-      _transcriptController.text = text;
-      _parsedResult = result;
+      _parsedResults = results;
     });
   }
 
-  void _saveTransaction() {
-    if (_parsedResult == null || !_parsedResult!.isValid) return;
+  void _removeItem(int index) {
+    setState(() {
+      _parsedResults.removeAt(index);
+    });
+  }
 
-    final res = _parsedResult!;
+  void _saveTransactions() {
+    if (_parsedResults.isEmpty) return;
+
     final defaultAccountId = widget.state.accounts.isNotEmpty
         ? widget.state.accounts.first.id
         : 'acc_cash';
 
-    final tx = TransactionModel(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      type: res.type,
-      amount: res.amount,
-      accountId: defaultAccountId,
-      category: res.category,
-      date: DateTime.now(),
-      note: res.title,
-      createdAt: DateTime.now().millisecondsSinceEpoch,
-    );
-
-    widget.state.addTransaction(tx);
+    final now = DateTime.now();
+    for (var i = 0; i < _parsedResults.length; i++) {
+      final res = _parsedResults[i];
+      final tx = TransactionModel(
+        id: '${now.millisecondsSinceEpoch}_$i',
+        type: res.type,
+        amount: res.amount,
+        accountId: defaultAccountId,
+        category: res.category,
+        date: now,
+        note: res.title,
+        createdAt: now.millisecondsSinceEpoch + i,
+      );
+      widget.state.addTransaction(tx);
+    }
 
     if (_speakResponse) {
-      final feedback = VoiceService.instance.formatTransactionFeedback(
-        title: res.title,
-        amount: res.amount,
-        category: res.category,
-      );
+      final feedback = VoiceService.instance.formatMultipleTransactionsFeedback(_parsedResults);
       VoiceService.instance.speak(feedback);
     }
 
     Navigator.of(context).pop();
 
+    final total = _parsedResults.fold<double>(0.0, (sum, i) => sum + i.amount);
+    final summaryText = _parsedResults.length == 1
+        ? 'Tercatat: ${_parsedResults.first.title} ${CurrencyFormatter.format(_parsedResults.first.amount, currency: widget.state.currency)}'
+        : 'Tercatat ${_parsedResults.length} transaksi (${CurrencyFormatter.format(total, currency: widget.state.currency)})';
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Tercatat: ${res.title} ${CurrencyFormatter.format(res.amount, currency: widget.state.currency)}'),
+        content: Text(summaryText),
         backgroundColor: AppTheme.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -249,7 +253,7 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
               isDark: isDark,
               onSelect: (val) => _toggleListening(val),
             ),
-            if (_parsedResult != null && _parsedResult!.isValid) ...[
+            if (_parsedResults.isNotEmpty) ...[
               const SizedBox(height: 16),
               _buildResultCard(isDark),
             ],
@@ -260,7 +264,9 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
   }
 
   Widget _buildResultCard(bool isDark) {
-    final res = _parsedResult!;
+    final totalAmount = _parsedResults.fold<double>(0.0, (sum, item) => sum + item.amount);
+    final isMultiple = _parsedResults.length > 1;
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -277,17 +283,19 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                res.title,
+                isMultiple
+                    ? 'Terdeteksi ${_parsedResults.length} Transaksi'
+                    : 'Terdeteksi Transaksi',
                 style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle,
                 ),
               ),
               Text(
-                CurrencyFormatter.format(res.amount, currency: widget.state.currency),
+                'Total: ${CurrencyFormatter.format(totalAmount, currency: widget.state.currency)}',
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.w900,
                   color: AppTheme.expense,
                 ),
@@ -295,6 +303,77 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
             ],
           ),
           const SizedBox(height: 10),
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _parsedResults.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            itemBuilder: (context, index) {
+              final item = _parsedResults[index];
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: isDark ? AppTheme.darkBgBase : AppTheme.background,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        item.category,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.primary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        item.title,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      CurrencyFormatter.format(item.amount, currency: widget.state.currency),
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        color: item.type == TransactionType.income
+                            ? AppTheme.income
+                            : AppTheme.expense,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded, size: 16),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                      tooltip: 'Hapus item',
+                      color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle,
+                      onPressed: () => _removeItem(index),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -314,15 +393,17 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
           ),
           const SizedBox(height: 10),
           ElevatedButton(
-            onPressed: _saveTransaction,
+            onPressed: _saveTransactions,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            child: const Text(
-              'Simpan Transaksi Suara',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+            child: Text(
+              isMultiple
+                  ? 'Simpan ${_parsedResults.length} Transaksi Suara'
+                  : 'Simpan Transaksi Suara',
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
             ),
           ),
         ],
