@@ -169,7 +169,7 @@ class DashboardSummary extends StatelessWidget {
           _buildSectionHeader('Balances', onSeeAllWallets, actionText: 'See all'),
           const SizedBox(height: 10),
           SizedBox(
-            height: 96,
+            height: 104,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
@@ -468,7 +468,7 @@ class DashboardSummary extends StatelessWidget {
 
     return Container(
       width: 100,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(16),
