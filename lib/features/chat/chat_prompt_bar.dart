@@ -5,6 +5,7 @@ import 'package:flow/core/formatters/currency_formatter.dart';
 import 'package:flow/models/transaction_model.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/features/chat/chat_assistant_modal.dart';
+import 'package:flow/features/voice/voice_assistant_modal.dart';
 
 class ChatPromptBar extends StatefulWidget {
   final AppState state;
@@ -137,12 +138,25 @@ class _ChatPromptBarState extends State<ChatPromptBar> {
               constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
             )
           else
-            IconButton(
-              icon: const Icon(Icons.chevron_right, size: 20, color: AppTheme.subtle),
-              onPressed: () => _openChatModal(),
-              splashRadius: 18,
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.mic_none_rounded, size: 18, color: AppTheme.primary),
+                  onPressed: () => VoiceAssistantModal.show(context, widget.state),
+                  tooltip: 'Voice Input',
+                  splashRadius: 18,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 30, minHeight: 30),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.chevron_right, size: 20, color: AppTheme.subtle),
+                  onPressed: () => _openChatModal(),
+                  splashRadius: 18,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 26, minHeight: 30),
+                ),
+              ],
             ),
         ],
       ),
