@@ -26,6 +26,7 @@ class SpeechRecognitionWeb implements SpeechRecognitionInterface {
       rec.lang = 'id-ID';
       rec.continuous = true;
       rec.interimResults = true;
+      rec.maxAlternatives = 5;
 
       rec.onResult.listen((event) {
         final results = event.results;
@@ -34,10 +35,25 @@ class SpeechRecognitionWeb implements SpeechRecognitionInterface {
         final buffer = StringBuffer();
         for (var i = 0; i < results.length; i++) {
           final res = results[i];
-          final part = res.item(0)?.transcript ?? '';
-          if (part.isNotEmpty) {
+          String bestPart = res.item(0)?.transcript ?? '';
+          final altCount = res.length ?? 1;
+          for (var j = 0; j < altCount; j++) {
+            final alt = res.item(j)?.transcript ?? '';
+            final altLower = alt.toLowerCase();
+            if (altLower.contains('matcha') ||
+                altLower.contains('maca') ||
+                altLower.contains('macha') ||
+                altLower.contains('mat cha') ||
+                altLower.contains('macca') ||
+                altLower.contains('matca')) {
+              bestPart = alt;
+              break;
+            }
+          }
+
+          if (bestPart.isNotEmpty) {
             if (buffer.isNotEmpty) buffer.write(' ');
-            buffer.write(part);
+            buffer.write(bestPart);
           }
         }
 

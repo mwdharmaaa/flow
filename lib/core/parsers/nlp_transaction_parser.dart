@@ -30,9 +30,13 @@ class NlpTransactionParser {
     'Food': [
       'coffee', 'kopi', 'makan', 'lunch', 'dinner', 'sarapan', 'nasi',
       'ayam', 'mie', 'snack', 'jajan', 'burger', 'pizza', 'minum',
-      'tea', 'teh', 'esteh', 'matcha', 'jus', 'boba', 'food', 'resto',
+      'tea', 'teh', 'esteh', 'es teh', 'matcha', 'maca', 'macha',
+      'mat cha', 'mat ca', 'macca', 'matca', 'matsa', 'matsya',
+      'masha', 'masya', 'marsha', 'macah', 'matchah', 'greentea',
+      'green tea', 'jus', 'juice', 'boba', 'food', 'resto',
       'cafe', 'kafe', 'roti', 'bakso', 'sate', 'soto', 'martabak',
-      'eskrim', 'icecream', 'kue', 'gorengan'
+      'eskrim', 'icecream', 'ice cream', 'kue', 'gorengan', 'latte',
+      'cappuccino', 'espresso'
     ],
     'Transport': [
       'grab', 'gojek', 'ojol', 'bensin', 'bbm', 'pertalite', 'pertamax',
@@ -42,7 +46,7 @@ class NlpTransactionParser {
     'Shopping': [
       'belanja', 'baju', 'celana', 'sepatu', 'kaos', 'shopee', 'tokped',
       'tokopedia', 'lazada', 'mall', 'shopping', 'skincare', 'makeup',
-      'tas', 'jaket', 'beli', 'supermarket', 'indomaret', 'alfamart'
+      'tas', 'jaket', 'supermarket', 'indomaret', 'alfamart'
     ],
     'Bills': [
       'listrik', 'pln', 'air', 'pdam', 'wifi', 'indihome', 'biznet',
@@ -51,7 +55,7 @@ class NlpTransactionParser {
     ],
     'Entertainment': [
       'netflix', 'spotify', 'youtube', 'game', 'steam', 'bioskop',
-      'nonton', 'film', 'cinema', 'xxi', 'hiburan', 'liburan', 'ticket'
+      'nonton', 'film', 'cinema', 'xxi', 'hiburan', 'liburan', 'ticket', 'tiket'
     ],
     'Health': [
       'obat', 'dokter', 'apotek', 'vitamin', 'rs', 'klinik', 'sehat',
@@ -82,6 +86,50 @@ class NlpTransactionParser {
     caseSensitive: false,
   );
 
+  static final RegExp _leadingActionVerbPattern = RegExp(
+    r'^(?:beli|membeli|pesan|memesan|order|ngorder|bayar|membayar|jajan|buat|untuk|ambil|ngambil)\s+',
+    caseSensitive: false,
+  );
+
+  static final RegExp _attachedMatchaNumberPattern = RegExp(
+    r'\b(?:maca|macha|macca|matca|matsa|matsya|masha|masya|marsha|macah|matchah|matja|mecha|matcha)(?=\d)',
+    caseSensitive: false,
+  );
+
+  static final RegExp _matchFollowedByAmount = RegExp(
+    r'\bmatch\s+(?=\d|k\b|rb\b|ribu\b|jt\b|juta\b)',
+    caseSensitive: false,
+  );
+
+  static final RegExp _matchaPhoneticPattern = RegExp(
+    r'\b(?:maca|macha|macca|matca|matsa|matsya|masha|masya|marsha|macah|matchah|matja|mecha|mat\s*cha|mat\s*ca|match\s*a)\b',
+    caseSensitive: false,
+  );
+
+  static final RegExp _esTehPhoneticPattern = RegExp(
+    r'\b(?:es\s+teh|es\s+te|es\s+tea|ice\s+tea)\b',
+    caseSensitive: false,
+  );
+
+  static String phoneticNormalize(String input) {
+    if (input.isEmpty) return input;
+    String res = input;
+
+    // 1. Separate attached matcha and digits: "matcha28k" -> "matcha 28k"
+    res = res.replaceAllMapped(_attachedMatchaNumberPattern, (m) => '${m[0]} ');
+
+    // 2. Normalize "match 28k" -> "matcha 28k"
+    res = res.replaceAllMapped(_matchFollowedByAmount, (_) => 'matcha ');
+
+    // 3. Normalize all matcha phonetic variants to "matcha"
+    res = res.replaceAll(_matchaPhoneticPattern, 'matcha');
+
+    // 4. Normalize common beverage variants like "es teh" -> "esteh"
+    res = res.replaceAll(_esTehPhoneticPattern, 'esteh');
+
+    return res;
+  }
+
   static ParsedTransactionResult parse(String input) {
     final all = parseAll(input);
     return all.isNotEmpty ? all.first : ParsedTransactionResult.invalid;
@@ -91,7 +139,8 @@ class NlpTransactionParser {
     final cleanInput = input.trim();
     if (cleanInput.isEmpty) return const [];
 
-    final normalized = IndonesianNumberParser.normalize(cleanInput);
+    final phoneticallyNormalized = phoneticNormalize(cleanInput);
+    final normalized = IndonesianNumberParser.normalize(phoneticallyNormalized);
     if (normalized.isEmpty) return const [];
 
     final rawSegments = normalized.split(_conjunctionSplitter);
@@ -167,11 +216,12 @@ class NlpTransactionParser {
         .trim();
 
     itemTitle = itemTitle.replaceFirst(_leadingConjunctionPattern, '').trim();
+    itemTitle = itemTitle.replaceFirst(_leadingActionVerbPattern, '').trim();
     if (itemTitle.isEmpty) {
       itemTitle = 'Quick Record';
     }
 
-    final formattedTitle = itemTitle[0].toUpperCase() + itemTitle.substring(1);
+    final formattedTitle = _formatTitle(itemTitle);
 
     String detectedCategory = 'Other';
     TransactionType detectedType = TransactionType.expense;
@@ -196,5 +246,15 @@ class NlpTransactionParser {
       title: formattedTitle,
       isValid: true,
     );
+  }
+
+  static String _formatTitle(String raw) {
+    final clean = raw.trim();
+    if (clean.isEmpty) return 'Quick Record';
+    return clean
+        .split(' ')
+        .where((w) => w.isNotEmpty)
+        .map((w) => w[0].toUpperCase() + w.substring(1).toLowerCase())
+        .join(' ');
   }
 }

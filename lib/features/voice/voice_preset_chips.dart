@@ -6,6 +6,7 @@ class VoicePresetChips extends StatelessWidget {
   final bool isDark;
 
   static const List<String> suggestions = [
+    'Matcha 28k',
     'Matcha 28k dan esteh 3k',
     'Kopi latte 18k',
     'Makan siang 25k',

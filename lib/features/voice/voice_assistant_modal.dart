@@ -56,7 +56,11 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
       setState(() => _isListening = false);
       if (_transcriptController.text.isNotEmpty &&
           !_transcriptController.text.startsWith('Mendengarkan')) {
-        _processTranscript(_transcriptController.text);
+        final normalized = NlpTransactionParser.phoneticNormalize(_transcriptController.text);
+        if (normalized != _transcriptController.text) {
+          _transcriptController.text = normalized;
+        }
+        _processTranscript(normalized);
       }
       return;
     }
@@ -69,10 +73,11 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
     SpeechRecognitionService.instance.startListening(
       onResult: (text, isFinal) {
         if (!mounted) return;
+        final normalizedText = NlpTransactionParser.phoneticNormalize(text);
         setState(() {
-          _transcriptController.text = text;
+          _transcriptController.text = normalizedText;
         });
-        _processTranscript(text);
+        _processTranscript(normalizedText);
       },
       onError: (err) {
         if (!mounted) return;
@@ -91,7 +96,11 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
           setState(() => _isListening = false);
           if (_transcriptController.text.isNotEmpty &&
               !_transcriptController.text.startsWith('Mendengarkan')) {
-            _processTranscript(_transcriptController.text);
+            final normalized = NlpTransactionParser.phoneticNormalize(_transcriptController.text);
+            if (normalized != _transcriptController.text) {
+              _transcriptController.text = normalized;
+            }
+            _processTranscript(normalized);
           }
         }
       },
