@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/models/transaction_model.dart';
 import 'package:flow/models/account_model.dart';
@@ -11,6 +12,7 @@ void main() {
     late AppState state;
 
     setUp(() {
+      SharedPreferences.setMockInitialValues({});
       state = AppState();
       state.addAccount(
         AccountModel(
