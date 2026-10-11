@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,6 +14,10 @@ class AppState extends ChangeNotifier {
   int _currentTabIndex = 0;
   String _currency = 'IDR';
   bool _isDarkMode = false;
+  final ValueNotifier<bool> darkModeNotifier = ValueNotifier<bool>(false);
+
+  Timer? _saveDebounceTimer;
+  SharedPreferences? _cachedPrefs;
 
   List<AccountModel> _accounts = [];
   List<TransactionModel> _transactions = [];
@@ -67,6 +72,7 @@ class AppState extends ChangeNotifier {
 
   void toggleDarkMode([bool? value]) {
     _isDarkMode = value ?? !_isDarkMode;
+    darkModeNotifier.value = _isDarkMode;
     _saveState();
     notifyListeners();
   }
@@ -410,23 +416,31 @@ class AppState extends ChangeNotifier {
 
       _currency = prefs.getString('flow_currency') ?? 'IDR';
       _isDarkMode = prefs.getBool('flow_dark_mode') ?? false;
+      darkModeNotifier.value = _isDarkMode;
       notifyListeners();
     } catch (_) {
       resetToDefaults();
     }
   }
 
-  Future<void> _saveState() async {
+  void _saveState() {
+    _saveDebounceTimer?.cancel();
+    _saveDebounceTimer = Timer(const Duration(milliseconds: 250), _persistState);
+  }
+
+  Future<void> _persistState() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('flow_accounts', jsonEncode(_accounts.map((e) => e.toJson()).toList()));
-      await prefs.setString('flow_transactions', jsonEncode(_transactions.map((e) => e.toJson()).toList()));
-      await prefs.setString('flow_budgets', jsonEncode(_budgets.map((e) => e.toJson()).toList()));
-      await prefs.setString('flow_debts', jsonEncode(_debts.map((e) => e.toJson()).toList()));
-      await prefs.setString('flow_recurring', jsonEncode(_recurring.map((e) => e.toJson()).toList()));
-      await prefs.setString('flow_goals', jsonEncode(_goals.map((e) => e.toJson()).toList()));
-      await prefs.setString('flow_currency', _currency);
-      await prefs.setBool('flow_dark_mode', _isDarkMode);
+      final prefs = _cachedPrefs ??= await SharedPreferences.getInstance();
+      await Future.wait([
+        prefs.setString('flow_accounts', jsonEncode(_accounts.map((e) => e.toJson()).toList())),
+        prefs.setString('flow_transactions', jsonEncode(_transactions.map((e) => e.toJson()).toList())),
+        prefs.setString('flow_budgets', jsonEncode(_budgets.map((e) => e.toJson()).toList())),
+        prefs.setString('flow_debts', jsonEncode(_debts.map((e) => e.toJson()).toList())),
+        prefs.setString('flow_recurring', jsonEncode(_recurring.map((e) => e.toJson()).toList())),
+        prefs.setString('flow_goals', jsonEncode(_goals.map((e) => e.toJson()).toList())),
+        prefs.setString('flow_currency', _currency),
+        prefs.setBool('flow_dark_mode', _isDarkMode),
+      ]);
     } catch (_) {}
   }
 }
