@@ -169,8 +169,9 @@ class DashboardSummary extends StatelessWidget {
           _buildSectionHeader('Balances', onSeeAllWallets, actionText: 'See all'),
           const SizedBox(height: 10),
           SizedBox(
-            height: 104,
+            height: 112,
             child: ListView.separated(
+              padding: EdgeInsets.zero,
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
               cacheExtent: 200,
@@ -467,8 +468,8 @@ class DashboardSummary extends StatelessWidget {
     }
 
     return Container(
-      width: 100,
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      width: 108,
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(16),
@@ -479,7 +480,7 @@ class DashboardSummary extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
-            padding: const EdgeInsets.all(6),
+            padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
               color: iconColor,
               shape: BoxShape.circle,
@@ -488,12 +489,20 @@ class DashboardSummary extends StatelessWidget {
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Text(account.name, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+              Text(
+                account.name,
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
               const SizedBox(height: 2),
               Text(
                 CurrencyFormatter.format(account.balance, currency: state.currency),
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.textPrimary),
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textPrimary),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
