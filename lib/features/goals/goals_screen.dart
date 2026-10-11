@@ -134,6 +134,8 @@ class GoalsScreen extends StatelessWidget {
                     )
                   : ListView.builder(
                       padding: const EdgeInsets.only(bottom: 110),
+                      physics: const BouncingScrollPhysics(),
+                      cacheExtent: 300,
                       itemCount: state.goals.length,
                       itemBuilder: (_, idx) {
                         final g = state.goals[idx];

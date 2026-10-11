@@ -94,6 +94,8 @@ class AccountsScreen extends StatelessWidget {
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.only(bottom: 110),
+                  physics: const BouncingScrollPhysics(),
+                  cacheExtent: 300,
                   itemCount: state.accounts.length,
                   itemBuilder: (_, idx) {
                     final acc = state.accounts[idx];

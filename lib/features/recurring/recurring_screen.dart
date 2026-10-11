@@ -27,6 +27,8 @@ class RecurringScreen extends StatelessWidget {
                   ? const Center(child: Text('No recurring subscriptions recorded yet.', style: TextStyle(fontSize: 13, color: AppTheme.subtle)))
                   : ListView.builder(
                       padding: const EdgeInsets.only(bottom: 110),
+                      physics: const BouncingScrollPhysics(),
+                      cacheExtent: 300,
                       itemCount: state.recurring.length,
                       itemBuilder: (_, idx) {
                         final r = state.recurring[idx];

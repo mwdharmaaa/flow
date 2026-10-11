@@ -172,6 +172,8 @@ class DashboardSummary extends StatelessWidget {
             height: 96,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              cacheExtent: 200,
               itemCount: state.accounts.length,
               separatorBuilder: (_, __) => const SizedBox(width: 10),
               itemBuilder: (_, idx) => _buildWalletCard(state.accounts[idx]),
