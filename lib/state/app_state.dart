@@ -271,8 +271,49 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  String resolveOrCreateAccountId(String? walletName) {
+    if (walletName == null || walletName.trim().isEmpty) {
+      return _accounts.isNotEmpty ? _accounts.first.id : 'acc_cash';
+    }
+    final normalized = walletName.trim().toLowerCase();
+    final existing = _accounts.cast<AccountModel?>().firstWhere(
+      (a) => a?.name.trim().toLowerCase() == normalized,
+      orElse: () => null,
+    );
+    if (existing != null) {
+      return existing.id;
+    }
+    final newAcc = AccountModel(
+      id: 'acc_${DateTime.now().millisecondsSinceEpoch}_${walletName.hashCode.abs() % 1000}',
+      name: walletName.trim(),
+      type: 'Wallet',
+      balance: 0.0,
+      colorValue: 0xFF1D61E0,
+    );
+    addAccount(newAcc);
+    return newAcc.id;
+  }
+
   void addBudget(BudgetModel bgt) {
     _budgets.add(bgt);
+    _saveState();
+    notifyListeners();
+  }
+
+  void addOrUpdateBudget(String category, double amount) {
+    final idx = _budgets.indexWhere((b) => b.category.toLowerCase() == category.toLowerCase());
+    if (idx != -1) {
+      final existing = _budgets[idx];
+      _budgets[idx] = existing.copyWith(monthlyLimit: existing.monthlyLimit + amount);
+    } else {
+      _budgets.add(BudgetModel(
+        id: 'bgt_${DateTime.now().millisecondsSinceEpoch}',
+        category: category,
+        monthlyLimit: amount,
+        spent: 0.0,
+        colorValue: 0xFF1D61E0,
+      ));
+    }
     _saveState();
     notifyListeners();
   }
