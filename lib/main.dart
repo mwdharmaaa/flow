@@ -10,6 +10,7 @@ import 'package:flow/features/debts/debts_screen.dart';
 import 'package:flow/features/recurring/recurring_screen.dart';
 import 'package:flow/features/goals/goals_screen.dart';
 import 'package:flow/features/transactions/add_transaction_dialog.dart';
+import 'package:flow/features/transactions/log_options_modal.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -61,13 +62,7 @@ class FlowMainScaffold extends StatelessWidget {
   const FlowMainScaffold({super.key, required this.state});
 
   void _openAddTransaction(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => AddTransactionDialog(
-        accounts: state.accounts,
-        onSave: (tx) => state.addTransaction(tx),
-      ),
-    );
+    LogOptionsModal.show(context, state);
   }
 
   String _getSubViewTitle(int index) {
