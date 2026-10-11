@@ -7,6 +7,7 @@ import 'package:flow/state/app_state.dart';
 import 'package:flow/features/chat/chat_prompt_bar.dart';
 import 'package:flow/features/receipt/receipt_scanner_modal.dart';
 import 'package:flow/features/voice/voice_assistant_modal.dart';
+import 'package:flow/core/widgets/flow_logo.dart';
 
 class DashboardHero extends StatefulWidget {
   final double monthExpense;
@@ -76,7 +77,6 @@ class _DashboardHeroState extends State<DashboardHero> {
                       width: 30,
                       height: 30,
                       decoration: BoxDecoration(
-                        color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
@@ -86,8 +86,10 @@ class _DashboardHeroState extends State<DashboardHero> {
                           ),
                         ],
                       ),
-                      child: const Center(
-                        child: Icon(Icons.waves, color: Colors.white, size: 17),
+                      child: FlowLogo(
+                        size: 30,
+                        backgroundColor: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary,
+                        waveColor: Colors.white,
                       ),
                     ),
                     const SizedBox(width: 8),
