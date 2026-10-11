@@ -28,41 +28,61 @@ class _FlowAppState extends State<FlowApp> {
   final AppState _appState = AppState();
 
   @override
-  void initState() {
-    super.initState();
-    _appState.addListener(() => setState(() {}));
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flow',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: _appState.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      builder: (context, child) {
-        return Container(
-          color: _appState.isDarkMode ? AppTheme.darkBgBase : const Color(0xFFE9F0FA),
-          alignment: Alignment.center,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 500),
-            child: child ?? const SizedBox(),
-          ),
+    return ValueListenableBuilder<bool>(
+      valueListenable: _appState.darkModeNotifier,
+      builder: (context, isDark, _) {
+        return MaterialApp(
+          title: 'Flow',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+          builder: (context, child) {
+            return Container(
+              color: isDark ? AppTheme.darkBgBase : const Color(0xFFE9F0FA),
+              alignment: Alignment.center,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 500),
+                child: child ?? const SizedBox(),
+              ),
+            );
+          },
+          home: FlowMainScaffold(state: _appState),
         );
       },
-      home: FlowMainScaffold(state: _appState),
     );
   }
 }
 
-class FlowMainScaffold extends StatelessWidget {
+class FlowMainScaffold extends StatefulWidget {
   final AppState state;
 
   const FlowMainScaffold({super.key, required this.state});
 
+  @override
+  State<FlowMainScaffold> createState() => _FlowMainScaffoldState();
+}
+
+class _FlowMainScaffoldState extends State<FlowMainScaffold> {
+  late final List<Widget> _cachedViews;
+
+  @override
+  void initState() {
+    super.initState();
+    _cachedViews = [
+      DashboardScreen(state: widget.state),
+      AnalyticsScreen(state: widget.state),
+      BudgetsScreen(state: widget.state),
+      AccountsScreen(state: widget.state),
+      DebtsScreen(state: widget.state),
+      RecurringScreen(state: widget.state),
+      GoalsScreen(state: widget.state),
+    ];
+  }
+
   void _openAddTransaction(BuildContext context) {
-    LogOptionsModal.show(context, state);
+    LogOptionsModal.show(context, widget.state);
   }
 
   String _getSubViewTitle(int index) {
@@ -80,77 +100,60 @@ class FlowMainScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isSubView = state.currentTabIndex > 3;
+    return ListenableBuilder(
+      listenable: widget.state,
+      builder: (context, _) {
+        final state = widget.state;
+        final isSubView = state.currentTabIndex > 3;
+        final isDark = state.isDarkMode;
 
-    Widget activeView;
-    switch (state.currentTabIndex) {
-      case 0:
-        activeView = DashboardScreen(state: state);
-        break;
-      case 1:
-        activeView = AnalyticsScreen(state: state);
-        break;
-      case 2:
-        activeView = BudgetsScreen(state: state);
-        break;
-      case 3:
-        activeView = AccountsScreen(state: state);
-        break;
-      case 4:
-        activeView = DebtsScreen(state: state);
-        break;
-      case 5:
-        activeView = RecurringScreen(state: state);
-        break;
-      case 6:
-        activeView = GoalsScreen(state: state);
-        break;
-      default:
-        activeView = DashboardScreen(state: state);
-    }
-
-    final isDark = state.isDarkMode;
-
-    return Scaffold(
-      backgroundColor: isDark ? AppTheme.darkBgBase : Colors.white,
-      extendBody: true,
-      appBar: isSubView
-          ? AppBar(
-              backgroundColor: isDark ? AppTheme.darkBgBase : AppTheme.background,
-              elevation: 0,
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary),
-                onPressed: () => state.setTabIndex(0),
+        return Scaffold(
+          backgroundColor: isDark ? AppTheme.darkBgBase : Colors.white,
+          extendBody: true,
+          appBar: isSubView
+              ? AppBar(
+                  backgroundColor: isDark ? AppTheme.darkBgBase : AppTheme.background,
+                  elevation: 0,
+                  leading: IconButton(
+                    icon: Icon(Icons.arrow_back, color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary),
+                    onPressed: () => state.setTabIndex(0),
+                  ),
+                  title: Text(
+                    _getSubViewTitle(state.currentTabIndex),
+                    style: TextStyle(
+                      color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                )
+              : null,
+          body: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Content layer cached across tab switches with IndexedStack
+              IndexedStack(
+                index: state.currentTabIndex.clamp(0, _cachedViews.length - 1),
+                children: _cachedViews,
               ),
-              title: Text(
-                _getSubViewTitle(state.currentTabIndex),
-                style: TextStyle(
-                  color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+
+              // Floating Navigation Bar (isolated with RepaintBoundary)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: RepaintBoundary(
+                  child: BottomNavBar(
+                    currentIndex: state.currentTabIndex <= 3 ? state.currentTabIndex : 0,
+                    onTap: (idx) => state.setTabIndex(idx),
+                    onAddTap: () => _openAddTransaction(context),
+                  ),
                 ),
               ),
-            )
-          : null,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Content layer (scrolls behind floating nav bar)
-          activeView,
-
-          // Floating Navigation Bar (rendered on topmost layer)
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: BottomNavBar(
-              currentIndex: state.currentTabIndex <= 3 ? state.currentTabIndex : 0,
-              onTap: (idx) => state.setTabIndex(idx),
-              onAddTap: () => _openAddTransaction(context),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
