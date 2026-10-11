@@ -25,43 +25,48 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final state = widget.state;
+    return ListenableBuilder(
+      listenable: widget.state,
+      builder: (context, _) {
+        final state = widget.state;
 
-    // Filter transactions for current month
-    final monthTransactions = state.transactions.where((tx) {
-      return tx.date.year == _currentMonth.year && tx.date.month == _currentMonth.month;
-    }).toList();
+        // Filter transactions for current month
+        final monthTransactions = state.transactions.where((tx) {
+          return tx.date.year == _currentMonth.year && tx.date.month == _currentMonth.month;
+        }).toList();
 
-    final monthExpense = monthTransactions
-        .where((t) => t.type == TransactionType.expense)
-        .fold(0.0, (sum, t) => sum + t.amount);
+        final monthExpense = monthTransactions
+            .where((t) => t.type == TransactionType.expense)
+            .fold(0.0, (sum, t) => sum + t.amount);
 
-    final isDark = state.isDarkMode;
+        final isDark = state.isDarkMode;
 
-    return Container(
-      color: isDark ? const Color(0xFF09090B) : Colors.white,
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            DashboardHero(
-              monthExpense: monthExpense,
-              currency: state.currency,
-              currentMonth: _currentMonth,
-              onAddTransaction: () => _openAddTransaction(context),
-              state: state,
+        return Container(
+          color: isDark ? const Color(0xFF09090B) : Colors.white,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                DashboardHero(
+                  monthExpense: monthExpense,
+                  currency: state.currency,
+                  currentMonth: _currentMonth,
+                  onAddTransaction: () => _openAddTransaction(context),
+                  state: state,
+                ),
+                DashboardSummary(
+                  state: state,
+                  onAddRecord: () => _openAddTransaction(context),
+                  onSeeAllWallets: () => state.setTabIndex(3),
+                  onSeeAllBudgets: () => state.setTabIndex(2),
+                  onSeeAllDebts: () => state.setTabIndex(4),
+                  onSeeAllRecurring: () => state.setTabIndex(5),
+                  onSeeAllSavings: () => state.setTabIndex(6),
+                ),
+              ],
             ),
-            DashboardSummary(
-              state: state,
-              onAddRecord: () => _openAddTransaction(context),
-              onSeeAllWallets: () => state.setTabIndex(3),
-              onSeeAllBudgets: () => state.setTabIndex(2),
-              onSeeAllDebts: () => state.setTabIndex(4),
-              onSeeAllRecurring: () => state.setTabIndex(5),
-              onSeeAllSavings: () => state.setTabIndex(6),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
