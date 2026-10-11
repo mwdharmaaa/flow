@@ -95,45 +95,47 @@ class _ChatAssistantModalState extends State<ChatAssistantModal> {
     });
     _scrollToBottom();
 
-    final result = NlpTransactionParser.parse(text);
-    if (result.isValid) {
+    final results = NlpTransactionParser.parseAll(text);
+    if (results.isNotEmpty) {
       final defaultAccountId = widget.state.accounts.isNotEmpty
           ? widget.state.accounts.first.id
           : 'acc_cash';
 
-      final newTx = TransactionModel(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        type: result.type,
-        amount: result.amount,
-        accountId: defaultAccountId,
-        category: result.category,
-        date: DateTime.now(),
-        note: result.title,
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-      );
+      final now = DateTime.now();
+      for (var i = 0; i < results.length; i++) {
+        final res = results[i];
+        final newTx = TransactionModel(
+          id: '${now.millisecondsSinceEpoch}_$i',
+          type: res.type,
+          amount: res.amount,
+          accountId: defaultAccountId,
+          category: res.category,
+          date: now,
+          note: res.title,
+          createdAt: now.millisecondsSinceEpoch + i,
+        );
+        widget.state.addTransaction(newTx);
+      }
 
-      widget.state.addTransaction(newTx);
-
-      final typeLabel = result.type == TransactionType.income ? 'Pemasukan' : 'Pengeluaran';
-      final formattedAmount = CurrencyFormatter.format(result.amount, currency: widget.state.currency);
+      final total = results.fold<double>(0.0, (sum, i) => sum + i.amount);
+      final formattedTotal = CurrencyFormatter.format(total, currency: widget.state.currency);
+      final textResponse = results.length == 1
+          ? 'Tercatat: ${results.first.type == TransactionType.income ? "Pemasukan" : "Pengeluaran"} "${results.first.title}" sebesar ${CurrencyFormatter.format(results.first.amount, currency: widget.state.currency)} (${results.first.category}) berhasil disimpan.'
+          : 'Tercatat ${results.length} transaksi sebesar $formattedTotal berhasil disimpan (${results.map((e) => "${e.title} ${CurrencyFormatter.format(e.amount, currency: widget.state.currency)}").join(", ")}).';
 
       setState(() {
         _messages.add(
           ChatMessage(
-            text: 'Tercatat: $typeLabel "${result.title}" sebesar $formattedAmount (${result.category}) berhasil disimpan.',
+            text: textResponse,
             isUser: false,
             timestamp: DateTime.now(),
-            parsedResult: result,
+            parsedResult: results.first,
           ),
         );
       });
 
       if (_isVoiceOutputEnabled) {
-        final speech = VoiceService.instance.formatTransactionFeedback(
-          title: result.title,
-          amount: result.amount,
-          category: result.category,
-        );
+        final speech = VoiceService.instance.formatMultipleTransactionsFeedback(results);
         VoiceService.instance.speak(speech);
       }
     } else {

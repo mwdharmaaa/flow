@@ -48,33 +48,40 @@ class _ChatPromptBarState extends State<ChatPromptBar> {
       return;
     }
 
-    final result = NlpTransactionParser.parse(text);
-    if (result.isValid) {
+    final results = NlpTransactionParser.parseAll(text);
+    if (results.isNotEmpty) {
       final defaultAccountId = widget.state.accounts.isNotEmpty
           ? widget.state.accounts.first.id
           : 'acc_cash';
 
-      final newTx = TransactionModel(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        type: result.type,
-        amount: result.amount,
-        accountId: defaultAccountId,
-        category: result.category,
-        date: DateTime.now(),
-        note: result.title,
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-      );
+      final now = DateTime.now();
+      for (var i = 0; i < results.length; i++) {
+        final result = results[i];
+        final newTx = TransactionModel(
+          id: '${now.millisecondsSinceEpoch}_$i',
+          type: result.type,
+          amount: result.amount,
+          accountId: defaultAccountId,
+          category: result.category,
+          date: now,
+          note: result.title,
+          createdAt: now.millisecondsSinceEpoch + i,
+        );
+        widget.state.addTransaction(newTx);
+      }
 
-      widget.state.addTransaction(newTx);
       _controller.clear();
       FocusScope.of(context).unfocus();
 
-      final formatted = CurrencyFormatter.format(result.amount, currency: widget.state.currency);
-      final typeLabel = result.type == TransactionType.income ? 'Pemasukan' : 'Pengeluaran';
+      final total = results.fold<double>(0.0, (sum, i) => sum + i.amount);
+      final formattedTotal = CurrencyFormatter.format(total, currency: widget.state.currency);
+      final msg = results.length == 1
+          ? 'Tercatat: ${results.first.type == TransactionType.income ? "Pemasukan" : "Pengeluaran"} "${results.first.title}" ${CurrencyFormatter.format(results.first.amount, currency: widget.state.currency)} (${results.first.category})'
+          : 'Tercatat ${results.length} transaksi ($formattedTotal)';
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Tercatat: $typeLabel "${result.title}" $formatted (${result.category})'),
+          content: Text(msg),
           backgroundColor: AppTheme.primary,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
