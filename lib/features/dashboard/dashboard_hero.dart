@@ -5,6 +5,8 @@ import 'package:flow/core/formatters/currency_formatter.dart';
 import 'package:flow/models/transaction_model.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/features/chat/chat_prompt_bar.dart';
+import 'package:flow/features/receipt/receipt_scanner_modal.dart';
+import 'package:flow/features/voice/voice_assistant_modal.dart';
 
 class DashboardHero extends StatefulWidget {
   final double monthExpense;
@@ -237,7 +239,7 @@ class _DashboardHeroState extends State<DashboardHero> {
                 child: _buildActionPill(
                   icon: Icons.receipt_long_outlined,
                   label: 'Receipt',
-                  onTap: widget.onAddTransaction,
+                  onTap: () => ReceiptScannerModal.show(context, widget.state),
                   isDark: isDark,
                 ),
               ),
@@ -246,7 +248,7 @@ class _DashboardHeroState extends State<DashboardHero> {
                 child: _buildActionPill(
                   icon: Icons.mic_none_rounded,
                   label: 'Voice',
-                  onTap: widget.onAddTransaction,
+                  onTap: () => VoiceAssistantModal.show(context, widget.state),
                   isDark: isDark,
                 ),
               ),
