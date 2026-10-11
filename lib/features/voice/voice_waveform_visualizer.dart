@@ -21,7 +21,23 @@ class _VoiceWaveformVisualizerState extends State<VoiceWaveformVisualizer>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
-    )..repeat();
+    );
+    if (widget.isListening) {
+      _controller.repeat();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant VoiceWaveformVisualizer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isListening != oldWidget.isListening) {
+      if (widget.isListening) {
+        _controller.repeat();
+      } else {
+        _controller.stop();
+        _controller.reset();
+      }
+    }
   }
 
   @override
@@ -32,7 +48,8 @@ class _VoiceWaveformVisualizerState extends State<VoiceWaveformVisualizer>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
+    return RepaintBoundary(
+      child: AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
         return SizedBox(
@@ -70,6 +87,7 @@ class _VoiceWaveformVisualizerState extends State<VoiceWaveformVisualizer>
           ),
         );
       },
-    );
-  }
+    ),
+  );
+}
 }
