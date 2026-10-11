@@ -6,6 +6,9 @@ import 'package:flow/models/transaction_model.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/features/chat/chat_message.dart';
 import 'package:flow/features/chat/chat_message_bubble.dart';
+import 'package:flow/core/services/voice_service.dart';
+import 'package:flow/features/voice/voice_assistant_modal.dart';
+import 'package:flow/features/receipt/receipt_scanner_modal.dart';
 
 class ChatAssistantModal extends StatefulWidget {
   final AppState state;
@@ -34,6 +37,7 @@ class _ChatAssistantModalState extends State<ChatAssistantModal> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final List<ChatMessage> _messages = [];
+  bool _isVoiceOutputEnabled = true;
 
   final List<String> _suggestions = const [
     'coffee 18k',
@@ -123,6 +127,15 @@ class _ChatAssistantModalState extends State<ChatAssistantModal> {
           ),
         );
       });
+
+      if (_isVoiceOutputEnabled) {
+        final speech = VoiceService.instance.formatTransactionFeedback(
+          title: result.title,
+          amount: result.amount,
+          category: result.category,
+        );
+        VoiceService.instance.speak(speech);
+      }
     } else {
       setState(() {
         _messages.add(
@@ -195,9 +208,22 @@ class _ChatAssistantModalState extends State<ChatAssistantModal> {
               ),
             ],
           ),
-          IconButton(
-            icon: const Icon(Icons.close, color: AppTheme.subtle, size: 20),
-            onPressed: () => Navigator.of(context).pop(),
+          Row(
+            children: [
+              IconButton(
+                icon: Icon(
+                  _isVoiceOutputEnabled ? Icons.volume_up_rounded : Icons.volume_off_rounded,
+                  color: _isVoiceOutputEnabled ? AppTheme.primary : AppTheme.subtle,
+                  size: 20,
+                ),
+                tooltip: _isVoiceOutputEnabled ? 'Voice Output Aktif' : 'Voice Output Mati',
+                onPressed: () => setState(() => _isVoiceOutputEnabled = !_isVoiceOutputEnabled),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close, color: AppTheme.subtle, size: 20),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
           ),
         ],
       ),
@@ -273,11 +299,27 @@ class _ChatAssistantModalState extends State<ChatAssistantModal> {
               ),
             ),
             const SizedBox(width: 8),
+            IconButton(
+              icon: const Icon(Icons.mic_none_rounded, color: AppTheme.primary, size: 22),
+              tooltip: 'Voice Input',
+              onPressed: () {
+                Navigator.of(context).pop();
+                VoiceAssistantModal.show(context, widget.state);
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.receipt_long_outlined, color: AppTheme.primary, size: 20),
+              tooltip: 'Pindai Struk',
+              onPressed: () {
+                Navigator.of(context).pop();
+                ReceiptScannerModal.show(context, widget.state);
+              },
+            ),
             GestureDetector(
               onTap: () => _handleSend(_controller.text),
               child: Container(
-                width: 40,
-                height: 40,
+                width: 38,
+                height: 38,
                 decoration: const BoxDecoration(
                   color: AppTheme.primary,
                   shape: BoxShape.circle,
