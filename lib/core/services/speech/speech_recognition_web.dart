@@ -24,18 +24,27 @@ class SpeechRecognitionWeb implements SpeechRecognitionInterface {
 
       final rec = html.SpeechRecognition();
       rec.lang = 'id-ID';
-      rec.continuous = false;
+      rec.continuous = true;
       rec.interimResults = true;
 
       rec.onResult.listen((event) {
         final results = event.results;
         if (results == null || results.isEmpty) return;
 
-        final last = results.last;
-        final transcript = last.item(0)?.transcript ?? '';
-        final isFinal = last.isFinal ?? false;
+        final buffer = StringBuffer();
+        for (var i = 0; i < results.length; i++) {
+          final res = results[i];
+          final part = res.item(0)?.transcript ?? '';
+          if (part.isNotEmpty) {
+            if (buffer.isNotEmpty) buffer.write(' ');
+            buffer.write(part);
+          }
+        }
 
-        onResult(transcript, isFinal);
+        final combined = buffer.toString().trim();
+        final isLastFinal = results.last.isFinal ?? false;
+
+        onResult(combined, isLastFinal);
       });
 
       rec.onError.listen((err) {
