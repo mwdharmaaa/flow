@@ -27,35 +27,37 @@ class BudgetCircularRing extends StatelessWidget {
     return Column(
       children: [
         // Circular Ring
-        SizedBox(
-          width: 170,
-          height: 170,
-          child: CustomPaint(
-            painter: RingPainter(
-              progress: validSpent / validLimit,
-              ringColor: const Color(0xFFE8EEF8),
-              progressColor: AppTheme.primary,
-            ),
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    '$percentage%',
-                    style: const TextStyle(
-                      fontSize: 34,
-                      fontWeight: FontWeight.w900,
-                      color: AppTheme.textPrimary,
+        RepaintBoundary(
+          child: SizedBox(
+            width: 170,
+            height: 170,
+            child: CustomPaint(
+              painter: RingPainter(
+                progress: validSpent / validLimit,
+                ringColor: const Color(0xFFE8EEF8),
+                progressColor: AppTheme.primary,
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '$percentage%',
+                      style: const TextStyle(
+                        fontSize: 34,
+                        fontWeight: FontWeight.w900,
+                        color: AppTheme.textPrimary,
+                      ),
                     ),
-                  ),
-                  const Text(
-                    'used',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: AppTheme.subtle,
+                    const Text(
+                      'used',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppTheme.subtle,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

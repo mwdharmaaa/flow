@@ -60,7 +60,8 @@ class AnalyticsDailyChart extends StatelessWidget {
         const SizedBox(height: 18),
 
         // 31-Day Bar Chart Container
-        Container(
+        RepaintBoundary(
+          child: Container(
           height: 140,
           padding: const EdgeInsets.only(top: 10, bottom: 4),
           child: Stack(
@@ -119,6 +120,7 @@ class AnalyticsDailyChart extends StatelessWidget {
             ],
           ),
         ),
+      ),
 
         // X-Axis Labels (1, 5, 10, 15, 20, 25, 31)
         Row(

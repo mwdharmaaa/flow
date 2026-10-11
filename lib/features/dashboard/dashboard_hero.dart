@@ -38,7 +38,8 @@ class _DashboardHeroState extends State<DashboardHero> {
     final dayNum = DateTime.now().day;
     final dayLabel = DateFormat('d MMM', 'en_US').format(DateTime.now());
 
-    return Container(
+    return RepaintBoundary(
+      child: Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -284,8 +285,9 @@ class _DashboardHeroState extends State<DashboardHero> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildPill(String text, bool isDark) {
     return Container(
