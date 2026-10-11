@@ -10,6 +10,7 @@ class TransactionModel {
   final DateTime date;
   final String note;
   final int createdAt;
+  final bool excludeFromTotals;
 
   TransactionModel({
     required this.id,
@@ -21,6 +22,7 @@ class TransactionModel {
     required this.date,
     required this.note,
     required this.createdAt,
+    this.excludeFromTotals = false,
   });
 
   Map<String, dynamic> toJson() => {
@@ -33,6 +35,7 @@ class TransactionModel {
         'date': date.toIso8601String(),
         'note': note,
         'createdAt': createdAt,
+        'excludeFromTotals': excludeFromTotals,
       };
 
   factory TransactionModel.fromJson(Map<String, dynamic> json) =>
@@ -46,5 +49,6 @@ class TransactionModel {
         date: DateTime.parse(json['date'] as String),
         note: json['note'] as String? ?? '',
         createdAt: json['createdAt'] as int? ?? DateTime.now().millisecondsSinceEpoch,
+        excludeFromTotals: json['excludeFromTotals'] as bool? ?? false,
       );
 }

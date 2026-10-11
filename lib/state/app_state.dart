@@ -43,11 +43,11 @@ class AppState extends ChangeNotifier {
       .fold(0.0, (sum, a) => sum + a.balance);
 
   double get totalIncome => _transactions
-      .where((t) => t.type == TransactionType.income)
+      .where((t) => t.type == TransactionType.income && !t.excludeFromTotals)
       .fold(0.0, (sum, t) => sum + t.amount);
 
   double get totalExpense => _transactions
-      .where((t) => t.type == TransactionType.expense)
+      .where((t) => t.type == TransactionType.expense && !t.excludeFromTotals)
       .fold(0.0, (sum, t) => sum + t.amount);
 
   AppState() {
