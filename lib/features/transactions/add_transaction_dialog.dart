@@ -27,12 +27,14 @@ const List<CategoryItem> kDefaultCategories = [
 class AddTransactionDialog extends StatefulWidget {
   final List<AccountModel> accounts;
   final TransactionType initialType;
+  final String? initialCategory;
   final Function(TransactionModel) onSave;
 
   const AddTransactionDialog({
     super.key,
     required this.accounts,
     this.initialType = TransactionType.expense,
+    this.initialCategory,
     required this.onSave,
   });
 
@@ -47,13 +49,14 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
 
   late String _selectedAccountId;
   late String _selectedDestAccountId;
-  String _selectedCategory = kDefaultCategories.first.name;
+  late String _selectedCategory;
   final DateTime _selectedDate = DateTime.now();
 
   @override
   void initState() {
     super.initState();
     _type = widget.initialType;
+    _selectedCategory = widget.initialCategory ?? kDefaultCategories.first.name;
     _selectedAccountId = widget.accounts.isNotEmpty ? widget.accounts.first.id : '';
     _selectedDestAccountId = widget.accounts.length > 1 ? widget.accounts[1].id : _selectedAccountId;
   }
@@ -160,14 +163,21 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                SizedBox(
-                  height: 80,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: kDefaultCategories.length,
-                    itemBuilder: (_, idx) {
-                      final cat = kDefaultCategories[idx];
-                      final isSelected = _selectedCategory == cat.name;
+                Builder(
+                  builder: (_) {
+                    final displayCategories = [
+                      if (!kDefaultCategories.any((c) => c.name == _selectedCategory))
+                        CategoryItem(_selectedCategory, Icons.category_rounded, AppTheme.primary),
+                      ...kDefaultCategories,
+                    ];
+                    return SizedBox(
+                      height: 80,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: displayCategories.length,
+                        itemBuilder: (_, idx) {
+                          final cat = displayCategories[idx];
+                          final isSelected = _selectedCategory == cat.name;
                       return GestureDetector(
                         onTap: () => setState(() => _selectedCategory = cat.name),
                         child: Container(
@@ -197,11 +207,12 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                             ],
                           ),
                         ),
-                      );
-                    },
-                  ),
-                ),
-              ],
+                    );
+                  },
+                );
+              },
+            ),
+          ],
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 value: _selectedAccountId,
