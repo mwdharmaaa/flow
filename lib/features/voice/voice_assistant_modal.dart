@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/parsers/nlp_transaction_parser.dart';
+import 'package:flow/core/parsers/voice_command_parser.dart';
 import 'package:flow/core/formatters/currency_formatter.dart';
 import 'package:flow/core/services/voice_service.dart';
 import 'package:flow/core/services/speech/speech_recognition_service.dart';
@@ -31,6 +32,7 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
   final TextEditingController _transcriptController = TextEditingController();
   bool _isListening = false;
   List<ParsedTransactionResult> _parsedResults = [];
+  VoiceCommandResult _detectedCommand = VoiceCommandResult.notACommand;
   bool _speakResponse = true;
 
   @override
@@ -108,8 +110,18 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
   }
 
   void _processTranscript(String text) {
+    final cmd = VoiceCommandParser.parse(text);
+    if (cmd.isCommand) {
+      setState(() {
+        _detectedCommand = cmd;
+        _parsedResults = [];
+      });
+      return;
+    }
+
     final results = NlpTransactionParser.parseAll(text);
     setState(() {
+      _detectedCommand = VoiceCommandResult.notACommand;
       _parsedResults = results;
     });
   }
@@ -262,7 +274,10 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
               isDark: isDark,
               onSelect: (val) => _toggleListening(val),
             ),
-            if (_parsedResults.isNotEmpty) ...[
+            if (_detectedCommand.isCommand) ...[
+              const SizedBox(height: 16),
+              _buildCommandCard(isDark),
+            ] else if (_parsedResults.isNotEmpty) ...[
               const SizedBox(height: 16),
               _buildResultCard(isDark),
             ],
@@ -414,6 +429,232 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
                   : 'Simpan Transaksi Suara',
               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _executeDeleteAll() {
+    final deletedCount = widget.state.clearAllTransactions();
+    Navigator.of(context).pop();
+
+    if (_speakResponse) {
+      VoiceService.instance.speak(VoiceService.instance.formatDeleteAllFeedback(deletedCount));
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$deletedCount riwayat transaksi berhasil dihapus.'),
+        backgroundColor: AppTheme.expense,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  void _executeDeleteByDate(DateTime targetDate) {
+    final deletedCount = widget.state.deleteTransactionsByDate(targetDate);
+    final dateLabel = VoiceCommandParser.formatDate(targetDate);
+    Navigator.of(context).pop();
+
+    if (_speakResponse) {
+      VoiceService.instance.speak(VoiceService.instance.formatDeleteByDateFeedback(dateLabel, deletedCount));
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$deletedCount riwayat transaksi pada $dateLabel berhasil dihapus.'),
+        backgroundColor: AppTheme.expense,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  Widget _buildCommandCard(bool isDark) {
+    final isDeleteAll = _detectedCommand.type == VoiceCommandType.deleteAllHistory;
+    final totalHistoryCount = widget.state.transactions.length;
+
+    List<TransactionModel> matchingTxs = [];
+    if (!isDeleteAll && _detectedCommand.targetDate != null) {
+      final tDate = _detectedCommand.targetDate!;
+      matchingTxs = widget.state.transactions
+          .where((tx) =>
+              tx.date.year == tDate.year &&
+              tx.date.month == tDate.month &&
+              tx.date.day == tDate.day)
+          .toList();
+    }
+
+    final int targetCount = isDeleteAll ? totalHistoryCount : matchingTxs.length;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? AppTheme.darkBgElevated : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.expense.withValues(alpha: 0.4),
+          width: 1.5,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.expense.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.delete_sweep_rounded,
+                  color: AppTheme.expense,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Perintah Suara Terdeteksi',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.expense,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      _detectedCommand.description,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            isDeleteAll
+                ? (totalHistoryCount > 0
+                    ? 'Terdapat $totalHistoryCount transaksi yang tersimpan. Menghapus histori akan menyelaraskan kembali saldo akun Anda.'
+                    : 'Tidak ada riwayat transaksi yang tersimpan.')
+                : (matchingTxs.isNotEmpty
+                    ? 'Ditemukan ${matchingTxs.length} transaksi pada tanggal tersebut.'
+                    : 'Tidak ada transaksi yang tercatat pada tanggal tersebut.'),
+            style: TextStyle(
+              fontSize: 12,
+              color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle,
+              height: 1.4,
+            ),
+          ),
+          if (matchingTxs.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Container(
+              constraints: const BoxConstraints(maxHeight: 120),
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount: matchingTxs.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 6),
+                itemBuilder: (context, idx) {
+                  final tx = matchingTxs[idx];
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppTheme.darkBgBase : AppTheme.background,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          tx.note.isNotEmpty ? tx.note : tx.category,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+                          ),
+                        ),
+                        Text(
+                          CurrencyFormatter.format(tx.amount, currency: widget.state.currency),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: tx.type == TransactionType.income ? AppTheme.income : AppTheme.expense,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {
+                    setState(() {
+                      _detectedCommand = VoiceCommandResult.notACommand;
+                    });
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 11),
+                    side: BorderSide(
+                      color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border,
+                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: Text(
+                    'Batal',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                flex: 2,
+                child: ElevatedButton.icon(
+                  onPressed: targetCount > 0
+                      ? () {
+                          if (isDeleteAll) {
+                            _executeDeleteAll();
+                          } else {
+                            _executeDeleteByDate(_detectedCommand.targetDate!);
+                          }
+                        }
+                      : null,
+                  icon: const Icon(Icons.delete_outline, size: 18, color: Colors.white),
+                  label: Text(
+                    targetCount > 0 ? 'Konfirmasi Hapus ($targetCount)' : 'Tidak Ada Data',
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.expense,
+                    disabledBackgroundColor: AppTheme.expense.withValues(alpha: 0.4),
+                    padding: const EdgeInsets.symmetric(vertical: 11),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

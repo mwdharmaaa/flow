@@ -120,6 +120,77 @@ class AppState extends ChangeNotifier {
     }
   }
 
+  int clearAllTransactions({bool revertBalances = true}) {
+    final count = _transactions.length;
+    if (revertBalances) {
+      for (final tx in _transactions) {
+        final accIndex = _accounts.indexWhere((a) => a.id == tx.accountId);
+        if (accIndex != -1) {
+          final acc = _accounts[accIndex];
+          if (tx.type == TransactionType.expense || tx.type == TransactionType.transfer) {
+            _accounts[accIndex] = acc.copyWith(balance: acc.balance + tx.amount);
+          } else if (tx.type == TransactionType.income) {
+            _accounts[accIndex] = acc.copyWith(balance: acc.balance - tx.amount);
+          }
+        }
+
+        if (tx.type == TransactionType.transfer && tx.destinationAccountId != null) {
+          final destIndex = _accounts.indexWhere((a) => a.id == tx.destinationAccountId);
+          if (destIndex != -1) {
+            final dest = _accounts[destIndex];
+            _accounts[destIndex] = dest.copyWith(balance: dest.balance - tx.amount);
+          }
+        }
+      }
+    }
+    _transactions.clear();
+    _saveState();
+    notifyListeners();
+    return count;
+  }
+
+  int deleteTransactionsByDate(DateTime targetDate, {bool revertBalances = true}) {
+    final toRemove = _transactions.where((tx) =>
+      tx.date.year == targetDate.year &&
+      tx.date.month == targetDate.month &&
+      tx.date.day == targetDate.day
+    ).toList();
+
+    if (toRemove.isEmpty) return 0;
+
+    if (revertBalances) {
+      for (final tx in toRemove) {
+        final accIndex = _accounts.indexWhere((a) => a.id == tx.accountId);
+        if (accIndex != -1) {
+          final acc = _accounts[accIndex];
+          if (tx.type == TransactionType.expense || tx.type == TransactionType.transfer) {
+            _accounts[accIndex] = acc.copyWith(balance: acc.balance + tx.amount);
+          } else if (tx.type == TransactionType.income) {
+            _accounts[accIndex] = acc.copyWith(balance: acc.balance - tx.amount);
+          }
+        }
+
+        if (tx.type == TransactionType.transfer && tx.destinationAccountId != null) {
+          final destIndex = _accounts.indexWhere((a) => a.id == tx.destinationAccountId);
+          if (destIndex != -1) {
+            final dest = _accounts[destIndex];
+            _accounts[destIndex] = dest.copyWith(balance: dest.balance - tx.amount);
+          }
+        }
+      }
+    }
+
+    _transactions.removeWhere((tx) =>
+      tx.date.year == targetDate.year &&
+      tx.date.month == targetDate.month &&
+      tx.date.day == targetDate.day
+    );
+
+    _saveState();
+    notifyListeners();
+    return toRemove.length;
+  }
+
   void addAccount(AccountModel acc) {
     _accounts.add(acc);
     _saveState();

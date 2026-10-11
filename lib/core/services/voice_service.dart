@@ -82,4 +82,14 @@ class VoiceService {
     final itemDescriptions = items.map((e) => '${e.title} ${e.amount.toInt()}').join(' dan ');
     return '${items.length} transaksi tercatat: $itemDescriptions rupiah. Total $total rupiah.';
   }
+
+  String formatDeleteAllFeedback(int count) {
+    if (count <= 0) return 'Tidak ada riwayat transaksi yang tersimpan.';
+    return '$count riwayat transaksi berhasil dihapus.';
+  }
+
+  String formatDeleteByDateFeedback(String dateStr, int count) {
+    if (count <= 0) return 'Tidak ada transaksi pada $dateStr.';
+    return '$count transaksi pada $dateStr berhasil dihapus.';
+  }
 }
