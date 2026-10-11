@@ -4,6 +4,7 @@ import 'package:flow/state/app_state.dart';
 import 'package:flow/features/dashboard/dashboard_hero.dart';
 import 'package:flow/features/dashboard/dashboard_summary.dart';
 import 'package:flow/features/transactions/add_transaction_dialog.dart';
+import 'package:flow/features/transactions/log_options_modal.dart';
 import 'package:flow/models/transaction_model.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -18,15 +19,8 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   final DateTime _currentMonth = DateTime(DateTime.now().year, DateTime.now().month);
 
-  void _openAddTransaction(BuildContext context, [TransactionType type = TransactionType.expense]) {
-    showDialog(
-      context: context,
-      builder: (_) => AddTransactionDialog(
-        accounts: widget.state.accounts,
-        initialType: type,
-        onSave: (tx) => widget.state.addTransaction(tx),
-      ),
-    );
+  void _openAddTransaction(BuildContext context) {
+    LogOptionsModal.show(context, widget.state);
   }
 
   @override
