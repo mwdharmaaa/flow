@@ -4,6 +4,7 @@ enum VoiceCommandType {
   deleteAllHistory,
   deleteHistoryByDate,
   restoreHistory,
+  addOrUpdateBudget,
   unknown,
 }
 
@@ -11,12 +12,18 @@ class VoiceCommandResult {
   final VoiceCommandType type;
   final String description;
   final DateTime? targetDate;
+  final String? targetCategory;
+  final String? targetWallet;
+  final double? targetAmount;
   final bool isCommand;
 
   const VoiceCommandResult({
     required this.type,
     required this.description,
     this.targetDate,
+    this.targetCategory,
+    this.targetWallet,
+    this.targetAmount,
     required this.isCommand,
   });
 
@@ -45,6 +52,11 @@ class VoiceCommandParser {
 
   static final RegExp _restorePattern = RegExp(
     r'\b(?:balikin|kembalikan|pulihkan|restore|undo|batalkan)\s+(?:semua\s+|seluruh\s+)?(?:history|histori|riwayat|transaksi|catatan|data|penghapusan|hapus)(?:\s+saya)?\b|\b(?:undo|restore)\b',
+    caseSensitive: false,
+  );
+
+  static final RegExp _budgetCommandPattern = RegExp(
+    r'\b(?:tambah|tambahin|atur|set|pasang|bikin|buat)\s+(?:budget|anggaran)\b|\b(?:budget|anggaran)\s+(?:baru\s+|tambah\s+)?\b',
     caseSensitive: false,
   );
 
@@ -82,7 +94,95 @@ class VoiceCommandParser {
       );
     }
 
-    // 2. Check Delete All History
+    // 2. Check Add/Set Budget Command
+    if (_budgetCommandPattern.hasMatch(lower)) {
+      final numNormalized = IndonesianNumberParser.normalize(lower);
+      final amountMatch = RegExp(r'(?:rp\.?\s*)?(\d+(?:[.,]\d+)?)\s*(k|rb|ribu|jt|juta|m|mio|million)?\b', caseSensitive: false).firstMatch(numNormalized);
+      if (amountMatch != null) {
+        String cleanNum = amountMatch.group(1)!;
+        if (RegExp(r'^\d{1,3}(?:\.\d{3})+$').hasMatch(cleanNum)) {
+          cleanNum = cleanNum.replaceAll('.', '');
+        } else {
+          cleanNum = cleanNum.replaceAll(',', '.');
+        }
+        final rawNum = double.tryParse(cleanNum);
+        if (rawNum != null && rawNum > 0) {
+          final suffix = (amountMatch.group(2) ?? '').toLowerCase();
+          double mult = 1.0;
+          if (suffix == 'k' || suffix == 'rb' || suffix == 'ribu') {
+            mult = 1000.0;
+          } else if (suffix == 'jt' || suffix == 'juta' || suffix == 'm' || suffix == 'mio') {
+            mult = 1000000.0;
+          } else if (rawNum < 1000 && !lower.contains('rp')) {
+            mult = 1000.0;
+          }
+          final finalAmount = rawNum * mult;
+
+          // Check if wallet is mentioned (e.g. "di gopay", "di wallet cash", "di bca")
+          final walletMatch = RegExp(
+            r'\b(?:di|ke|pada)?\s*(?:wallet\s+|dompet\s+|rekening\s+|akun\s+)?(cash|tunai|dompet|kantong|gopay|go-pay|go\s+pay|jago|bca|mandiri|dana|ovo|shopeepay|spay|bri|bni|seabank|jenius|bsi|cimb)\b|\b(?:wallet|dompet)\s+([a-zA-Z0-9]+)\b',
+            caseSensitive: false,
+          ).firstMatch(lower);
+
+          String? targetWallet;
+          if (walletMatch != null) {
+            final rawW = (walletMatch.group(1) ?? walletMatch.group(2) ?? '').toLowerCase();
+            if (rawW.isNotEmpty && rawW != 'jalan') {
+              const walletMap = {
+                'cash': 'Cash', 'tunai': 'Cash', 'dompet': 'Cash', 'kantong': 'Cash',
+                'gopay': 'GoPay', 'go-pay': 'GoPay', 'go pay': 'GoPay', 'jago': 'Jago',
+                'bca': 'BCA', 'mandiri': 'Mandiri', 'dana': 'DANA',
+                'ovo': 'OVO', 'shopeepay': 'ShopeePay', 'spay': 'ShopeePay',
+                'bri': 'BRI', 'bni': 'BNI', 'seabank': 'SeaBank',
+                'jenius': 'Jenius', 'bsi': 'BSI', 'cimb': 'CIMB',
+              };
+              targetWallet = walletMap[rawW] ?? (rawW[0].toUpperCase() + rawW.substring(1));
+            }
+          }
+
+          // Category mapping
+          String? targetCategory;
+          if (targetWallet == null) {
+            if (lower.contains('makan') || lower.contains('food') || lower.contains('kopi') || lower.contains('jajan')) {
+              targetCategory = 'Food';
+            } else if (lower.contains('transport') || lower.contains('bensin') || lower.contains('ojol')) {
+              targetCategory = 'Transport';
+            } else if (lower.contains('belanja') || lower.contains('shopping')) {
+              targetCategory = 'Shopping';
+            } else if (lower.contains('tagihan') || lower.contains('bill') || lower.contains('listrik')) {
+              targetCategory = 'Bills';
+            } else if (lower.contains('hiburan') || lower.contains('game') || lower.contains('entertainment')) {
+              targetCategory = 'Entertainment';
+            } else if (lower.contains('kesehatan') || lower.contains('obat') || lower.contains('health')) {
+              targetCategory = 'Health';
+            } else if (lower.contains('pendidikan') || lower.contains('buku') || lower.contains('education')) {
+              targetCategory = 'Education';
+            } else {
+              final catMatch = RegExp(r'\b(?:buat|untuk|kategori)\s+([a-zA-Z]+)\b', caseSensitive: false).firstMatch(lower);
+              if (catMatch != null) {
+                final rawCat = catMatch.group(1)!;
+                targetCategory = rawCat[0].toUpperCase() + rawCat.substring(1).toLowerCase();
+              } else {
+                targetCategory = 'General';
+              }
+            }
+          }
+
+          final targetLabel = targetWallet != null ? 'wallet $targetWallet' : 'kategori $targetCategory';
+          final formattedAmount = '${finalAmount.toInt()}';
+          return VoiceCommandResult(
+            type: VoiceCommandType.addOrUpdateBudget,
+            description: 'Tambah budget $targetLabel Rp $formattedAmount',
+            targetCategory: targetCategory,
+            targetWallet: targetWallet,
+            targetAmount: finalAmount,
+            isCommand: true,
+          );
+        }
+      }
+    }
+
+    // 3. Check Delete All History
     if (_deleteAllPattern.hasMatch(lower)) {
       return const VoiceCommandResult(
         type: VoiceCommandType.deleteAllHistory,
