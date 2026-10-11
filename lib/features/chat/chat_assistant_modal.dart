@@ -97,18 +97,15 @@ class _ChatAssistantModalState extends State<ChatAssistantModal> {
 
     final results = NlpTransactionParser.parseAll(text);
     if (results.isNotEmpty) {
-      final defaultAccountId = widget.state.accounts.isNotEmpty
-          ? widget.state.accounts.first.id
-          : 'acc_cash';
-
       final now = DateTime.now();
       for (var i = 0; i < results.length; i++) {
         final res = results[i];
+        final accountId = widget.state.resolveOrCreateAccountId(res.walletName);
         final newTx = TransactionModel(
           id: '${now.millisecondsSinceEpoch}_$i',
           type: res.type,
           amount: res.amount,
-          accountId: defaultAccountId,
+          accountId: accountId,
           category: res.category,
           date: now,
           note: res.title,
