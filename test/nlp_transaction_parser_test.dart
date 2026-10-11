@@ -182,5 +182,41 @@ void main() {
       expect(mixed[1].amount, 28000.0);
       expect(mixed[1].category, 'Food');
     });
+
+    test('parses unexpected income expressions like nemu duit di jalan', () {
+      final res1 = NlpTransactionParser.parse('nemu duit di jalan 50k');
+      expect(res1.isValid, isTrue);
+      expect(res1.type, TransactionType.income);
+      expect(res1.amount, 50000.0);
+      expect(res1.category, 'Income');
+      expect(res1.walletName, isNull);
+
+      final res2 = NlpTransactionParser.parse('nemu uang 20 ribu di kasur');
+      expect(res2.isValid, isTrue);
+      expect(res2.type, TransactionType.income);
+      expect(res2.amount, 20000.0);
+      expect(res2.category, 'Income');
+
+      final res3 = NlpTransactionParser.parse('dapet rejeki nomplok 500k di BCA');
+      expect(res3.isValid, isTrue);
+      expect(res3.type, TransactionType.income);
+      expect(res3.amount, 500000.0);
+      expect(res3.category, 'Bonus');
+      expect(res3.walletName, 'BCA');
+
+      final res4 = NlpTransactionParser.parse('dikasi duit 100k di GoPay');
+      expect(res4.isValid, isTrue);
+      expect(res4.type, TransactionType.income);
+      expect(res4.amount, 100000.0);
+      expect(res4.category, 'Gifts Received');
+      expect(res4.walletName, 'GoPay');
+
+      final res5 = NlpTransactionParser.parse('dikasih uang saku 50rb di dompet cash');
+      expect(res5.isValid, isTrue);
+      expect(res5.type, TransactionType.income);
+      expect(res5.amount, 50000.0);
+      expect(res5.category, 'Gifts Received');
+      expect(res5.walletName, 'Cash');
+    });
   });
 }
