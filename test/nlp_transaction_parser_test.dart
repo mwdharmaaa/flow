@@ -134,5 +134,53 @@ void main() {
       expect(res3.amount, 28000.0);
       expect(res3.category, 'Food');
     });
+
+    test('parses income voice commands accurately', () {
+      final res1 = NlpTransactionParser.parse('dapet duit 30k');
+      expect(res1.isValid, isTrue);
+      expect(res1.type, TransactionType.income);
+      expect(res1.amount, 30000.0);
+      expect(res1.category, 'Income');
+
+      final res2 = NlpTransactionParser.parse('dikasi duit 8k');
+      expect(res2.isValid, isTrue);
+      expect(res2.type, TransactionType.income);
+      expect(res2.amount, 8000.0);
+      expect(res2.category, 'Gifts Received');
+
+      final res3 = NlpTransactionParser.parse('dikasih duit 8k');
+      expect(res3.isValid, isTrue);
+      expect(res3.type, TransactionType.income);
+      expect(res3.amount, 8000.0);
+      expect(res3.category, 'Gifts Received');
+
+      final res4 = NlpTransactionParser.parse('tambahin ke saldo 100k');
+      expect(res4.isValid, isTrue);
+      expect(res4.type, TransactionType.income);
+      expect(res4.amount, 100000.0);
+      expect(res4.category, 'Income');
+
+      final res5 = NlpTransactionParser.parse('tambahin ke saldo bca 100k');
+      expect(res5.isValid, isTrue);
+      expect(res5.type, TransactionType.income);
+      expect(res5.title, 'Saldo Bca');
+      expect(res5.amount, 100000.0);
+      expect(res5.category, 'Income');
+
+      final res6 = NlpTransactionParser.parse('dapat uang lima puluh ribu');
+      expect(res6.isValid, isTrue);
+      expect(res6.type, TransactionType.income);
+      expect(res6.amount, 50000.0);
+      expect(res6.category, 'Income');
+
+      final mixed = NlpTransactionParser.parseAll('dapet duit 30k dan matcha 28k');
+      expect(mixed.length, 2);
+      expect(mixed[0].type, TransactionType.income);
+      expect(mixed[0].amount, 30000.0);
+      expect(mixed[1].type, TransactionType.expense);
+      expect(mixed[1].title, 'Matcha');
+      expect(mixed[1].amount, 28000.0);
+      expect(mixed[1].category, 'Food');
+    });
   });
 }

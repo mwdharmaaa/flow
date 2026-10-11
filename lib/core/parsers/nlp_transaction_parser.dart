@@ -36,7 +36,7 @@ class NlpTransactionParser {
       'green tea', 'jus', 'juice', 'boba', 'food', 'resto',
       'cafe', 'kafe', 'roti', 'bakso', 'sate', 'soto', 'martabak',
       'eskrim', 'icecream', 'ice cream', 'kue', 'gorengan', 'latte',
-      'cappuccino', 'espresso'
+      'cappuccino', 'espresso', 'donat', 'donut'
     ],
     'Transport': [
       'grab', 'gojek', 'ojol', 'bensin', 'bbm', 'pertalite', 'pertamax',
@@ -66,9 +66,41 @@ class NlpTransactionParser {
       'education', 'seminar', 'training'
     ],
     'Salary': [
-      'gaji', 'salary', 'bonus', 'thr', 'income', 'pemasukan', 'upah',
-      'proyek', 'freelance', 'dividen', 'cuan', 'transferan'
+      'gaji', 'salary', 'upah', 'honor', 'gajian'
     ],
+    'Bonus': [
+      'bonus', 'thr', 'tip', 'cuan', 'cashback', 'reimburse', 'reward', 'komisi'
+    ],
+    'Gifts Received': [
+      'dikasi', 'dikasih', 'hadiah', 'uang jajan', 'duit jajan', 'angpao', 'pemberian'
+    ],
+    'Sales': [
+      'jualan', 'hasil jualan', 'laku', 'omset', 'omzet', 'penjualan'
+    ],
+    'Business': [
+      'bisnis', 'business', 'proyek', 'freelance', 'klien'
+    ],
+    'Investment': [
+      'dividen', 'profit', 'crypto', 'saham', 'reksadana', 'bunga bank'
+    ],
+    'Income': [
+      'dapet duit', 'dapat duit', 'dapet uang', 'dapat uang', 'pemasukan',
+      'income', 'tambahin ke saldo', 'tambah ke saldo', 'tambah saldo',
+      'tambahin saldo', 'masuk saldo', 'masuk ke saldo', 'saldo masuk',
+      'uang masuk', 'duit masuk', 'transferan masuk', 'terima transfer',
+      'terima uang', 'dapat transferan', 'dapet transferan',
+      'dapat kiriman', 'dapet kiriman'
+    ],
+  };
+
+  static const Set<String> _incomeCategories = {
+    'Salary',
+    'Bonus',
+    'Gifts Received',
+    'Sales',
+    'Business',
+    'Investment',
+    'Income',
   };
 
   static final RegExp _amountPattern = RegExp(
@@ -87,7 +119,12 @@ class NlpTransactionParser {
   );
 
   static final RegExp _leadingActionVerbPattern = RegExp(
-    r'^(?:beli|membeli|pesan|memesan|order|ngorder|bayar|membayar|jajan|buat|untuk|ambil|ngambil)\s+',
+    r'^(?:beli|membeli|pesan|memesan|order|ngorder|bayar|membayar|jajan|buat|untuk|ambil|ngambil|tambahin\s+ke|tambah\s+ke|masuk\s+ke)\s+',
+    caseSensitive: false,
+  );
+
+  static final RegExp _incomePattern = RegExp(
+    r'\b(?:dapet\s+duit|dapat\s+duit|dapet\s+uang|dapat\s+uang|dikasi\s+duit|dikasih\s+duit|dikasi\s+uang|dikasih\s+uang|dikasi|dikasih|tambahin\s+(?:ke\s+)?saldo|tambah\s+(?:ke\s+)?saldo|masuk\s+(?:ke\s+)?saldo|saldo\s+masuk|uang\s+masuk|duit\s+masuk|pemasukan|income|gaji|salary|upah|honor|bonus|thr|cuan|komisi|cashback|reimburse|angpao|uang\s+jajan|duit\s+jajan|transferan(?:\s+masuk)?|terima\s+(?:transfer|uang)|dapet\s+transfer|dapat\s+transfer|hasil\s+jualan|laku|dividen|profit)\b',
     caseSensitive: false,
   );
 
@@ -230,13 +267,17 @@ class NlpTransactionParser {
       for (var kw in entry.value) {
         if (lower.contains(kw)) {
           detectedCategory = entry.key;
-          if (entry.key == 'Salary') {
-            detectedType = TransactionType.income;
-          }
           break;
         }
       }
       if (detectedCategory != 'Other') break;
+    }
+
+    if (_incomeCategories.contains(detectedCategory) || _incomePattern.hasMatch(lower)) {
+      detectedType = TransactionType.income;
+      if (detectedCategory == 'Other') {
+        detectedCategory = 'Income';
+      }
     }
 
     return ParsedTransactionResult(

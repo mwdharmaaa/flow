@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flow/core/parsers/nlp_transaction_parser.dart';
+import 'package:flow/models/transaction_model.dart';
 
 class VoiceEvent {
   final String text;
@@ -60,9 +61,11 @@ class VoiceService {
     required String title,
     required double amount,
     required String category,
+    TransactionType type = TransactionType.expense,
   }) {
     final formatted = amount.toInt().toString();
-    return 'Pengeluaran $title sebesar $formatted rupiah berhasil disimpan ke kategori $category.';
+    final typeLabel = type == TransactionType.income ? 'Pemasukan' : 'Pengeluaran';
+    return '$typeLabel $title sebesar $formatted rupiah berhasil disimpan ke kategori $category.';
   }
 
   String formatMultipleTransactionsFeedback(List<ParsedTransactionResult> items) {
@@ -72,6 +75,7 @@ class VoiceService {
         title: items.first.title,
         amount: items.first.amount,
         category: items.first.category,
+        type: items.first.type,
       );
     }
     final total = items.fold<double>(0.0, (sum, i) => sum + i.amount).toInt();

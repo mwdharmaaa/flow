@@ -38,6 +38,7 @@ jobs:
         run: |
           rm -rf web
           flutter create . --org com.flow --project-name flow --platforms=web
+          rm -f test/widget_test.dart
 
       - name: Install Dependencies
         run: flutter pub get

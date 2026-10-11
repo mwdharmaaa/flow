@@ -109,6 +109,11 @@ class CategoryHierarchyData {
 
   static const List<CategoryItemData> incomeCategories = [
     CategoryItemData(
+      name: 'Income',
+      icon: Icons.account_balance_wallet,
+      color: Color(0xFF10B981),
+    ),
+    CategoryItemData(
       name: 'Business',
       icon: Icons.business_center,
       color: Color(0xFF064E3B),
