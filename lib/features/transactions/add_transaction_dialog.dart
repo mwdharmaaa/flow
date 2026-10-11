@@ -207,12 +207,13 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                             ],
                           ),
                         ),
-                    );
-                  },
-                );
-              },
-            ),
-          ],
+                      );
+                      },
+                    ),
+                  );
+                },
+              ),
+            ],
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 value: _selectedAccountId,
