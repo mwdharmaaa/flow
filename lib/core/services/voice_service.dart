@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:flow/core/parsers/nlp_transaction_parser.dart';
 
 class VoiceEvent {
   final String text;
@@ -62,5 +63,19 @@ class VoiceService {
   }) {
     final formatted = amount.toInt().toString();
     return 'Pengeluaran $title sebesar $formatted rupiah berhasil disimpan ke kategori $category.';
+  }
+
+  String formatMultipleTransactionsFeedback(List<ParsedTransactionResult> items) {
+    if (items.isEmpty) return 'Tidak ada transaksi yang terdeteksi.';
+    if (items.length == 1) {
+      return formatTransactionFeedback(
+        title: items.first.title,
+        amount: items.first.amount,
+        category: items.first.category,
+      );
+    }
+    final total = items.fold<double>(0.0, (sum, i) => sum + i.amount).toInt();
+    final itemDescriptions = items.map((e) => '${e.title} ${e.amount.toInt()}').join(' dan ');
+    return '${items.length} transaksi tercatat: $itemDescriptions rupiah. Total $total rupiah.';
   }
 }
