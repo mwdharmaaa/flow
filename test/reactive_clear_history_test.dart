@@ -36,6 +36,10 @@ void main() {
     });
 
     testWidgets('DashboardScreen immediately reacts to clearAllTransactions', (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 2.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -55,6 +59,10 @@ void main() {
     });
 
     testWidgets('FlowMainScaffold IndexedStack immediately reacts to clearAllTransactions', (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 2.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
       await tester.pumpWidget(
         MaterialApp(
           home: FlowMainScaffold(state: state),
