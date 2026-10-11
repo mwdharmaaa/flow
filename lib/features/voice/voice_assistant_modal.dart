@@ -6,6 +6,8 @@ import 'package:flow/core/formatters/currency_formatter.dart';
 import 'package:flow/core/services/voice_service.dart';
 import 'package:flow/core/services/speech/speech_recognition_service.dart';
 import 'package:flow/models/transaction_model.dart';
+import 'package:flow/models/account_model.dart';
+import 'package:flow/models/budget_model.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/features/voice/voice_waveform_visualizer.dart';
 import 'package:flow/features/voice/voice_preset_chips.dart';
@@ -135,18 +137,15 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
   void _saveTransactions() {
     if (_parsedResults.isEmpty) return;
 
-    final defaultAccountId = widget.state.accounts.isNotEmpty
-        ? widget.state.accounts.first.id
-        : 'acc_cash';
-
     final now = DateTime.now();
     for (var i = 0; i < _parsedResults.length; i++) {
       final res = _parsedResults[i];
+      final accountId = widget.state.resolveOrCreateAccountId(res.walletName);
       final tx = TransactionModel(
         id: '${now.millisecondsSinceEpoch}_$i',
         type: res.type,
         amount: res.amount,
-        accountId: defaultAccountId,
+        accountId: accountId,
         category: res.category,
         date: now,
         note: res.title,
@@ -360,6 +359,24 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
                         ),
                       ),
                     ),
+                    if (item.walletName != null) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppTheme.income.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          item.walletName!,
+                          style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.income,
+                          ),
+                        ),
+                      ),
+                    ],
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
@@ -490,14 +507,53 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
     );
   }
 
+  void _executeAddBudget() {
+    final amount = _detectedCommand.targetAmount ?? 0.0;
+    final wallet = _detectedCommand.targetWallet;
+    final category = _detectedCommand.targetCategory ?? 'General';
+    final targetLabel = wallet != null ? 'wallet $wallet' : 'kategori $category';
+
+    if (amount <= 0) return;
+
+    if (wallet != null) {
+      final accountId = widget.state.resolveOrCreateAccountId(wallet);
+      final acc = widget.state.accounts.firstWhere((a) => a.id == accountId);
+      widget.state.adjustAccountBalance(accountId, acc.balance + amount);
+      widget.state.addOrUpdateBudget(wallet, amount);
+    } else {
+      widget.state.addOrUpdateBudget(category, amount);
+    }
+
+    Navigator.of(context).pop();
+
+    if (_speakResponse) {
+      VoiceService.instance.speak(
+        VoiceService.instance.formatAddBudgetFeedback(
+          targetLabel: targetLabel,
+          amount: amount,
+        ),
+      );
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Budget $targetLabel sebesar ${CurrencyFormatter.format(amount, currency: widget.state.currency)} berhasil ditambahkan.'),
+        backgroundColor: AppTheme.income,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
   Widget _buildCommandCard(bool isDark) {
     final isRestore = _detectedCommand.type == VoiceCommandType.restoreHistory;
     final isDeleteAll = _detectedCommand.type == VoiceCommandType.deleteAllHistory;
+    final isAddBudget = _detectedCommand.type == VoiceCommandType.addOrUpdateBudget;
     final totalHistoryCount = widget.state.transactions.length;
     final restorableCount = widget.state.restorableCount;
 
     List<TransactionModel> matchingTxs = [];
-    if (!isDeleteAll && !isRestore && _detectedCommand.targetDate != null) {
+    if (!isDeleteAll && !isRestore && !isAddBudget && _detectedCommand.targetDate != null) {
       final tDate = _detectedCommand.targetDate!;
       matchingTxs = widget.state.transactions
           .where((tx) =>
@@ -507,11 +563,15 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
           .toList();
     }
 
-    final int targetCount = isRestore
-        ? restorableCount
-        : (isDeleteAll ? totalHistoryCount : matchingTxs.length);
+    final int targetCount = isAddBudget
+        ? ((_detectedCommand.targetAmount ?? 0) > 0 ? 1 : 0)
+        : (isRestore
+            ? restorableCount
+            : (isDeleteAll ? totalHistoryCount : matchingTxs.length));
 
-    final actionColor = isRestore ? AppTheme.income : AppTheme.expense;
+    final actionColor = isAddBudget
+        ? AppTheme.primary
+        : (isRestore ? AppTheme.income : AppTheme.expense);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -535,7 +595,9 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  isRestore ? Icons.restore_rounded : Icons.delete_sweep_rounded,
+                  isAddBudget
+                      ? Icons.account_balance_wallet_rounded
+                      : (isRestore ? Icons.restore_rounded : Icons.delete_sweep_rounded),
                   color: actionColor,
                   size: 20,
                 ),
@@ -570,17 +632,19 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
           ),
           const SizedBox(height: 12),
           Text(
-            isRestore
-                ? (restorableCount > 0
-                    ? 'Terdapat $restorableCount transaksi yang dapat dipulihkan. Transaksi akan dikembalikan dan saldo akun akan diselaraskan kembali.'
-                    : 'Tidak ada riwayat transaksi yang dapat dipulihkan.')
-                : (isDeleteAll
-                    ? (totalHistoryCount > 0
-                        ? 'Terdapat $totalHistoryCount transaksi yang tersimpan. Menghapus histori akan menyelaraskan kembali saldo akun Anda.'
-                        : 'Tidak ada riwayat transaksi yang tersimpan.')
-                    : (matchingTxs.isNotEmpty
-                        ? 'Ditemukan ${matchingTxs.length} transaksi pada tanggal tersebut.'
-                        : 'Tidak ada transaksi yang tercatat pada tanggal tersebut.')),
+            isAddBudget
+                ? 'Menambahkan alokasi budget sebesar ${CurrencyFormatter.format(_detectedCommand.targetAmount ?? 0, currency: widget.state.currency)} untuk ${_detectedCommand.targetWallet != null ? 'wallet ${_detectedCommand.targetWallet}' : 'kategori ${_detectedCommand.targetCategory}'}.'
+                : (isRestore
+                    ? (restorableCount > 0
+                        ? 'Terdapat $restorableCount transaksi yang dapat dipulihkan. Transaksi akan dikembalikan dan saldo akun akan diselaraskan kembali.'
+                        : 'Tidak ada riwayat transaksi yang dapat dipulihkan.')
+                    : (isDeleteAll
+                        ? (totalHistoryCount > 0
+                            ? 'Terdapat $totalHistoryCount transaksi yang tersimpan. Menghapus histori akan menyelaraskan kembali saldo akun Anda.'
+                            : 'Tidak ada riwayat transaksi yang tersimpan.')
+                        : (matchingTxs.isNotEmpty
+                            ? 'Ditemukan ${matchingTxs.length} transaksi pada tanggal tersebut.'
+                            : 'Tidak ada transaksi yang tercatat pada tanggal tersebut.'))),
             style: TextStyle(
               fontSize: 12,
               color: isDark ? AppTheme.darkTextSecondary : AppTheme.subtle,
@@ -662,7 +726,9 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
                 child: ElevatedButton.icon(
                   onPressed: targetCount > 0
                       ? () {
-                          if (isRestore) {
+                          if (isAddBudget) {
+                            _executeAddBudget();
+                          } else if (isRestore) {
                             _executeRestore();
                           } else if (isDeleteAll) {
                             _executeDeleteAll();
@@ -672,13 +738,17 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
                         }
                       : null,
                   icon: Icon(
-                    isRestore ? Icons.restore_rounded : Icons.delete_outline,
+                    isAddBudget
+                        ? Icons.add_task_rounded
+                        : (isRestore ? Icons.restore_rounded : Icons.delete_outline),
                     size: 18,
                     color: Colors.white,
                   ),
                   label: Text(
                     targetCount > 0
-                        ? (isRestore ? 'Konfirmasi Pulihkan ($targetCount)' : 'Konfirmasi Hapus ($targetCount)')
+                        ? (isAddBudget
+                            ? 'Konfirmasi Tambah Budget'
+                            : (isRestore ? 'Konfirmasi Pulihkan ($targetCount)' : 'Konfirmasi Hapus ($targetCount)'))
                         : 'Tidak Ada Data',
                     style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
