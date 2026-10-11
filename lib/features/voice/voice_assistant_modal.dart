@@ -169,11 +169,11 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
                   width: 64,
                   height: 64,
                   decoration: BoxDecoration(
-                    color: _isListening ? AppTheme.expenseRed : AppTheme.primary,
+                    color: _isListening ? AppTheme.expense : AppTheme.primary,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: (_isListening ? AppTheme.expenseRed : AppTheme.primary)
+                        color: (_isListening ? AppTheme.expense : AppTheme.primary)
                             .withValues(alpha: 0.35),
                         blurRadius: 16,
                         spreadRadius: 2,
@@ -252,7 +252,7 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w900,
-                  color: AppTheme.expenseRed,
+                  color: AppTheme.expense,
                 ),
               ),
             ],

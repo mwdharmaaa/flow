@@ -13,6 +13,7 @@ class AppTheme {
   static const Color primarySoft = Color(0xFFEBF2FF);
   static const Color income = Color(0xFF10B981);
   static const Color expense = Color(0xFFEF4444);
+  static const Color expenseRed = Color(0xFFEF4444);
   static const Color transfer = Color(0xFF1D61E0);
   static const Color warning = Color(0xFFF59E0B);
 
