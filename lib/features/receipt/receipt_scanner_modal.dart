@@ -1,11 +1,15 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/parsers/receipt_parser.dart';
 import 'package:flow/core/services/voice_service.dart';
+import 'package:flow/core/services/camera/camera_capture_service.dart';
 import 'package:flow/models/receipt_model.dart';
 import 'package:flow/models/transaction_model.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/features/receipt/receipt_viewfinder.dart';
+import 'package:flow/features/receipt/receipt_action_buttons.dart';
+import 'package:flow/features/receipt/receipt_ocr_text_box.dart';
 import 'package:flow/features/receipt/receipt_preset_picker.dart';
 import 'package:flow/features/receipt/receipt_result_card.dart';
 
@@ -28,7 +32,9 @@ class ReceiptScannerModal extends StatefulWidget {
 }
 
 class _ReceiptScannerModalState extends State<ReceiptScannerModal> {
+  final TextEditingController _ocrTextController = TextEditingController();
   bool _isScanning = false;
+  Uint8List? _imageBytes;
   ReceiptData? _parsedReceipt;
   late String _selectedAccountId;
   late String _selectedCategory;
@@ -43,10 +49,42 @@ class _ReceiptScannerModalState extends State<ReceiptScannerModal> {
     _selectedCategory = 'Shopping';
   }
 
-  void _processReceiptText(String raw) async {
-    setState(() => _isScanning = true);
-    await Future.delayed(const Duration(milliseconds: 600));
+  @override
+  void dispose() {
+    _ocrTextController.dispose();
+    super.dispose();
+  }
 
+  void _onCapture(bool fromCamera) async {
+    setState(() => _isScanning = true);
+    final result = fromCamera
+        ? await CameraCaptureService.instance.captureFromCamera()
+        : await CameraCaptureService.instance.pickFromGallery();
+
+    if (result == null) {
+      setState(() => _isScanning = false);
+      return;
+    }
+
+    setState(() {
+      _imageBytes = result.bytes;
+      _isScanning = true;
+    });
+
+    await Future.delayed(const Duration(milliseconds: 700));
+
+    // OCR simulation from captured receipt
+    final sampleText = '''INDOMARET POINT
+2 x ROTI TAWAR 16.000
+1 x SUSU ULTRA MILK 1L 21.500
+1 x AIR MINERAL 5.000
+TOTAL 42.500''';
+
+    _ocrTextController.text = sampleText;
+    _processReceiptText(sampleText);
+  }
+
+  void _processReceiptText(String raw) {
     final parsed = ReceiptParser.parse(raw);
     setState(() {
       _isScanning = false;
@@ -59,9 +97,7 @@ class _ReceiptScannerModalState extends State<ReceiptScannerModal> {
     if (_parsedReceipt == null || !_parsedReceipt!.isValid) return;
 
     final receipt = _parsedReceipt!;
-    final itemNotes = receipt.items
-        .map((i) => '${i.quantity}x ${i.name}')
-        .join(', ');
+    final itemNotes = receipt.items.map((i) => '${i.quantity}x ${i.name}').join(', ');
 
     final newTx = TransactionModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -92,7 +128,6 @@ class _ReceiptScannerModalState extends State<ReceiptScannerModal> {
         content: Text('Struk ${receipt.merchant} berhasil disimpan!'),
         backgroundColor: AppTheme.primary,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }
@@ -128,7 +163,7 @@ class _ReceiptScannerModalState extends State<ReceiptScannerModal> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Deteksi Struk Belanja (OCR)',
+                  'Deteksi Struk Belanja (Kamera & OCR)',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -142,13 +177,33 @@ class _ReceiptScannerModalState extends State<ReceiptScannerModal> {
               ],
             ),
             const SizedBox(height: 10),
-            ReceiptViewfinder(isScanning: _isScanning),
-            const SizedBox(height: 14),
+            ReceiptViewfinder(
+              isScanning: _isScanning,
+              imageBytes: _imageBytes,
+              onRetake: () => setState(() => _imageBytes = null),
+            ),
+            const SizedBox(height: 12),
+            ReceiptActionButtons(
+              onTapCamera: () => _onCapture(true),
+              onTapGallery: () => _onCapture(false),
+              isDark: isDark,
+              isScanning: _isScanning,
+            ),
+            const SizedBox(height: 12),
+            ReceiptOcrTextBox(
+              controller: _ocrTextController,
+              onChanged: _processReceiptText,
+              isDark: isDark,
+            ),
+            const SizedBox(height: 12),
             ReceiptPresetPicker(
               isDark: isDark,
-              onSelectPreset: _processReceiptText,
+              onSelectPreset: (text) {
+                _ocrTextController.text = text;
+                _processReceiptText(text);
+              },
             ),
-            if (_parsedReceipt != null) ...[
+            if (_parsedReceipt != null && _parsedReceipt!.isValid) ...[
               const SizedBox(height: 14),
               ReceiptResultCard(
                 receipt: _parsedReceipt!,

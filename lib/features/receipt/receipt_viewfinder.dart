@@ -1,10 +1,18 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
 
 class ReceiptViewfinder extends StatefulWidget {
   final bool isScanning;
+  final Uint8List? imageBytes;
+  final VoidCallback? onRetake;
 
-  const ReceiptViewfinder({super.key, this.isScanning = false});
+  const ReceiptViewfinder({
+    super.key,
+    this.isScanning = false,
+    this.imageBytes,
+    this.onRetake,
+  });
 
   @override
   State<ReceiptViewfinder> createState() => _ReceiptViewfinderState();
@@ -39,86 +47,110 @@ class _ReceiptViewfinderState extends State<ReceiptViewfinder>
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppTheme.darkBorderSubtle),
       ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Corner Guides
-          Positioned(
-            top: 14,
-            left: 14,
-            child: _buildCorner(isTop: true, isLeft: true),
-          ),
-          Positioned(
-            top: 14,
-            right: 14,
-            child: _buildCorner(isTop: true, isLeft: false),
-          ),
-          Positioned(
-            bottom: 14,
-            left: 14,
-            child: _buildCorner(isTop: false, isLeft: true),
-          ),
-          Positioned(
-            bottom: 14,
-            right: 14,
-            child: _buildCorner(isTop: false, isLeft: false),
-          ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            if (widget.imageBytes != null)
+              Positioned.fill(
+                child: Image.memory(
+                  widget.imageBytes!,
+                  fit: BoxFit.cover,
+                ),
+              ),
 
-          // Scanning Line
-          if (widget.isScanning)
-            AnimatedBuilder(
-              animation: _animController,
-              builder: (context, child) {
-                return Positioned(
-                  top: 20 + (_animController.value * 140),
-                  left: 20,
-                  right: 20,
-                  child: Container(
-                    height: 2,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          AppTheme.primary.withValues(alpha: 0.1),
-                          AppTheme.primary,
-                          AppTheme.primary.withValues(alpha: 0.1),
+            // Corner Guides
+            Positioned(top: 14, left: 14, child: _buildCorner(isTop: true, isLeft: true)),
+            Positioned(top: 14, right: 14, child: _buildCorner(isTop: true, isLeft: false)),
+            Positioned(bottom: 14, left: 14, child: _buildCorner(isTop: false, isLeft: true)),
+            Positioned(bottom: 14, right: 14, child: _buildCorner(isTop: false, isLeft: false)),
+
+            // Scanning Line
+            if (widget.isScanning)
+              AnimatedBuilder(
+                animation: _animController,
+                builder: (context, child) {
+                  return Positioned(
+                    top: 20 + (_animController.value * 140),
+                    left: 20,
+                    right: 20,
+                    child: Container(
+                      height: 2,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppTheme.primary.withValues(alpha: 0.1),
+                            AppTheme.primary,
+                            AppTheme.primary.withValues(alpha: 0.1),
+                          ],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTheme.primary.withValues(alpha: 0.6),
+                            blurRadius: 6,
+                            spreadRadius: 1,
+                          ),
                         ],
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppTheme.primary.withValues(alpha: 0.6),
-                          blurRadius: 6,
-                          spreadRadius: 1,
+                    ),
+                  );
+                },
+              ),
+
+            // Center Content
+            if (widget.imageBytes == null)
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.document_scanner_outlined,
+                    color: widget.isScanning ? AppTheme.primary : Colors.white54,
+                    size: 38,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    widget.isScanning
+                        ? 'Memproses Optical Character Recognition (OCR)...'
+                        : 'Posisikan kamera ke struk belanja kasir',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.white70,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+
+            // Retake Button
+            if (widget.imageBytes != null && widget.onRetake != null)
+              Positioned(
+                top: 10,
+                right: 10,
+                child: GestureDetector(
+                  onTap: widget.onRetake,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.7),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.refresh, size: 12, color: Colors.white),
+                        SizedBox(width: 4),
+                        Text(
+                          'Ganti Foto',
+                          style: TextStyle(fontSize: 10, color: Colors.white),
                         ),
                       ],
                     ),
                   ),
-                );
-              },
-            ),
-
-          // Central Icon & Instruction
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.document_scanner_outlined,
-                color: widget.isScanning ? AppTheme.primary : Colors.white54,
-                size: 38,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                widget.isScanning
-                    ? 'Memproses Optical Character Recognition (OCR)...'
-                    : 'Posisikan struk belanja di dalam kotak sensor',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.white70,
-                  fontWeight: FontWeight.w500,
                 ),
               ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -129,18 +161,10 @@ class _ReceiptViewfinderState extends State<ReceiptViewfinder>
       height: 16,
       decoration: BoxDecoration(
         border: Border(
-          top: isTop
-              ? const BorderSide(color: AppTheme.primary, width: 2.5)
-              : BorderSide.none,
-          bottom: !isTop
-              ? const BorderSide(color: AppTheme.primary, width: 2.5)
-              : BorderSide.none,
-          left: isLeft
-              ? const BorderSide(color: AppTheme.primary, width: 2.5)
-              : BorderSide.none,
-          right: !isLeft
-              ? const BorderSide(color: AppTheme.primary, width: 2.5)
-              : BorderSide.none,
+          top: isTop ? const BorderSide(color: AppTheme.primary, width: 2.5) : BorderSide.none,
+          bottom: !isTop ? const BorderSide(color: AppTheme.primary, width: 2.5) : BorderSide.none,
+          left: isLeft ? const BorderSide(color: AppTheme.primary, width: 2.5) : BorderSide.none,
+          right: !isLeft ? const BorderSide(color: AppTheme.primary, width: 2.5) : BorderSide.none,
         ),
       ),
     );
