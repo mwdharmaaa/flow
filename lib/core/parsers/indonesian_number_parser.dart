@@ -29,7 +29,7 @@ class IndonesianNumberParser {
 
     // Convert multi-word spoken numbers into digits
     final spokenPatterns = [
-      RegExp(r'(?:(?:satu|dua|tiga|empat|lima|enam|tujuh|delapan|sembilan|se)\s*(?:belas|puluh|ratus)?\s*)*(?:ribu|juta)?'),
+      RegExp(r'\b(?:(?:satu|dua|tiga|empat|lima|enam|tujuh|delapan|sembilan|sepuluh|sebelas|seratus|seribu|sejuta|se)\s*(?:belas|puluh|ratus)?\s*)+(?:ribu|juta)?\b'),
     ];
 
     for (final pattern in spokenPatterns) {
