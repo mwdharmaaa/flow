@@ -52,7 +52,7 @@ void main() {
       expect(find.text('No transactions yet'), findsNothing);
 
       state.clearAllTransactions();
-      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       expect(find.text('Kopi'), findsNothing);
       expect(find.text('No transactions yet'), findsOneWidget);
@@ -72,7 +72,7 @@ void main() {
       expect(find.text('Kopi'), findsOneWidget);
 
       state.clearAllTransactions();
-      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       expect(find.text('Kopi'), findsNothing);
       expect(find.text('No transactions yet'), findsOneWidget);
