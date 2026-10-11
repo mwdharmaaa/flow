@@ -30,13 +30,14 @@ class NlpTransactionParser {
     'Food': [
       'coffee', 'kopi', 'makan', 'lunch', 'dinner', 'sarapan', 'nasi',
       'ayam', 'mie', 'snack', 'jajan', 'burger', 'pizza', 'minum',
-      'tea', 'boba', 'food', 'resto', 'cafe', 'kafe', 'roti', 'bakso',
-      'sate', 'soto', 'martabak', 'eskrim', 'icecream'
+      'tea', 'teh', 'esteh', 'matcha', 'jus', 'boba', 'food', 'resto',
+      'cafe', 'kafe', 'roti', 'bakso', 'sate', 'soto', 'martabak',
+      'eskrim', 'icecream', 'kue', 'gorengan'
     ],
     'Transport': [
       'grab', 'gojek', 'ojol', 'bensin', 'bbm', 'pertalite', 'pertamax',
       'tol', 'parkir', 'kereta', 'bus', 'mrt', 'tije', 'taxi', 'transport',
-      'commuter', 'solar', 'shell', 'angkot'
+      'commuter', 'solar', 'shell', 'angkot', 'maxim'
     ],
     'Shopping': [
       'belanja', 'baju', 'celana', 'sepatu', 'kaos', 'shopee', 'tokped',
@@ -46,7 +47,7 @@ class NlpTransactionParser {
     'Bills': [
       'listrik', 'pln', 'air', 'pdam', 'wifi', 'indihome', 'biznet',
       'pulsa', 'kuota', 'tagihan', 'bill', 'iuran', 'bpjs', 'sewa',
-      'kontrakan', 'kos', 'pajak', 'ipl'
+      'kontrakan', 'kos', 'pajak', 'ipl', 'token'
     ],
     'Entertainment': [
       'netflix', 'spotify', 'youtube', 'game', 'steam', 'bioskop',
@@ -66,23 +67,86 @@ class NlpTransactionParser {
     ],
   };
 
+  static final RegExp _amountPattern = RegExp(
+    r'(?:rp\.?\s*)?(\d+(?:[.,]\d+)?)\s*(k|rb|ribu|jt|juta|m|mio|million)?\b',
+    caseSensitive: false,
+  );
+
+  static final RegExp _conjunctionSplitter = RegExp(
+    r'(?:,|\b(?:dan\s+juga|dan|sama|serta|lalu|terus|kemudian|tambah|plus|juga|&)\b|\n|;)',
+    caseSensitive: false,
+  );
+
+  static final RegExp _leadingConjunctionPattern = RegExp(
+    r'^(?:dan\s+juga|dan|sama|serta|lalu|terus|kemudian|juga|tambah|plus|&|\+|-)\s+',
+    caseSensitive: false,
+  );
+
   static ParsedTransactionResult parse(String input) {
+    final all = parseAll(input);
+    return all.isNotEmpty ? all.first : ParsedTransactionResult.invalid;
+  }
+
+  static List<ParsedTransactionResult> parseAll(String input) {
     final cleanInput = input.trim();
-    if (cleanInput.isEmpty) return ParsedTransactionResult.invalid;
+    if (cleanInput.isEmpty) return const [];
 
     final normalized = IndonesianNumberParser.normalize(cleanInput);
-    final lower = normalized.toLowerCase();
+    if (normalized.isEmpty) return const [];
 
-    // 1. Extract Amount
-    final amountMatch = RegExp(
-      r'(?:rp\.?\s*)?(\d+(?:[.,]\d+)?)\s*(k|rb|ribu|jt|juta|m|mio|million)?',
-      caseSensitive: false,
-    ).firstMatch(lower);
+    final rawSegments = normalized.split(_conjunctionSplitter);
+    final List<String> segments = [];
 
+    for (final seg in rawSegments) {
+      final trimmed = seg.trim();
+      if (trimmed.isEmpty) continue;
+      final matches = _amountPattern.allMatches(trimmed).toList();
+      if (matches.length > 1) {
+        segments.addAll(_subdivideSegment(trimmed, matches));
+      } else {
+        segments.add(trimmed);
+      }
+    }
+
+    final List<ParsedTransactionResult> results = [];
+    for (final seg in segments) {
+      final res = _parseSegment(seg);
+      if (res.isValid) results.add(res);
+    }
+    return results;
+  }
+
+  static List<String> _subdivideSegment(String text, List<RegExpMatch> matches) {
+    if (matches.length <= 1) return [text];
+    final isPrefix = matches.first.start <= 2;
+    final List<String> subs = [];
+    int prev = 0;
+
+    for (int i = isPrefix ? 1 : 0; i < (isPrefix ? matches.length : matches.length - 1); i++) {
+      final idx = isPrefix ? matches[i].start : matches[i].end;
+      subs.add(text.substring(prev, idx).trim());
+      prev = idx;
+    }
+    subs.add(text.substring(prev).trim());
+    return subs.where((s) => s.isNotEmpty).toList();
+  }
+
+  static ParsedTransactionResult _parseSegment(String segment) {
+    final clean = segment.trim();
+    if (clean.isEmpty) return ParsedTransactionResult.invalid;
+
+    final lower = clean.toLowerCase();
+    final amountMatch = _amountPattern.firstMatch(lower);
     if (amountMatch == null) return ParsedTransactionResult.invalid;
 
-    final numStr = amountMatch.group(1)!.replaceAll(',', '.');
-    final rawNum = double.tryParse(numStr);
+    String cleanNum = amountMatch.group(1)!;
+    if (RegExp(r'^\d{1,3}(?:\.\d{3})+$').hasMatch(cleanNum)) {
+      cleanNum = cleanNum.replaceAll('.', '');
+    } else {
+      cleanNum = cleanNum.replaceAll(',', '.');
+    }
+
+    final rawNum = double.tryParse(cleanNum);
     if (rawNum == null || rawNum <= 0) return ParsedTransactionResult.invalid;
 
     final suffix = (amountMatch.group(2) ?? '').toLowerCase();
@@ -92,26 +156,23 @@ class NlpTransactionParser {
     } else if (suffix == 'jt' || suffix == 'juta' || suffix == 'm' || suffix == 'mio' || suffix == 'million') {
       multiplier = 1000000.0;
     } else if (rawNum < 1000 && !lower.contains('rp')) {
-      // e.g. "coffee 18" -> assume 18k if small integer
       multiplier = 1000.0;
     }
 
     final finalAmount = rawNum * multiplier;
 
-    // 2. Extract Title / Item description
     String itemTitle = lower
         .replaceAll(amountMatch.group(0)!, '')
         .replaceAll(RegExp(r'\s+'), ' ')
         .trim();
 
+    itemTitle = itemTitle.replaceFirst(_leadingConjunctionPattern, '').trim();
     if (itemTitle.isEmpty) {
       itemTitle = 'Quick Record';
     }
 
-    // Capitalize first letter of itemTitle
     final formattedTitle = itemTitle[0].toUpperCase() + itemTitle.substring(1);
 
-    // 3. Match Category & TransactionType
     String detectedCategory = 'Other';
     TransactionType detectedType = TransactionType.expense;
 
