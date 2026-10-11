@@ -8,23 +8,30 @@ import 'package:flow/features/transactions/models/category_item_data.dart';
 class ChooseCategoryModal extends StatefulWidget {
   final AppState state;
   final TransactionType initialType;
+  final ValueChanged<String>? onCategoryPicked;
 
   const ChooseCategoryModal({
     super.key,
     required this.state,
     this.initialType = TransactionType.expense,
+    this.onCategoryPicked,
   });
 
   static Future<void> show(
     BuildContext context,
     AppState state, {
     TransactionType initialType = TransactionType.expense,
+    ValueChanged<String>? onCategoryPicked,
   }) {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => ChooseCategoryModal(state: state, initialType: initialType),
+      builder: (_) => ChooseCategoryModal(
+        state: state,
+        initialType: initialType,
+        onCategoryPicked: onCategoryPicked,
+      ),
     );
   }
 
@@ -51,14 +58,15 @@ class _ChooseCategoryModalState extends State<ChooseCategoryModal> {
 
   void _onCategorySelected(TransactionType type, String category) {
     Navigator.of(context).pop();
-    showDialog(
-      context: context,
-      builder: (_) => AddTransactionDialog(
-        accounts: widget.state.accounts,
-        initialType: type,
-        initialCategory: category,
-        onSave: (tx) => widget.state.addTransaction(tx),
-      ),
+    if (widget.onCategoryPicked != null) {
+      widget.onCategoryPicked!(category);
+      return;
+    }
+    AddTransactionDialog.show(
+      context,
+      state: widget.state,
+      initialType: type,
+      initialCategory: category,
     );
   }
 

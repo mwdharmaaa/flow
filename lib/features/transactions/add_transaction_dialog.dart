@@ -266,7 +266,12 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
 
   void _openAllCategories() {
     if (widget.state == null) return;
-    ChooseCategoryModal.show(context, widget.state!, initialType: _type);
+    ChooseCategoryModal.show(
+      context,
+      widget.state!,
+      initialType: _type,
+      onCategoryPicked: (cat) => setState(() => _selectedCategory = cat),
+    );
   }
 
   @override
