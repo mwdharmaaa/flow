@@ -97,4 +97,12 @@ class VoiceService {
     if (count <= 0) return 'Tidak ada riwayat transaksi yang dapat dipulihkan.';
     return '$count riwayat transaksi berhasil dipulihkan.';
   }
+
+  String formatAddBudgetFeedback({
+    required String targetLabel,
+    required double amount,
+  }) {
+    final formatted = amount.toInt().toString();
+    return 'Budget $targetLabel sebesar $formatted rupiah berhasil ditambahkan.';
+  }
 }
