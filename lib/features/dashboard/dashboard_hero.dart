@@ -173,7 +173,7 @@ class _DashboardHeroState extends State<DashboardHero> {
             height: 110,
             decoration: BoxDecoration(
               color: isDark ? AppTheme.darkBgElevated : Colors.white.withValues(alpha: 0.6),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: AppTheme.borderRadius(isDark, 20),
               border: Border.all(
                 color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border.withValues(alpha: 0.7),
               ),
@@ -296,7 +296,7 @@ class _DashboardHeroState extends State<DashboardHero> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: isDark ? AppTheme.darkBgElevated : Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppTheme.borderRadius(isDark, 20),
         border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border),
       ),
       child: Text(
@@ -315,7 +315,7 @@ class _DashboardHeroState extends State<DashboardHero> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: isDark ? AppTheme.darkBgElevated : AppTheme.primarySoft,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppTheme.borderRadius(isDark, 20),
         border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : Colors.transparent),
       ),
       child: Text(
@@ -341,7 +341,7 @@ class _DashboardHeroState extends State<DashboardHero> {
         height: 48,
         decoration: BoxDecoration(
           color: isDark ? AppTheme.darkBgElevated : Colors.white,
-          borderRadius: BorderRadius.circular(26),
+          borderRadius: AppTheme.borderRadius(isDark, 26),
           border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border),
           boxShadow: [
             BoxShadow(
