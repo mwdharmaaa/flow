@@ -95,6 +95,13 @@ class DashboardSummary extends StatelessWidget {
               color: bgElevated,
               borderRadius: AppTheme.borderRadius(isDark, 16),
               border: Border.all(color: borderSubtle),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.02),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -475,6 +482,13 @@ class DashboardSummary extends StatelessWidget {
         color: bg,
         borderRadius: AppTheme.borderRadius(isDark, 16),
         border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border.withValues(alpha: 0.5)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

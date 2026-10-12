@@ -71,6 +71,13 @@ class TransactionTile extends StatelessWidget {
         color: bgElevated,
         borderRadius: AppTheme.borderRadius(isDark, 16),
         border: Border.all(color: borderSubtle),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Row(
         children: [

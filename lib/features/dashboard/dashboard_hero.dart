@@ -177,6 +177,13 @@ class _DashboardHeroState extends State<DashboardHero> {
               border: Border.all(
                 color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border.withValues(alpha: 0.7),
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.03),
+                  blurRadius: 14,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Stack(
               children: [
@@ -345,9 +352,9 @@ class _DashboardHeroState extends State<DashboardHero> {
           border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.02),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+              color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
