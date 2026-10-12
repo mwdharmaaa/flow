@@ -17,23 +17,22 @@ class AppTheme {
   static const Color transfer = Color(0xFF1D61E0);
   static const Color warning = Color(0xFFF59E0B);
 
-  // Layoutcraft Neutral Dark Palette (Zinc-950)
+  // Liquid Glass Neutral Dark Palette & Luminous Specular Tokens
   static const Color darkBgBase = Color(0xFF09090B);
-  static const Color darkBgSurface = Color(0xFF121215);
-  static const Color darkBgElevated = Color(0xFF18181B);
-  static const Color darkBorderSubtle = Color(0xFF27272A);
+  static const Color darkBgSurface = Color(0xCC121217);
+  static const Color darkBgElevated = Color(0xD9181822);
+  static const Color darkBorderSubtle = Color(0x2EFFFFFF);
+  static const Color darkBorderHighlight = Color(0x40FFFFFF);
   static const Color darkTextPrimary = Color(0xFFFAFAFA);
   static const Color darkTextSecondary = Color(0xFFA1A1AA);
   static const Color darkAccentPrimary = Color(0xFF3B82F6);
 
-  // Project0002 Sharp Corner Design Tokens
-  // In dark mode: 2.0px razor-sharp Bauhaus/Linear edge matching project0002.
-  // In light mode: smooth iOS/Material curve.
-  static double radius(bool isDark, [double light = 16.0]) => isDark ? 2.0 : light;
+  // Liquid Glass Smooth Curved Design Tokens
+  static double radius(bool isDark, [double light = 16.0]) => light;
   static BorderRadius borderRadius(bool isDark, [double light = 16.0]) =>
-      BorderRadius.circular(isDark ? 2.0 : light);
+      BorderRadius.circular(light);
   static BorderRadius verticalTop(bool isDark, [double light = 24.0]) =>
-      BorderRadius.vertical(top: Radius.circular(isDark ? 2.0 : light));
+      BorderRadius.vertical(top: Radius.circular(light));
 
   static ThemeData get lightTheme {
     return ThemeData(
@@ -80,7 +79,7 @@ class AppTheme {
         color: darkBgElevated,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(2.0),
+          borderRadius: BorderRadius.circular(16.0),
           side: const BorderSide(color: darkBorderSubtle),
         ),
       ),
@@ -88,7 +87,7 @@ class AppTheme {
         backgroundColor: darkBgElevated,
         elevation: 24,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(2.0),
+          borderRadius: BorderRadius.circular(24.0),
           side: const BorderSide(color: darkBorderSubtle),
         ),
       ),
@@ -96,7 +95,7 @@ class AppTheme {
         backgroundColor: darkBgBase,
         elevation: 16,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(2.0)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28.0)),
         ),
       ),
       appBarTheme: const AppBarTheme(
@@ -117,6 +116,36 @@ class AppTheme {
         type: BottomNavigationBarType.fixed,
         elevation: 8,
       ),
+    );
+  }
+
+  static BoxDecoration liquidGlassDecoration({
+    required bool isDark,
+    double radius = 16.0,
+    BorderRadius? borderRadius,
+    Color? borderColor,
+    Color? color,
+    double borderWidth = 1.0,
+    bool elevated = false,
+  }) {
+    final r = borderRadius ?? BorderRadius.circular(radius);
+    return BoxDecoration(
+      borderRadius: r,
+      color: color ??
+          (isDark
+              ? (elevated ? darkBgElevated : darkBgSurface)
+              : (elevated ? const Color(0xF2FFFFFF) : const Color(0xE6FFFFFF))),
+      border: Border.all(
+        color: borderColor ?? (isDark ? darkBorderSubtle : border.withValues(alpha: 0.8)),
+        width: borderWidth,
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: isDark ? 0.30 : 0.04),
+          blurRadius: elevated ? 20 : 12,
+          offset: const Offset(0, 4),
+        ),
+      ],
     );
   }
 }
