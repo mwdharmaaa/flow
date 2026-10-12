@@ -18,11 +18,11 @@ class AppTheme {
   static const Color warning = Color(0xFFF59E0B);
 
   // Liquid Glass Neutral Dark Palette & Luminous Specular Tokens
-  static const Color darkBgBase = Color(0xFF09090B);
-  static const Color darkBgSurface = Color(0xCC121217);
-  static const Color darkBgElevated = Color(0xD9181822);
-  static const Color darkBorderSubtle = Color(0x2EFFFFFF);
-  static const Color darkBorderHighlight = Color(0x40FFFFFF);
+  static const Color darkBgBase = Color(0xFF08090D);
+  static const Color darkBgSurface = Color(0x1AFFFFFF);
+  static const Color darkBgElevated = Color(0x28FFFFFF);
+  static const Color darkBorderSubtle = Color(0x38FFFFFF);
+  static const Color darkBorderHighlight = Color(0x5EFFFFFF);
   static const Color darkTextPrimary = Color(0xFFFAFAFA);
   static const Color darkTextSecondary = Color(0xFFA1A1AA);
   static const Color darkAccentPrimary = Color(0xFF3B82F6);
@@ -76,30 +76,31 @@ class AppTheme {
         error: expense,
       ),
       cardTheme: CardTheme(
-        color: darkBgElevated,
+        color: const Color(0x1FFFFFFF),
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0),
-          side: const BorderSide(color: darkBorderSubtle),
+          borderRadius: BorderRadius.circular(20.0),
+          side: const BorderSide(color: darkBorderSubtle, width: 1.2),
         ),
       ),
       dialogTheme: DialogTheme(
-        backgroundColor: darkBgElevated,
+        backgroundColor: const Color(0xF210121A),
         elevation: 24,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24.0),
-          side: const BorderSide(color: darkBorderSubtle),
+          side: const BorderSide(color: darkBorderSubtle, width: 1.2),
         ),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: darkBgBase,
+        backgroundColor: Color(0xF210121A),
         elevation: 16,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(28.0)),
+          side: BorderSide(color: darkBorderSubtle, width: 1.0),
         ),
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: darkBgBase,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
         iconTheme: IconThemeData(color: darkTextPrimary),
@@ -110,7 +111,7 @@ class AppTheme {
         ),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: darkBgElevated,
+        backgroundColor: Colors.transparent,
         selectedItemColor: darkAccentPrimary,
         unselectedItemColor: darkTextSecondary,
         type: BottomNavigationBarType.fixed,
@@ -121,30 +122,58 @@ class AppTheme {
 
   static BoxDecoration liquidGlassDecoration({
     required bool isDark,
-    double radius = 16.0,
+    double radius = 20.0,
     BorderRadius? borderRadius,
     Color? borderColor,
     Color? color,
-    double borderWidth = 1.0,
+    double borderWidth = 1.2,
     bool elevated = false,
   }) {
     final r = borderRadius ?? BorderRadius.circular(radius);
     return BoxDecoration(
       borderRadius: r,
-      color: color ??
-          (isDark
-              ? (elevated ? darkBgElevated : darkBgSurface)
-              : (elevated ? const Color(0xF2FFFFFF) : const Color(0xE6FFFFFF))),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: isDark
+            ? (elevated
+                ? [
+                    Colors.white.withValues(alpha: 0.14),
+                    Colors.white.withValues(alpha: 0.03),
+                  ]
+                : [
+                    Colors.white.withValues(alpha: 0.09),
+                    Colors.white.withValues(alpha: 0.015),
+                  ])
+            : (elevated
+                ? [
+                    Colors.white.withValues(alpha: 0.92),
+                    Colors.white.withValues(alpha: 0.68),
+                  ]
+                : [
+                    Colors.white.withValues(alpha: 0.84),
+                    Colors.white.withValues(alpha: 0.52),
+                  ]),
+      ),
       border: Border.all(
-        color: borderColor ?? (isDark ? darkBorderSubtle : border.withValues(alpha: 0.8)),
+        color: borderColor ??
+            (isDark
+                ? (elevated ? darkBorderHighlight : darkBorderSubtle)
+                : Colors.white.withValues(alpha: elevated ? 0.95 : 0.75)),
         width: borderWidth,
       ),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withValues(alpha: isDark ? 0.30 : 0.04),
-          blurRadius: elevated ? 20 : 12,
-          offset: const Offset(0, 4),
+          color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.06),
+          blurRadius: elevated ? 22 : 14,
+          offset: const Offset(0, 6),
         ),
+        if (isDark)
+          BoxShadow(
+            color: Colors.white.withValues(alpha: 0.06),
+            blurRadius: 1,
+            offset: const Offset(0, 1),
+          ),
       ],
     );
   }
