@@ -19,15 +19,15 @@ class DebtsScreen extends StatelessWidget {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (context, setState) => Dialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          backgroundColor: state.isDarkMode ? AppTheme.darkBgElevated : Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: AppTheme.borderRadius(state.isDarkMode, 24)),
           child: Padding(
             padding: const EdgeInsets.all(22),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text('Log Debt / Loan', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                Text('Log Debt / Loan', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: state.isDarkMode ? AppTheme.darkTextPrimary : AppTheme.textPrimary)),
                 const SizedBox(height: 14),
                 Row(
                   children: [
@@ -37,9 +37,9 @@ class DebtsScreen extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 9),
                           decoration: BoxDecoration(
-                            color: type == 'receivable' ? AppTheme.income.withValues(alpha: 0.12) : const Color(0xFFF6F9FD),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: type == 'receivable' ? AppTheme.income : AppTheme.border),
+                            color: type == 'receivable' ? AppTheme.income.withValues(alpha: 0.12) : (state.isDarkMode ? AppTheme.darkBgSurface : const Color(0xFFF6F9FD)),
+                            borderRadius: AppTheme.borderRadius(state.isDarkMode, 10),
+                            border: Border.all(color: type == 'receivable' ? AppTheme.income : (state.isDarkMode ? AppTheme.darkBorderSubtle : AppTheme.border)),
                           ),
                           alignment: Alignment.center,
                           child: Text('Lent to (Owed)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: type == 'receivable' ? AppTheme.income : AppTheme.subtle)),
@@ -53,9 +53,9 @@ class DebtsScreen extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 9),
                           decoration: BoxDecoration(
-                            color: type == 'payable' ? AppTheme.expense.withValues(alpha: 0.12) : const Color(0xFFF6F9FD),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: type == 'payable' ? AppTheme.expense : AppTheme.border),
+                            color: type == 'payable' ? AppTheme.expense.withValues(alpha: 0.12) : (state.isDarkMode ? AppTheme.darkBgSurface : const Color(0xFFF6F9FD)),
+                            borderRadius: AppTheme.borderRadius(state.isDarkMode, 10),
+                            border: Border.all(color: type == 'payable' ? AppTheme.expense : (state.isDarkMode ? AppTheme.darkBorderSubtle : AppTheme.border)),
                           ),
                           alignment: Alignment.center,
                           child: Text('Borrowed', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: type == 'payable' ? AppTheme.expense : AppTheme.subtle)),
@@ -146,9 +146,9 @@ class DebtsScreen extends StatelessWidget {
                           margin: const EdgeInsets.only(bottom: 10),
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: AppTheme.border),
+                            color: state.isDarkMode ? AppTheme.darkBgElevated : Colors.white,
+                            borderRadius: AppTheme.borderRadius(state.isDarkMode, 16),
+                            border: Border.all(color: state.isDarkMode ? AppTheme.darkBorderSubtle : AppTheme.border),
                           ),
                           child: Row(
                             children: [
@@ -158,7 +158,7 @@ class DebtsScreen extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(d.personName, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                                    Text(d.personName, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: state.isDarkMode ? AppTheme.darkTextPrimary : AppTheme.textPrimary)),
                                     Text(isReceivable ? 'Lent' : 'Borrowed', style: TextStyle(fontSize: 10, color: isReceivable ? AppTheme.income : AppTheme.expense)),
                                   ],
                                 ),

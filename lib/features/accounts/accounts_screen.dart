@@ -25,20 +25,26 @@ class AccountsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = state.isDarkMode;
+    final textPrimary = isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary;
+    final textSubtle = isDark ? AppTheme.darkTextSecondary : AppTheme.subtle;
+    final cardBg = isDark ? AppTheme.darkBgElevated : Colors.white;
+    final borderSubtle = isDark ? AppTheme.darkBorderSubtle : AppTheme.border;
+
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: isDark ? AppTheme.darkBgBase : AppTheme.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Wallets',
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.w900,
-                  color: AppTheme.textPrimary,
+                  color: textPrimary,
                   letterSpacing: -0.5,
                 ),
               ),
@@ -47,9 +53,9 @@ class AccountsScreen extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: AppTheme.border),
+                  color: cardBg,
+                  borderRadius: AppTheme.borderRadius(isDark, 18),
+                  border: Border.all(color: borderSubtle),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -57,11 +63,11 @@ class AccountsScreen extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Total Net Balance', style: TextStyle(fontSize: 11, color: AppTheme.subtle)),
+                        Text('Total Net Balance', style: TextStyle(fontSize: 11, color: textSubtle)),
                         const SizedBox(height: 4),
                         Text(
                           CurrencyFormatter.format(state.totalBalance, currency: state.currency),
-                          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppTheme.textPrimary),
+                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: textPrimary),
                         ),
                         const SizedBox(height: 4),
                         const Text('100% Offline Local', style: TextStyle(fontSize: 11, color: AppTheme.income, fontWeight: FontWeight.bold)),
@@ -77,9 +83,9 @@ class AccountsScreen extends StatelessWidget {
                       icon: const Icon(Icons.add, size: 16, color: Colors.white),
                       label: const Text('Add', style: TextStyle(color: Colors.white, fontSize: 12)),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primary,
+                        backgroundColor: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(borderRadius: AppTheme.borderRadius(isDark, 12)),
                       ),
                     ),
                   ],
@@ -88,7 +94,7 @@ class AccountsScreen extends StatelessWidget {
               const SizedBox(height: 24),
               Text(
                 'WALLETS & ACCOUNTS (${state.accounts.length})',
-                style: const TextStyle(fontSize: 11, color: AppTheme.subtle, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                style: TextStyle(fontSize: 11, color: textSubtle, fontWeight: FontWeight.bold, letterSpacing: 0.5),
               ),
               const SizedBox(height: 12),
               Expanded(
@@ -103,9 +109,9 @@ class AccountsScreen extends StatelessWidget {
                       margin: const EdgeInsets.only(bottom: 10),
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppTheme.border),
+                        color: cardBg,
+                        borderRadius: AppTheme.borderRadius(isDark, 16),
+                        border: Border.all(color: borderSubtle),
                       ),
                       child: Row(
                         children: [
@@ -113,7 +119,7 @@ class AccountsScreen extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               color: Color(acc.colorValue).withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: AppTheme.borderRadius(isDark, 12),
                             ),
                             child: Icon(_getAccountIcon(acc.type), size: 20, color: Color(acc.colorValue)),
                           ),
@@ -122,9 +128,9 @@ class AccountsScreen extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(acc.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                                Text(acc.name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textPrimary)),
                                 const SizedBox(height: 2),
-                                Text(acc.type.toUpperCase(), style: const TextStyle(fontSize: 10, color: AppTheme.subtle)),
+                                Text(acc.type.toUpperCase(), style: TextStyle(fontSize: 10, color: textSubtle)),
                               ],
                             ),
                           ),
@@ -133,7 +139,7 @@ class AccountsScreen extends StatelessWidget {
                             children: [
                               Text(
                                 CurrencyFormatter.format(acc.balance, currency: state.currency),
-                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textPrimary),
                               ),
                               const SizedBox(height: 4),
                               GestureDetector(
@@ -150,12 +156,12 @@ class AccountsScreen extends StatelessWidget {
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                   decoration: BoxDecoration(
-                                    color: AppTheme.primarySoft,
-                                    borderRadius: BorderRadius.circular(6),
+                                    color: isDark ? AppTheme.darkBgSurface : AppTheme.primarySoft,
+                                    borderRadius: AppTheme.borderRadius(isDark, 6),
                                   ),
-                                  child: const Text(
+                                  child: Text(
                                     'Adjust',
-                                    style: TextStyle(fontSize: 10, color: AppTheme.primary, fontWeight: FontWeight.bold),
+                                    style: TextStyle(fontSize: 10, color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary, fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),

@@ -141,7 +141,7 @@ TOTAL 42.500''';
       padding: EdgeInsets.fromLTRB(16, 12, 16, 20 + bottomInset),
       decoration: BoxDecoration(
         color: isDark ? AppTheme.darkBgBase : AppTheme.background,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: AppTheme.verticalTop(isDark, 24),
       ),
       child: SingleChildScrollView(
         child: Column(

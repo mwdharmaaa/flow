@@ -33,7 +33,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: isDark ? AppTheme.darkBgElevated : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: AppTheme.borderRadius(isDark, 20)),
         title: Text(
           'Delete Budget',
           style: TextStyle(
@@ -65,7 +65,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.expense,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(borderRadius: AppTheme.borderRadius(isDark, 12)),
               elevation: 0,
             ),
             child: const Text('Delete'),
@@ -113,7 +113,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                       decoration: BoxDecoration(
                         color: isDark ? AppTheme.darkBgElevated : AppTheme.primarySoft,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: AppTheme.borderRadius(isDark, 20),
                         border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : Colors.transparent),
                       ),
                       child: Row(
@@ -317,7 +317,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
             elevation: 0,
             padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: AppTheme.borderRadius(widget.state.isDarkMode, 30),
             ),
           ),
         ),

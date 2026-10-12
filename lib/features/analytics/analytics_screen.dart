@@ -51,21 +51,22 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                     decoration: BoxDecoration(
-                      color: AppTheme.primarySoft,
-                      borderRadius: BorderRadius.circular(20),
+                      color: widget.state.isDarkMode ? AppTheme.darkBgElevated : AppTheme.primarySoft,
+                      borderRadius: AppTheme.borderRadius(widget.state.isDarkMode, 20),
+                      border: Border.all(color: widget.state.isDarkMode ? AppTheme.darkBorderSubtle : Colors.transparent),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
                         Text(
                           'Monthly',
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
-                            color: AppTheme.primary,
+                            color: widget.state.isDarkMode ? AppTheme.darkAccentPrimary : AppTheme.primary,
                           ),
                         ),
-                        SizedBox(width: 4),
-                        Icon(Icons.keyboard_arrow_down, size: 16, color: AppTheme.primary),
+                        const SizedBox(width: 4),
+                        Icon(Icons.keyboard_arrow_down, size: 16, color: widget.state.isDarkMode ? AppTheme.darkAccentPrimary : AppTheme.primary),
                       ],
                     ),
                   ),

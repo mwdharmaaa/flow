@@ -14,13 +14,13 @@ class GoalsScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Add Savings', style: TextStyle(color: AppTheme.textPrimary, fontSize: 16, fontWeight: FontWeight.bold)),
+        backgroundColor: state.isDarkMode ? AppTheme.darkBgElevated : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: AppTheme.borderRadius(state.isDarkMode, 20)),
+        title: Text('Add Savings', style: TextStyle(color: state.isDarkMode ? AppTheme.darkTextPrimary : AppTheme.textPrimary, fontSize: 16, fontWeight: FontWeight.bold)),
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.number,
-          style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold),
+          style: TextStyle(color: state.isDarkMode ? AppTheme.darkTextPrimary : AppTheme.textPrimary, fontWeight: FontWeight.bold),
           decoration: const InputDecoration(
             labelText: 'Deposit Amount',
             prefixText: 'Rp ',
@@ -144,9 +144,9 @@ class GoalsScreen extends StatelessWidget {
                           margin: const EdgeInsets.only(bottom: 10),
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: AppTheme.border),
+                            color: state.isDarkMode ? AppTheme.darkBgElevated : Colors.white,
+                            borderRadius: AppTheme.borderRadius(state.isDarkMode, 16),
+                            border: Border.all(color: state.isDarkMode ? AppTheme.darkBorderSubtle : AppTheme.border),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,7 +154,7 @@ class GoalsScreen extends StatelessWidget {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(g.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                                  Text(g.name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: state.isDarkMode ? AppTheme.darkTextPrimary : AppTheme.textPrimary)),
                                   IconButton(
                                     icon: const Icon(Icons.delete_outline, size: 16, color: AppTheme.subtle),
                                     onPressed: () => state.deleteGoal(g.id),

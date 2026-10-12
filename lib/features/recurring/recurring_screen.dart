@@ -36,28 +36,28 @@ class RecurringScreen extends StatelessWidget {
                           margin: const EdgeInsets.only(bottom: 10),
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: AppTheme.border),
+                            color: state.isDarkMode ? AppTheme.darkBgElevated : Colors.white,
+                            borderRadius: AppTheme.borderRadius(state.isDarkMode, 16),
+                            border: Border.all(color: state.isDarkMode ? AppTheme.darkBorderSubtle : AppTheme.border),
                           ),
                           child: Row(
                             children: [
                               Container(
                                 padding: const EdgeInsets.all(10),
-                                decoration: const BoxDecoration(
-                                  color: AppTheme.primarySoft,
+                                decoration: BoxDecoration(
+                                  color: state.isDarkMode ? AppTheme.darkBgSurface : AppTheme.primarySoft,
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.autorenew_rounded, color: AppTheme.primary, size: 20),
+                                child: Icon(Icons.autorenew_rounded, color: state.isDarkMode ? AppTheme.darkAccentPrimary : AppTheme.primary, size: 20),
                               ),
                               const SizedBox(width: 14),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(r.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                                    Text(r.name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: state.isDarkMode ? AppTheme.darkTextPrimary : AppTheme.textPrimary)),
                                     const SizedBox(height: 2),
-                                    Text('${r.category} • ${r.interval.toUpperCase()}', style: const TextStyle(fontSize: 10, color: AppTheme.subtle)),
+                                    Text('${r.category} • ${r.interval.toUpperCase()}', style: TextStyle(fontSize: 10, color: state.isDarkMode ? AppTheme.darkTextSecondary : AppTheme.subtle)),
                                   ],
                                 ),
                               ),

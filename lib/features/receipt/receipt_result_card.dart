@@ -38,7 +38,7 @@ class ReceiptResultCard extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: isDark ? AppTheme.darkBgElevated : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppTheme.borderRadius(isDark, 16),
         border: Border.all(
           color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border,
         ),

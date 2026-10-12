@@ -185,7 +185,7 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
       padding: EdgeInsets.fromLTRB(16, 12, 16, 20 + bottomInset),
       decoration: BoxDecoration(
         color: isDark ? AppTheme.darkBgBase : AppTheme.background,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: AppTheme.verticalTop(isDark, 24),
       ),
       child: SingleChildScrollView(
         child: Column(
@@ -294,7 +294,7 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: isDark ? AppTheme.darkBgElevated : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppTheme.borderRadius(isDark, 16),
         border: Border.all(
           color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border,
         ),
@@ -577,7 +577,7 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isDark ? AppTheme.darkBgElevated : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppTheme.borderRadius(isDark, 16),
         border: Border.all(
           color: actionColor.withValues(alpha: 0.4),
           width: 1.5,
