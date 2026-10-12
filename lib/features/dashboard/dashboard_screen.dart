@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
+import 'package:flow/core/widgets/liquid_background.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/features/dashboard/dashboard_hero.dart';
 import 'package:flow/features/dashboard/dashboard_summary.dart';
@@ -41,8 +42,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
         final isDark = state.isDarkMode;
 
-        return Container(
-          color: isDark ? const Color(0xFF09090B) : Colors.white,
+        return LiquidBackground(
+          isDark: isDark,
           child: SingleChildScrollView(
             child: Column(
               children: [

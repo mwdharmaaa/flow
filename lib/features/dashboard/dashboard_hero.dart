@@ -8,6 +8,7 @@ import 'package:flow/features/chat/chat_prompt_bar.dart';
 import 'package:flow/features/receipt/receipt_scanner_modal.dart';
 import 'package:flow/features/voice/voice_assistant_modal.dart';
 import 'package:flow/core/widgets/flow_logo.dart';
+import 'package:flow/core/widgets/liquid_glass_container.dart';
 
 class DashboardHero extends StatefulWidget {
   final double monthExpense;
@@ -41,22 +42,8 @@ class _DashboardHeroState extends State<DashboardHero> {
 
     return RepaintBoundary(
       child: Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: isDark
-              ? const [
-                  Color(0xFF121215),
-                  Color(0xFF09090B),
-                  Color(0xFF09090B),
-                ]
-              : const [
-                  Color(0xFFEBF3FE),
-                  Color(0xFFF3F7FD),
-                  Color(0xFFFFFFFF),
-                ],
-        ),
+      decoration: const BoxDecoration(
+        color: Colors.transparent,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
       child: Column(
@@ -169,22 +156,11 @@ class _DashboardHeroState extends State<DashboardHero> {
           const SizedBox(height: 20),
 
           // Clouds & Dotted Trajectory Box
-          Container(
+          LiquidGlassContainer(
+            isDark: isDark,
             height: 110,
-            decoration: BoxDecoration(
-              color: isDark ? AppTheme.darkBgElevated : Colors.white.withValues(alpha: 0.6),
-              borderRadius: AppTheme.borderRadius(isDark, 20),
-              border: Border.all(
-                color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border.withValues(alpha: 0.7),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.03),
-                  blurRadius: 14,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
+            radius: 20,
+            elevated: true,
             child: Stack(
               children: [
                 // Dashed guides
@@ -299,13 +275,10 @@ class _DashboardHeroState extends State<DashboardHero> {
 }
 
   Widget _buildPill(String text, bool isDark) {
-    return Container(
+    return LiquidGlassContainer(
+      isDark: isDark,
+      radius: 20,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: isDark ? AppTheme.darkBgElevated : Colors.white,
-        borderRadius: AppTheme.borderRadius(isDark, 20),
-        border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border),
-      ),
       child: Text(
         text,
         style: TextStyle(
@@ -318,13 +291,11 @@ class _DashboardHeroState extends State<DashboardHero> {
   }
 
   Widget _buildBadgePill(String text, bool isDark) {
-    return Container(
+    return LiquidGlassContainer(
+      isDark: isDark,
+      radius: 20,
+      elevated: true,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: isDark ? AppTheme.darkBgElevated : AppTheme.primarySoft,
-        borderRadius: AppTheme.borderRadius(isDark, 20),
-        border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : Colors.transparent),
-      ),
       child: Text(
         text,
         style: TextStyle(
@@ -342,37 +313,26 @@ class _DashboardHeroState extends State<DashboardHero> {
     required VoidCallback onTap,
     required bool isDark,
   }) {
-    return GestureDetector(
+    return LiquidGlassContainer(
+      isDark: isDark,
+      height: 48,
+      radius: 26,
+      elevated: true,
       onTap: onTap,
-      child: Container(
-        height: 48,
-        decoration: BoxDecoration(
-          color: isDark ? AppTheme.darkBgElevated : Colors.white,
-          borderRadius: AppTheme.borderRadius(isDark, 26),
-          border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 18, color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
             ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 18, color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

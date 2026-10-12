@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/formatters/currency_formatter.dart';
+import 'package:flow/core/widgets/liquid_glass_container.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/models/account_model.dart';
 import 'package:flow/models/transaction_model.dart';
@@ -35,8 +36,8 @@ class DashboardSummary extends StatelessWidget {
     final borderSubtle = isDark ? AppTheme.darkBorderSubtle : AppTheme.border;
 
     return Container(
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF09090B) : Colors.white,
+      decoration: const BoxDecoration(
+        color: Colors.transparent,
       ),
       padding: const EdgeInsets.fromLTRB(18, 4, 18, 110),
       child: Column(
@@ -89,20 +90,11 @@ class DashboardSummary extends StatelessWidget {
           const SizedBox(height: 16),
 
           // Two Column Box
-          Container(
+          LiquidGlassContainer(
+            isDark: isDark,
+            radius: 20,
+            elevated: true,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(
-              color: bgElevated,
-              borderRadius: AppTheme.borderRadius(isDark, 16),
-              border: Border.all(color: borderSubtle),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.02),
-                  blurRadius: 10,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
             child: Row(
               children: [
                 Expanded(
@@ -401,13 +393,10 @@ class DashboardSummary extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     final isDark = state.isDarkMode;
-    return Container(
+    return LiquidGlassContainer(
+      isDark: isDark,
+      radius: 18,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      decoration: BoxDecoration(
-        color: isDark ? AppTheme.darkBgElevated : Colors.white,
-        borderRadius: AppTheme.borderRadius(isDark, 14),
-        border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : Colors.transparent),
-      ),
       child: Row(
         children: [
           Container(
@@ -475,21 +464,12 @@ class DashboardSummary extends StatelessWidget {
       iconColor = const Color(0xFFFF8B00);
     }
 
-    return Container(
+    return LiquidGlassContainer(
+      isDark: isDark,
       width: 108,
+      radius: 18,
+      elevated: true,
       padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: AppTheme.borderRadius(isDark, 16),
-        border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border.withValues(alpha: 0.5)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
