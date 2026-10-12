@@ -26,6 +26,15 @@ class AppTheme {
   static const Color darkTextSecondary = Color(0xFFA1A1AA);
   static const Color darkAccentPrimary = Color(0xFF3B82F6);
 
+  // Project0002 Sharp Corner Design Tokens
+  // In dark mode: 2.0px razor-sharp Bauhaus/Linear edge matching project0002.
+  // In light mode: smooth iOS/Material curve.
+  static double radius(bool isDark, [double light = 16.0]) => isDark ? 2.0 : light;
+  static BorderRadius borderRadius(bool isDark, [double light = 16.0]) =>
+      BorderRadius.circular(isDark ? 2.0 : light);
+  static BorderRadius verticalTop(bool isDark, [double light = 24.0]) =>
+      BorderRadius.vertical(top: Radius.circular(isDark ? 2.0 : light));
+
   static ThemeData get lightTheme {
     return ThemeData(
       brightness: Brightness.light,
@@ -66,6 +75,29 @@ class AppTheme {
         primary: darkAccentPrimary,
         surface: darkBgSurface,
         error: expense,
+      ),
+      cardTheme: CardTheme(
+        color: darkBgElevated,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(2.0),
+          side: const BorderSide(color: darkBorderSubtle),
+        ),
+      ),
+      dialogTheme: DialogTheme(
+        backgroundColor: darkBgElevated,
+        elevation: 24,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(2.0),
+          side: const BorderSide(color: darkBorderSubtle),
+        ),
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: darkBgBase,
+        elevation: 16,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(2.0)),
+        ),
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: darkBgBase,
