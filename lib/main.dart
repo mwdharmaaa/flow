@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/widgets/layout/bottom_nav_bar.dart';
@@ -84,6 +85,16 @@ class FlowMainScaffold extends StatelessWidget {
       builder: (context, _) {
         final isSubView = state.currentTabIndex > 3;
         final isDark = state.isDarkMode;
+
+        SystemChrome.setSystemUIOverlayStyle(
+          SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+            statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+            systemNavigationBarColor: Colors.transparent,
+            systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          ),
+        );
 
         return Scaffold(
           backgroundColor: isDark ? AppTheme.darkBgBase : Colors.white,

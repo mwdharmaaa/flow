@@ -45,7 +45,7 @@ class _DashboardHeroState extends State<DashboardHero> {
       decoration: const BoxDecoration(
         color: Colors.transparent,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

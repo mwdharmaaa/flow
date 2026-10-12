@@ -44,26 +44,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
         return LiquidBackground(
           isDark: isDark,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                DashboardHero(
-                  monthExpense: monthExpense,
-                  currency: state.currency,
-                  currentMonth: _currentMonth,
-                  onAddTransaction: () => _openAddTransaction(context),
-                  state: state,
-                ),
-                DashboardSummary(
-                  state: state,
-                  onAddRecord: () => _openAddTransaction(context),
-                  onSeeAllWallets: () => state.setTabIndex(3),
-                  onSeeAllBudgets: () => state.setTabIndex(2),
-                  onSeeAllDebts: () => state.setTabIndex(4),
-                  onSeeAllRecurring: () => state.setTabIndex(5),
-                  onSeeAllSavings: () => state.setTabIndex(6),
-                ),
-              ],
+          child: SafeArea(
+            bottom: false,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  DashboardHero(
+                    monthExpense: monthExpense,
+                    currency: state.currency,
+                    currentMonth: _currentMonth,
+                    onAddTransaction: () => _openAddTransaction(context),
+                    state: state,
+                  ),
+                  DashboardSummary(
+                    state: state,
+                    onAddRecord: () => _openAddTransaction(context),
+                    onSeeAllWallets: () => state.setTabIndex(3),
+                    onSeeAllBudgets: () => state.setTabIndex(2),
+                    onSeeAllDebts: () => state.setTabIndex(4),
+                    onSeeAllRecurring: () => state.setTabIndex(5),
+                    onSeeAllSavings: () => state.setTabIndex(6),
+                  ),
+                ],
+              ),
             ),
           ),
         );
