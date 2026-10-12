@@ -60,7 +60,7 @@ class DashboardSummary extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: isDark ? AppTheme.darkBgElevated : const Color(0xFFFFF4EB),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: AppTheme.borderRadius(isDark, 20),
                       border: Border.all(color: isDark ? borderSubtle : Colors.transparent),
                     ),
                     child: const Row(
@@ -93,7 +93,7 @@ class DashboardSummary extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
               color: bgElevated,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: AppTheme.borderRadius(isDark, 16),
               border: Border.all(color: borderSubtle),
             ),
             child: Row(
@@ -240,25 +240,25 @@ class DashboardSummary extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: const Color(0xFFF6F9FD),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppTheme.border),
+                color: isDark ? AppTheme.darkBgElevated : const Color(0xFFF6F9FD),
+                borderRadius: AppTheme.borderRadius(isDark, 16),
+                border: Border.all(color: isDark ? borderSubtle : AppTheme.border),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.file_download_outlined, size: 20, color: AppTheme.primary),
-                  SizedBox(width: 12),
+                  Icon(Icons.file_download_outlined, size: 20, color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Export Data (CSV / JSON)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
-                        SizedBox(height: 2),
-                        Text('Standard local export feature • 100% free', style: TextStyle(fontSize: 11, color: AppTheme.subtle)),
+                        Text('Export Data (CSV / JSON)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: textPrimary)),
+                        const SizedBox(height: 2),
+                        Text('Standard local export feature • 100% free', style: TextStyle(fontSize: 11, color: textSubtle)),
                       ],
                     ),
                   ),
-                  Icon(Icons.chevron_right, size: 18, color: AppTheme.subtle),
+                  Icon(Icons.chevron_right, size: 18, color: textSubtle),
                 ],
               ),
             ),
@@ -316,7 +316,7 @@ class DashboardSummary extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: isDark ? AppTheme.darkBgElevated : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: AppTheme.borderRadius(isDark, 20)),
         title: Text(
           'Delete Expense',
           style: TextStyle(
@@ -348,7 +348,7 @@ class DashboardSummary extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.expense,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(borderRadius: AppTheme.borderRadius(isDark, 12)),
               elevation: 0,
             ),
             child: const Text('Delete'),
@@ -398,7 +398,7 @@ class DashboardSummary extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: isDark ? AppTheme.darkBgElevated : Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: AppTheme.borderRadius(isDark, 14),
         border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : Colors.transparent),
       ),
       child: Row(
@@ -457,13 +457,14 @@ class DashboardSummary extends StatelessWidget {
   }
 
   Widget _buildWalletCard(AccountModel account) {
-    Color bg = const Color(0xFFF0FDF4); // mint
+    final isDark = state.isDarkMode;
+    Color bg = isDark ? AppTheme.darkBgElevated : const Color(0xFFF0FDF4); // mint
     Color iconColor = const Color(0xFF10B981);
     if (account.name.toLowerCase().contains('gopay')) {
-      bg = const Color(0xFFFFF1F2);
+      bg = isDark ? AppTheme.darkBgElevated : const Color(0xFFFFF1F2);
       iconColor = const Color(0xFF00AED6);
     } else if (account.name.toLowerCase().contains('jago')) {
-      bg = const Color(0xFFFFFBEB);
+      bg = isDark ? AppTheme.darkBgElevated : const Color(0xFFFFFBEB);
       iconColor = const Color(0xFFFF8B00);
     }
 
@@ -472,8 +473,8 @@ class DashboardSummary extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.border.withValues(alpha: 0.5)),
+        borderRadius: AppTheme.borderRadius(isDark, 16),
+        border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border.withValues(alpha: 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -493,14 +494,14 @@ class DashboardSummary extends StatelessWidget {
             children: [
               Text(
                 account.name,
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 2),
               Text(
                 CurrencyFormatter.format(account.balance, currency: state.currency),
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textPrimary),
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),

@@ -93,15 +93,19 @@ class _ChatPromptBarState extends State<ChatPromptBar> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = widget.state.isDarkMode;
+    final primaryAccent = isDark ? AppTheme.darkAccentPrimary : AppTheme.primary;
+    final textSubtle = isDark ? AppTheme.darkTextSecondary : AppTheme.subtle;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.border),
+        color: isDark ? AppTheme.darkBgElevated : Colors.white,
+        borderRadius: AppTheme.borderRadius(isDark, 16),
+        border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -110,7 +114,7 @@ class _ChatPromptBarState extends State<ChatPromptBar> {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.chat_bubble_outline_rounded, size: 18, color: AppTheme.primary),
+            icon: Icon(Icons.chat_bubble_outline_rounded, size: 18, color: primaryAccent),
             onPressed: () => _openChatModal(_controller.text),
             tooltip: 'Open Chat Assistant',
             splashRadius: 18,
@@ -123,19 +127,19 @@ class _ChatPromptBarState extends State<ChatPromptBar> {
               controller: _controller,
               textInputAction: TextInputAction.send,
               onSubmitted: _handleSubmit,
-              style: const TextStyle(fontSize: 13, color: AppTheme.textPrimary),
-              decoration: const InputDecoration(
+              style: TextStyle(fontSize: 13, color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary),
+              decoration: InputDecoration(
                 hintText: 'Try typing "coffee 18k" in chat',
-                hintStyle: TextStyle(fontSize: 12, color: AppTheme.subtle),
+                hintStyle: TextStyle(fontSize: 12, color: textSubtle),
                 border: InputBorder.none,
                 isDense: true,
-                contentPadding: EdgeInsets.symmetric(vertical: 10),
+                contentPadding: const EdgeInsets.symmetric(vertical: 10),
               ),
             ),
           ),
           if (_hasText)
             IconButton(
-              icon: const Icon(Icons.arrow_upward_rounded, size: 18, color: AppTheme.primary),
+              icon: Icon(Icons.arrow_upward_rounded, size: 18, color: primaryAccent),
               onPressed: () => _handleSubmit(_controller.text),
               splashRadius: 18,
               padding: EdgeInsets.zero,
@@ -146,7 +150,7 @@ class _ChatPromptBarState extends State<ChatPromptBar> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.mic_none_rounded, size: 18, color: AppTheme.primary),
+                  icon: Icon(Icons.mic_none_rounded, size: 18, color: primaryAccent),
                   onPressed: () => VoiceAssistantModal.show(context, widget.state),
                   tooltip: 'Voice Input',
                   splashRadius: 18,
@@ -154,7 +158,7 @@ class _ChatPromptBarState extends State<ChatPromptBar> {
                   constraints: const BoxConstraints(minWidth: 30, minHeight: 30),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.chevron_right, size: 20, color: AppTheme.subtle),
+                  icon: Icon(Icons.chevron_right, size: 20, color: textSubtle),
                   onPressed: () => _openChatModal(),
                   splashRadius: 18,
                   padding: EdgeInsets.zero,
