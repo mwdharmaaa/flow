@@ -33,17 +33,10 @@ class BottomNavBar extends StatelessWidget {
           filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
           child: Container(
             height: 66,
-            decoration: BoxDecoration(
-              color: navBg,
-              borderRadius: navRadius,
-              border: Border.all(color: navBorder),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.06),
-                  blurRadius: 22,
-                  offset: const Offset(0, 6),
-                ),
-              ],
+            decoration: AppTheme.liquidGlassDecoration(
+              isDark: isDark,
+              radius: 34,
+              elevated: true,
             ),
             child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,

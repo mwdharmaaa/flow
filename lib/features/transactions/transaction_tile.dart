@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/formatters/currency_formatter.dart';
+import 'package:flow/core/widgets/liquid_glass_container.dart';
 import 'package:flow/models/transaction_model.dart';
 
 class TransactionTile extends StatelessWidget {
@@ -65,20 +66,10 @@ class TransactionTile extends StatelessWidget {
     final displayTitle = transaction.note.isNotEmpty ? transaction.note : transaction.category;
     final subtitleText = accountName != null ? '${transaction.category} • $accountName • $dateStr' : '${transaction.category} • $dateStr';
 
-    return Container(
+    return LiquidGlassContainer(
+      isDark: isDark,
+      radius: 18,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: bgElevated,
-        borderRadius: AppTheme.borderRadius(isDark, 16),
-        border: Border.all(color: borderSubtle),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
       child: Row(
         children: [
           Container(

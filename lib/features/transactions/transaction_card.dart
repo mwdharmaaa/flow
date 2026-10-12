@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/formatters/currency_formatter.dart';
+import 'package:flow/core/widgets/liquid_glass_container.dart';
 import 'package:flow/models/transaction_model.dart';
 import 'package:flow/models/account_model.dart';
 
@@ -94,25 +95,13 @@ class TransactionCard extends StatelessWidget {
             : account.name;
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBg = isDark ? AppTheme.darkBgElevated : AppTheme.card;
-    final cardBorder = isDark ? AppTheme.darkBorderSubtle : AppTheme.border.withValues(alpha: 0.6);
     final titleColor = isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary;
 
-    return Container(
+    return LiquidGlassContainer(
+      isDark: isDark,
+      radius: 18,
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: AppTheme.borderRadius(isDark, 16),
-        border: Border.all(color: cardBorder),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
       child: Row(
         children: [
           Container(

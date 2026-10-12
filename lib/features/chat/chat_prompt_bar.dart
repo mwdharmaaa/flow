@@ -106,17 +106,10 @@ class _ChatPromptBarState extends State<ChatPromptBar> {
         filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xCC1A1A24) : Colors.white.withValues(alpha: 0.88),
-            borderRadius: barRadius,
-            border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.03),
-                blurRadius: 10,
-                offset: const Offset(0, 3),
-              ),
-            ],
+          decoration: AppTheme.liquidGlassDecoration(
+            isDark: isDark,
+            radius: 18,
+            elevated: true,
           ),
           child: Row(
             children: [
