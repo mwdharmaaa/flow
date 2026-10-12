@@ -1,3 +1,4 @@
+import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
 
@@ -16,30 +17,35 @@ class BottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final navBg = isDark ? AppTheme.darkBgElevated : AppTheme.surface;
-    final navBorder = isDark ? AppTheme.darkBorderSubtle : AppTheme.border;
+    final navBg = isDark ? const Color(0xCC16161F) : Colors.white.withValues(alpha: 0.85);
+    final navBorder = isDark ? AppTheme.darkBorderSubtle : AppTheme.border.withValues(alpha: 0.8);
     final activeColor = isDark ? AppTheme.darkAccentPrimary : AppTheme.primary;
     final inactiveColor = isDark ? AppTheme.darkTextSecondary : AppTheme.subtle;
     final bottomInset = MediaQuery.of(context).padding.bottom;
+    final navRadius = AppTheme.borderRadius(isDark, 34);
 
     return Container(
       color: Colors.transparent,
       padding: EdgeInsets.fromLTRB(16, 8, 16, 16 + bottomInset),
-      child: Container(
-        height: 66,
-        decoration: BoxDecoration(
-          color: navBg,
-          borderRadius: AppTheme.borderRadius(isDark, 34),
-          border: Border.all(color: navBorder),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05),
-              blurRadius: 18,
-              offset: const Offset(0, 6),
+      child: ClipRRect(
+        borderRadius: navRadius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          child: Container(
+            height: 66,
+            decoration: BoxDecoration(
+              color: navBg,
+              borderRadius: navRadius,
+              border: Border.all(color: navBorder),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.06),
+                  blurRadius: 22,
+                  offset: const Offset(0, 6),
+                ),
+              ],
             ),
-          ],
-        ),
-        child: Row(
+            child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildNavItem(
@@ -101,7 +107,9 @@ class BottomNavBar extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ),
+  ),
+);
   }
 
   Widget _buildNavItem({
