@@ -45,7 +45,7 @@ class _DashboardHeroState extends State<DashboardHero> {
       decoration: const BoxDecoration(
         color: Colors.transparent,
       ),
-      padding: const EdgeInsets.fromLTRB(18, 28, 18, 12),
+      padding: const EdgeInsets.fromLTRB(18, 48, 18, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -58,7 +58,7 @@ class _DashboardHeroState extends State<DashboardHero> {
                 onTap: () => widget.state.toggleDarkMode(),
                 behavior: HitTestBehavior.opaque,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -69,15 +69,15 @@ class _DashboardHeroState extends State<DashboardHero> {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: (isDark ? AppTheme.darkAccentPrimary : AppTheme.primary).withValues(alpha: 0.3),
+                              color: AppTheme.primary.withValues(alpha: 0.35),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
                           ],
                         ),
-                        child: FlowLogo(
+                        child: const FlowLogo(
                           size: 32,
-                          backgroundColor: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary,
+                          backgroundColor: AppTheme.primary,
                           waveColor: Colors.white,
                         ),
                       ),
