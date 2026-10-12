@@ -72,8 +72,8 @@ jobs:
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/devv'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v2.0.1-${{ github.sha }}
-          name: Flow Release v2.0.1 (Flutter Native)
+          tag_name: v2.0.2-${{ github.sha }}
+          name: Flow Release v2.0.2 (Flutter Native)
           make_latest: true
           body: |
             ## Flow - Personal Finance Tracker (Flutter Native APK)
@@ -94,7 +94,7 @@ jobs:
           git config user.email "mwdharmaaa@users.noreply.github.com"
           git add flow.apk
           if ! git diff-index --quiet HEAD; then
-            git commit -m "build(apk): sync standalone flow.apk with release v2.0.1-${{ github.sha }} [skip ci]"
+            git commit -m "build(apk): sync standalone flow.apk with release v2.0.2-${{ github.sha }} [skip ci]"
             git push origin ${{ github.ref_name }}
           fi
 
