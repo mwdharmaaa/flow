@@ -69,7 +69,7 @@ class TransactionTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: bgElevated,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppTheme.borderRadius(isDark, 16),
         border: Border.all(color: borderSubtle),
       ),
       child: Row(

@@ -29,7 +29,7 @@ class LogOptionsModal extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(20, 10, 20, 24 + bottomInset),
       decoration: BoxDecoration(
         color: isDark ? AppTheme.darkBgBase : Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+        borderRadius: AppTheme.verticalTop(isDark, 30),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -146,7 +146,7 @@ class LogOptionsModal extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: isDark ? AppTheme.darkBgElevated : Colors.white,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: AppTheme.borderRadius(isDark, 20),
                   border: Border.all(
                     color: isDark ? AppTheme.darkBorderSubtle : const Color(0xFFE2E8F0),
                   ),

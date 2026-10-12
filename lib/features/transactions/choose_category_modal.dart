@@ -106,7 +106,7 @@ class _ChooseCategoryModalState extends State<ChooseCategoryModal> {
       padding: EdgeInsets.fromLTRB(20, 10, 20, 24 + bottomInset),
       decoration: BoxDecoration(
         color: isDark ? AppTheme.darkBgBase : Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+        borderRadius: AppTheme.verticalTop(isDark, 30),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -180,7 +180,7 @@ class _ChooseCategoryModalState extends State<ChooseCategoryModal> {
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: isDark ? AppTheme.darkBgElevated : const Color(0xFFF1F5F9),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppTheme.borderRadius(isDark, 16),
       ),
       child: Row(
         children: [
@@ -204,7 +204,7 @@ class _ChooseCategoryModalState extends State<ChooseCategoryModal> {
             color: isSelected
                 ? (isDark ? AppTheme.darkBgBase : Colors.white)
                 : Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppTheme.borderRadius(isDark, 12),
             boxShadow: isSelected
                 ? [
                     BoxShadow(
@@ -236,7 +236,7 @@ class _ChooseCategoryModalState extends State<ChooseCategoryModal> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: isDark ? AppTheme.darkBgElevated : const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: AppTheme.borderRadius(isDark, 24),
         border: Border.all(
           color: isDark ? AppTheme.darkBorderSubtle : const Color(0xFFF1F5F9),
         ),
@@ -393,7 +393,7 @@ class _ChooseCategoryModalState extends State<ChooseCategoryModal> {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: AppTheme.borderRadius(isDark, 10),
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: isSub ? 8 : 10),
         child: Row(

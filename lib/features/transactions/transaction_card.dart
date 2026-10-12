@@ -93,13 +93,18 @@ class TransactionCard extends StatelessWidget {
             ? '${account.name} • ${transaction.note}'
             : account.name;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? AppTheme.darkBgElevated : AppTheme.card;
+    final cardBorder = isDark ? AppTheme.darkBorderSubtle : AppTheme.border.withValues(alpha: 0.6);
+    final titleColor = isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: AppTheme.card,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.border.withValues(alpha: 0.6)),
+        color: cardBg,
+        borderRadius: AppTheme.borderRadius(isDark, 16),
+        border: Border.all(color: cardBorder),
       ),
       child: Row(
         children: [
@@ -118,7 +123,7 @@ class TransactionCard extends StatelessWidget {
               children: [
                 Text(
                   transaction.category,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: titleColor),
                 ),
                 const SizedBox(height: 2),
                 Text(
