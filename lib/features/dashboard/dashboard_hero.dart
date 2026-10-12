@@ -45,7 +45,7 @@ class _DashboardHeroState extends State<DashboardHero> {
       decoration: const BoxDecoration(
         color: Colors.transparent,
       ),
-      padding: const EdgeInsets.fromLTRB(18, 48, 18, 12),
+      padding: const EdgeInsets.fromLTRB(18, 22, 18, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -58,7 +58,7 @@ class _DashboardHeroState extends State<DashboardHero> {
                 onTap: () => widget.state.toggleDarkMode(),
                 behavior: HitTestBehavior.opaque,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+                  padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
