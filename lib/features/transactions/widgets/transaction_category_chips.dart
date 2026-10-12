@@ -55,14 +55,14 @@ class TransactionCategoryChips extends StatelessWidget {
   Widget _buildAllChip() {
     return Material(
       color: isDark ? AppTheme.darkBgElevated : Colors.white,
-      borderRadius: BorderRadius.circular(22),
+      borderRadius: AppTheme.borderRadius(isDark, 22),
       child: InkWell(
         onTap: onAllTap,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: AppTheme.borderRadius(isDark, 22),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: AppTheme.borderRadius(isDark, 22),
             border: Border.all(
               color: isDark ? AppTheme.darkBorderSubtle : const Color(0xFFE2E8F0),
             ),
@@ -109,14 +109,14 @@ class TransactionCategoryChips extends StatelessWidget {
 
     return Material(
       color: bg,
-      borderRadius: BorderRadius.circular(22),
+      borderRadius: AppTheme.borderRadius(isDark, 22),
       child: InkWell(
         onTap: () => onCategorySelected(cat.name),
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: AppTheme.borderRadius(isDark, 22),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: AppTheme.borderRadius(isDark, 22),
             border: Border.all(color: border),
           ),
           alignment: Alignment.center,

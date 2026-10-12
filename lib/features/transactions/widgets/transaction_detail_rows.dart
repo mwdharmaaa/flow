@@ -48,7 +48,7 @@ class TransactionDetailRows extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppTheme.borderRadius(isDark, 20),
         border: Border.all(color: border),
       ),
       child: Column(
@@ -56,7 +56,7 @@ class TransactionDetailRows extends StatelessWidget {
           // Row 1: Wallet
           InkWell(
             onTap: onChooseWalletTap,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            borderRadius: AppTheme.verticalTop(isDark, 20),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
               child: Row(
@@ -122,7 +122,7 @@ class TransactionDetailRows extends StatelessWidget {
                 ),
                 InkWell(
                   onTap: onReceiptTap,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: AppTheme.borderRadius(isDark, 16),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     child: Row(

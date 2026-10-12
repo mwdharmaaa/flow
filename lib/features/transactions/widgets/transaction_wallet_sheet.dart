@@ -45,7 +45,7 @@ class TransactionWalletSheet extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: AppTheme.verticalTop(isDark, 28),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

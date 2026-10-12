@@ -285,7 +285,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
       constraints: BoxConstraints(maxHeight: maxHeight),
       decoration: BoxDecoration(
         color: isDark ? AppTheme.darkBgBase : const Color(0xFFF8FAFC),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: AppTheme.verticalTop(isDark, 28),
       ),
       child: SafeArea(
         top: false,
@@ -385,7 +385,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: containerBg,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: AppTheme.borderRadius(isDark, 24),
       ),
       child: Row(
         children: [
@@ -407,7 +407,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
             _selectedCategory = _getDefaultCategory(type);
           });
         },
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppTheme.borderRadius(isDark, 20),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           alignment: Alignment.center,
@@ -415,7 +415,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
             color: isSelected
                 ? (isDark ? const Color(0xFF1E293B) : Colors.white)
                 : Colors.transparent,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: AppTheme.borderRadius(isDark, 20),
             boxShadow: isSelected && !isDark
                 ? [
                     BoxShadow(
@@ -453,7 +453,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               onPressed: _saveAndAddAnother,
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                shape: RoundedRectangleBorder(borderRadius: AppTheme.borderRadius(isDark, 24)),
                 side: BorderSide(
                   color: isDark ? AppTheme.darkBorderSubtle : const Color(0xFFCBD5E1),
                 ),
@@ -476,7 +476,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               onPressed: _submit,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                shape: RoundedRectangleBorder(borderRadius: AppTheme.borderRadius(isDark, 24)),
                 backgroundColor: const Color(0xFF1D61E0),
                 elevation: 0,
               ),

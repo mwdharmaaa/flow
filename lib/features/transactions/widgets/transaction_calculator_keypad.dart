@@ -75,12 +75,12 @@ class TransactionCalculatorKeypad extends StatelessWidget {
 
     return Material(
       color: bg,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: AppTheme.borderRadius(isDark, 14),
       elevation: (!isOp && !isOk && !isDark) ? 1 : 0,
       shadowColor: Colors.black.withValues(alpha: 0.05),
       child: InkWell(
         onTap: () => onKeyTap(key),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: AppTheme.borderRadius(isDark, 14),
         child: Container(
           height: 48,
           alignment: Alignment.center,
