@@ -45,7 +45,7 @@ class _DashboardHeroState extends State<DashboardHero> {
       decoration: const BoxDecoration(
         color: Colors.transparent,
       ),
-      padding: const EdgeInsets.fromLTRB(18, 16, 18, 12),
+      padding: const EdgeInsets.fromLTRB(18, 28, 18, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -57,39 +57,42 @@ class _DashboardHeroState extends State<DashboardHero> {
               GestureDetector(
                 onTap: () => widget.state.toggleDarkMode(),
                 behavior: HitTestBehavior.opaque,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: (isDark ? AppTheme.darkAccentPrimary : AppTheme.primary).withValues(alpha: 0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: (isDark ? AppTheme.darkAccentPrimary : AppTheme.primary).withValues(alpha: 0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: FlowLogo(
+                          size: 32,
+                          backgroundColor: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary,
+                          waveColor: Colors.white,
+                        ),
                       ),
-                      child: FlowLogo(
-                        size: 30,
-                        backgroundColor: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary,
-                        waveColor: Colors.white,
+                      const SizedBox(width: 8),
+                      Text(
+                        'flow',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                          color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
+                          letterSpacing: -0.5,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'flow',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               // Pills
@@ -102,7 +105,7 @@ class _DashboardHeroState extends State<DashboardHero> {
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           // Greeting & Spending Header
           Center(
