@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/models/transaction_model.dart';
@@ -281,13 +282,20 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     final categories = _getCategoriesForType(_type);
     final maxHeight = MediaQuery.of(context).size.height * 0.95;
 
-    return Container(
-      constraints: BoxConstraints(maxHeight: maxHeight),
-      decoration: BoxDecoration(
-        color: isDark ? AppTheme.darkBgBase : const Color(0xFFF8FAFC),
-        borderRadius: AppTheme.verticalTop(isDark, 28),
-      ),
-      child: SafeArea(
+    final sheetRadius = AppTheme.verticalTop(isDark, 28);
+
+    return ClipRRect(
+      borderRadius: sheetRadius,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+        child: Container(
+          constraints: BoxConstraints(maxHeight: maxHeight),
+          decoration: AppTheme.liquidGlassDecoration(
+            isDark: isDark,
+            borderRadius: sheetRadius,
+            elevated: true,
+          ),
+          child: SafeArea(
         top: false,
         child: Column(
           children: [
@@ -339,6 +347,8 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
           ],
         ),
       ),
+    ),
+    ),
     );
   }
 

@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/state/app_state.dart';
@@ -24,14 +25,20 @@ class LogOptionsModal extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = state.isDarkMode;
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final sheetRadius = AppTheme.verticalTop(isDark, 30);
 
-    return Container(
-      padding: EdgeInsets.fromLTRB(20, 10, 20, 24 + bottomInset),
-      decoration: BoxDecoration(
-        color: isDark ? AppTheme.darkBgBase : Colors.white,
-        borderRadius: AppTheme.verticalTop(isDark, 30),
-      ),
-      child: Column(
+    return ClipRRect(
+      borderRadius: sheetRadius,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+        child: Container(
+          padding: EdgeInsets.fromLTRB(20, 10, 20, 24 + bottomInset),
+          decoration: AppTheme.liquidGlassDecoration(
+            isDark: isDark,
+            borderRadius: sheetRadius,
+            elevated: true,
+          ),
+          child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -184,6 +191,8 @@ class LogOptionsModal extends StatelessWidget {
           ),
         ],
       ),
+    ),
+    ),
     );
   }
 
