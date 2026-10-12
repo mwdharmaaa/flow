@@ -8,12 +8,14 @@ class AnalyticsDailyChart extends StatelessWidget {
   final List<TransactionModel> transactions;
   final String currency;
   final DateTime currentMonth;
+  final bool isDark;
 
   const AnalyticsDailyChart({
     super.key,
     required this.transactions,
     required this.currency,
     required this.currentMonth,
+    this.isDark = false,
   });
 
   @override
@@ -41,21 +43,27 @@ class AnalyticsDailyChart extends StatelessWidget {
     final todaySpent = dailySpend[now.day] ?? 0.0;
     final activeDay = now.day;
 
+    final textPrimary = isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary;
+    final textSecondary = isDark ? AppTheme.darkTextSecondary : AppTheme.subtle;
+    final barActiveColor = isDark ? AppTheme.darkAccentPrimary : AppTheme.primary;
+    final barEmptyColor = isDark ? Colors.white.withValues(alpha: 0.12) : const Color(0xFFE2EBF6);
+    final guideColor = isDark ? AppTheme.darkBorderHighlight : const Color(0xFFC8D7ED);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Daily trend',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: AppTheme.textPrimary,
+            color: textPrimary,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           '$dayLabel • ${CurrencyFormatter.format(todaySpent, currency: currency)}',
-          style: const TextStyle(fontSize: 13, color: AppTheme.subtle),
+          style: TextStyle(fontSize: 13, color: textSecondary),
         ),
         const SizedBox(height: 18),
 
@@ -73,7 +81,7 @@ class AnalyticsDailyChart extends StatelessWidget {
                 bottom: 45,
                 child: CustomPaint(
                   size: const Size(double.infinity, 1),
-                  painter: DottedLinePainter(color: const Color(0xFFC8D7ED)),
+                  painter: DottedLinePainter(color: guideColor),
                 ),
               ),
 
@@ -98,7 +106,7 @@ class AnalyticsDailyChart extends StatelessWidget {
                             width: 6,
                             height: barHeight,
                             decoration: BoxDecoration(
-                              color: AppTheme.primary,
+                              color: barActiveColor,
                               borderRadius: BorderRadius.circular(3),
                             ),
                           )
@@ -107,7 +115,7 @@ class AnalyticsDailyChart extends StatelessWidget {
                             width: 3,
                             height: 3,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFE2EBF6),
+                              color: barEmptyColor,
                               borderRadius: BorderRadius.circular(2),
                             ),
                           ),
@@ -132,7 +140,7 @@ class AnalyticsDailyChart extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: isHighlight ? FontWeight.bold : FontWeight.normal,
-                color: isHighlight ? AppTheme.primary : AppTheme.subtle,
+                color: isHighlight ? barActiveColor : textSecondary,
               ),
             );
           }).toList(),
@@ -145,7 +153,7 @@ class AnalyticsDailyChart extends StatelessWidget {
           children: [
             Text(
               '---- avg ${CurrencyFormatter.format(totalSpent > 0 ? (totalSpent / daysInMonth) : 0.0, currency: currency)}/day',
-              style: const TextStyle(fontSize: 11, color: AppTheme.subtle),
+              style: TextStyle(fontSize: 11, color: textSecondary),
             ),
             Row(
               children: [
@@ -153,14 +161,14 @@ class AnalyticsDailyChart extends StatelessWidget {
                   width: 10,
                   height: 10,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF7FA7EC),
+                    color: isDark ? AppTheme.darkAccentPrimary : const Color(0xFF7FA7EC),
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
                 const SizedBox(width: 6),
-                const Text(
+                Text(
                   'above average',
-                  style: TextStyle(fontSize: 11, color: AppTheme.subtle),
+                  style: TextStyle(fontSize: 11, color: textSecondary),
                 ),
               ],
             ),
