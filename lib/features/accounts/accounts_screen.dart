@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/formatters/currency_formatter.dart';
+import 'package:flow/core/widgets/liquid_background.dart';
+import 'package:flow/core/widgets/liquid_glass_container.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/features/accounts/add_account_dialog.dart';
 import 'package:flow/features/accounts/adjust_balance_dialog.dart';
@@ -33,31 +35,31 @@ class AccountsScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: isDark ? AppTheme.darkBgBase : AppTheme.background,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Wallets',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.w900,
-                  color: textPrimary,
-                  letterSpacing: -0.5,
+      body: LiquidBackground(
+        isDark: isDark,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Wallets',
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w900,
+                    color: textPrimary,
+                    letterSpacing: -0.5,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 18),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: cardBg,
-                  borderRadius: AppTheme.borderRadius(isDark, 18),
-                  border: Border.all(color: borderSubtle),
-                ),
-                child: Row(
+                const SizedBox(height: 18),
+                LiquidGlassContainer(
+                  isDark: isDark,
+                  width: double.infinity,
+                  radius: 20,
+                  elevated: true,
+                  padding: const EdgeInsets.all(18),
+                  child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Column(
@@ -105,14 +107,11 @@ class AccountsScreen extends StatelessWidget {
                   itemCount: state.accounts.length,
                   itemBuilder: (_, idx) {
                     final acc = state.accounts[idx];
-                    return Container(
+                    return LiquidGlassContainer(
+                      isDark: isDark,
+                      radius: 18,
                       margin: const EdgeInsets.only(bottom: 10),
                       padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: cardBg,
-                        borderRadius: AppTheme.borderRadius(isDark, 16),
-                        border: Border.all(color: borderSubtle),
-                      ),
                       child: Row(
                         children: [
                           Container(
@@ -177,6 +176,7 @@ class AccountsScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 }

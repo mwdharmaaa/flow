@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/formatters/currency_formatter.dart';
+import 'package:flow/core/widgets/liquid_background.dart';
+import 'package:flow/core/widgets/liquid_glass_container.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/features/budgets/widgets/budget_circular_ring.dart';
 import 'package:flow/features/budgets/widgets/budget_category_tile.dart';
@@ -88,34 +90,33 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
 
     return Scaffold(
       backgroundColor: isDark ? AppTheme.darkBgBase : AppTheme.background,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 110),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Budget',
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.w900,
-                      color: textPrimary,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () => _openAddOrEditBudget(context),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-                      decoration: BoxDecoration(
-                        color: isDark ? AppTheme.darkBgElevated : AppTheme.primarySoft,
-                        borderRadius: AppTheme.borderRadius(isDark, 20),
-                        border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : Colors.transparent),
+      body: LiquidBackground(
+        isDark: isDark,
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 110),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Budget',
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.w900,
+                        color: textPrimary,
+                        letterSpacing: -0.5,
                       ),
+                    ),
+                    LiquidGlassContainer(
+                      isDark: isDark,
+                      radius: 20,
+                      elevated: true,
+                      onTap: () => _openAddOrEditBudget(context),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                       child: Row(
                         children: [
                           Icon(
@@ -135,9 +136,8 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                         ],
                       ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
               const SizedBox(height: 20),
 
               if (state.budgets.isEmpty) ...[
@@ -254,7 +254,8 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildEmptyState(BuildContext context) {
