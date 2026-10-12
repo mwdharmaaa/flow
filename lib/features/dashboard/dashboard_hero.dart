@@ -155,7 +155,7 @@ class _DashboardHeroState extends State<DashboardHero> {
           ),
           const SizedBox(height: 20),
 
-          // Clouds & Dotted Trajectory Box
+          // Clouds & Empty State Trajectory Box
           LiquidGlassContainer(
             isDark: isDark,
             height: 110,
@@ -163,16 +163,6 @@ class _DashboardHeroState extends State<DashboardHero> {
             elevated: true,
             child: Stack(
               children: [
-                // Dashed guides
-                Positioned.fill(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Container(height: 1, color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border.withValues(alpha: 0.4)),
-                      Container(height: 1, color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border.withValues(alpha: 0.4)),
-                    ],
-                  ),
-                ),
                 // Clouds
                 Positioned(
                   top: 14,
