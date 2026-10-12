@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/parsers/receipt_parser.dart';
@@ -137,13 +138,20 @@ TOTAL 42.500''';
     final isDark = widget.state.isDarkMode;
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
-    return Container(
-      padding: EdgeInsets.fromLTRB(16, 12, 16, 20 + bottomInset),
-      decoration: BoxDecoration(
-        color: isDark ? AppTheme.darkBgBase : AppTheme.background,
-        borderRadius: AppTheme.verticalTop(isDark, 24),
-      ),
-      child: SingleChildScrollView(
+    final sheetRadius = AppTheme.verticalTop(isDark, 24);
+
+    return ClipRRect(
+      borderRadius: sheetRadius,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+        child: Container(
+          padding: EdgeInsets.fromLTRB(16, 12, 16, 20 + bottomInset),
+          decoration: AppTheme.liquidGlassDecoration(
+            isDark: isDark,
+            borderRadius: sheetRadius,
+            elevated: true,
+          ),
+          child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -222,6 +230,8 @@ TOTAL 42.500''';
           ],
         ),
       ),
+    ),
+    ),
     );
   }
 }
