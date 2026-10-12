@@ -18,12 +18,16 @@ class TopHeaderBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary = isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary;
+    final textSecondary = isDark ? AppTheme.darkTextSecondary : AppTheme.subtle;
+
     return AppBar(
-      backgroundColor: AppTheme.background,
+      backgroundColor: Colors.transparent,
       elevation: 0,
       leading: onBack != null
           ? IconButton(
-              icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
+              icon: Icon(Icons.arrow_back, color: textPrimary),
               onPressed: onBack,
             )
           : null,
@@ -32,18 +36,18 @@ class TopHeaderBar extends StatelessWidget implements PreferredSizeWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              color: textPrimary,
             ),
           ),
           const SizedBox(height: 2),
           Text(
             subtitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
-              color: AppTheme.subtle,
+              color: textSecondary,
               fontWeight: FontWeight.normal,
             ),
           ),
