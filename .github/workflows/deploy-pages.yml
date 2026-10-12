@@ -50,6 +50,12 @@ jobs:
       - name: Build Flutter Web Release
         run: flutter build web --release --base-href "/flow/"
 
+      - name: Bundle flow.apk to Web Distribution
+        run: |
+          if [ -f "flow.apk" ]; then
+            cp flow.apk build/web/flow.apk
+          fi
+
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5
 

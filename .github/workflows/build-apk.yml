@@ -69,3 +69,15 @@ jobs:
           files: build-output/flow.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sync Standalone APK to Repository
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/devv'
+        run: |
+          cp build-output/flow.apk flow.apk
+          git config user.name "mwdharmaaa"
+          git config user.email "mwdharmaaa@users.noreply.github.com"
+          git add flow.apk
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "build(apk): sync standalone flow.apk with release v2.0.0-${{ github.sha }} [skip ci]"
+            git push origin ${{ github.ref_name }}
+          fi
