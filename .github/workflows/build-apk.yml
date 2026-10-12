@@ -1,4 +1,4 @@
-name: Build Flow APK (Flutter)
+name: Build Flow APK & Deploy Web
 
 on:
   push:
@@ -9,9 +9,15 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'distribution'
+  cancel-in-progress: false
 
 jobs:
-  build:
+  build-apk:
     runs-on: ubuntu-latest
 
     steps:
@@ -36,6 +42,14 @@ jobs:
           rm -rf android
           flutter create . --org com.flow --project-name flow --platforms=android
 
+      - name: Configure Android App Icon with Flow Branding
+        run: |
+          for dir in android/app/src/main/res/mipmap-*; do
+            cp web/icons/Icon-192.png "$dir/ic_launcher.png"
+            cp web/icons/Icon-192.png "$dir/ic_launcher_round.png" 2>/dev/null || true
+          done
+          echo "[OK] Injected official Flow waves icon into Android launcher mipmaps"
+
       - name: Install Flutter Dependencies
         run: flutter pub get
 
@@ -58,11 +72,13 @@ jobs:
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/devv'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v2.0.0-${{ github.sha }}
-          name: Flow Release v2.0.0 (Flutter Native)
+          tag_name: v2.0.1-${{ github.sha }}
+          name: Flow Release v2.0.1 (Flutter Native)
+          make_latest: true
           body: |
             ## Flow - Personal Finance Tracker (Flutter Native APK)
             - Rebuilt 100% with Flutter & Dart
+            - Official Flow waves launcher icon branded on Android
             - ZERO LOGIN: Akses langsung tanpa registrasi, tanpa otentikasi, tanpa server
             - Semua fitur premium terbuka bebas (Multi-dompet, anggaran, analitik, rutin, hutang/piutang)
             - Download `flow.apk` di bawah dan pasang langsung di HP Android.
@@ -78,6 +94,62 @@ jobs:
           git config user.email "mwdharmaaa@users.noreply.github.com"
           git add flow.apk
           if ! git diff-index --quiet HEAD; then
-            git commit -m "build(apk): sync standalone flow.apk with release v2.0.0-${{ github.sha }} [skip ci]"
+            git commit -m "build(apk): sync standalone flow.apk with release v2.0.1-${{ github.sha }} [skip ci]"
             git push origin ${{ github.ref_name }}
           fi
+
+  deploy-pages:
+    needs: build-apk
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.1'
+          channel: 'stable'
+          cache: true
+
+      - name: Download Built APK Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: flow-apk
+          path: build-output
+
+      - name: Scaffold Flutter Web Platform
+        run: |
+          if [ ! -d "web" ]; then
+            flutter create . --org com.flow --project-name flow --platforms=web
+          fi
+          rm -f test/widget_test.dart
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Run Unit Tests
+        run: flutter test
+
+      - name: Build Flutter Web Release
+        run: flutter build web --release --base-href "/flow/"
+
+      - name: Bundle Fresh flow.apk to Web Distribution
+        run: |
+          cp build-output/flow.apk build/web/flow.apk
+          echo "[OK] Successfully bundled freshly built flow.apk to build/web/flow.apk"
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
