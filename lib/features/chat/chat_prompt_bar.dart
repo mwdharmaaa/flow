@@ -1,3 +1,4 @@
+import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/parsers/nlp_transaction_parser.dart';
@@ -97,76 +98,84 @@ class _ChatPromptBarState extends State<ChatPromptBar> {
     final primaryAccent = isDark ? AppTheme.darkAccentPrimary : AppTheme.primary;
     final textSubtle = isDark ? AppTheme.darkTextSecondary : AppTheme.subtle;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        color: isDark ? AppTheme.darkBgElevated : Colors.white,
-        borderRadius: AppTheme.borderRadius(isDark, 16),
-        border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          IconButton(
-            icon: Icon(Icons.chat_bubble_outline_rounded, size: 18, color: primaryAccent),
-            onPressed: () => _openChatModal(_controller.text),
-            tooltip: 'Open Chat Assistant',
-            splashRadius: 18,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-          ),
-          const SizedBox(width: 6),
-          Expanded(
-            child: TextField(
-              controller: _controller,
-              textInputAction: TextInputAction.send,
-              onSubmitted: _handleSubmit,
-              style: TextStyle(fontSize: 13, color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary),
-              decoration: InputDecoration(
-                hintText: 'Try typing "coffee 18k" in chat',
-                hintStyle: TextStyle(fontSize: 12, color: textSubtle),
-                border: InputBorder.none,
-                isDense: true,
-                contentPadding: const EdgeInsets.symmetric(vertical: 10),
+    final barRadius = AppTheme.borderRadius(isDark, 18);
+
+    return ClipRRect(
+      borderRadius: barRadius,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xCC1A1A24) : Colors.white.withValues(alpha: 0.88),
+            borderRadius: barRadius,
+            border: Border.all(color: isDark ? AppTheme.darkBorderSubtle : AppTheme.border),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.03),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
               ),
-            ),
+            ],
           ),
-          if (_hasText)
-            IconButton(
-              icon: Icon(Icons.arrow_upward_rounded, size: 18, color: primaryAccent),
-              onPressed: () => _handleSubmit(_controller.text),
-              splashRadius: 18,
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-            )
-          else
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
+          child: Row(
+            children: [
+              IconButton(
+                icon: Icon(Icons.chat_bubble_outline_rounded, size: 18, color: primaryAccent),
+                onPressed: () => _openChatModal(_controller.text),
+                tooltip: 'Open Chat Assistant',
+                splashRadius: 18,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: TextField(
+                  controller: _controller,
+                  textInputAction: TextInputAction.send,
+                  onSubmitted: _handleSubmit,
+                  style: TextStyle(fontSize: 13, color: isDark ? AppTheme.darkTextPrimary : AppTheme.textPrimary),
+                  decoration: InputDecoration(
+                    hintText: 'Try typing "coffee 18k" in chat',
+                    hintStyle: TextStyle(fontSize: 12, color: textSubtle),
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                  ),
+                ),
+              ),
+              if (_hasText)
                 IconButton(
-                  icon: Icon(Icons.mic_none_rounded, size: 18, color: primaryAccent),
-                  onPressed: () => VoiceAssistantModal.show(context, widget.state),
-                  tooltip: 'Voice Input',
+                  icon: Icon(Icons.arrow_upward_rounded, size: 18, color: primaryAccent),
+                  onPressed: () => _handleSubmit(_controller.text),
                   splashRadius: 18,
                   padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 30, minHeight: 30),
+                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                )
+              else
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.mic_none_rounded, size: 18, color: primaryAccent),
+                      onPressed: () => VoiceAssistantModal.show(context, widget.state),
+                      tooltip: 'Voice Input',
+                      splashRadius: 18,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 30, minHeight: 30),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.chevron_right, size: 20, color: textSubtle),
+                      onPressed: () => _openChatModal(),
+                      splashRadius: 18,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 26, minHeight: 30),
+                    ),
+                  ],
                 ),
-                IconButton(
-                  icon: Icon(Icons.chevron_right, size: 20, color: textSubtle),
-                  onPressed: () => _openChatModal(),
-                  splashRadius: 18,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 26, minHeight: 30),
-                ),
-              ],
-            ),
-        ],
+            ],
+          ),
+        ),
       ),
     );
   }
