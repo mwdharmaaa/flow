@@ -6,6 +6,7 @@ import 'package:flow/core/widgets/liquid_glass_container.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/features/accounts/add_account_dialog.dart';
 import 'package:flow/features/accounts/adjust_balance_dialog.dart';
+import 'package:flow/features/accounts/delete_account_dialog.dart';
 
 class AccountsScreen extends StatelessWidget {
   final AppState state;
@@ -23,6 +24,37 @@ class AccountsScreen extends StatelessWidget {
       default:
         return Icons.account_balance_wallet_outlined;
     }
+  }
+
+  void _confirmDeleteAccount(BuildContext context, dynamic acc) {
+    if (state.accounts.length <= 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Cannot delete the only wallet. At least one wallet is required.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (_) => DeleteAccountDialog(
+        account: acc,
+        currency: state.currency,
+        onConfirm: () {
+          final ok = state.deleteAccount(acc.id);
+          if (ok) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Wallet "${acc.name}" deleted'),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+        },
+      ),
+    );
   }
 
   @override
@@ -141,28 +173,54 @@ class AccountsScreen extends StatelessWidget {
                                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textPrimary),
                               ),
                               const SizedBox(height: 4),
-                              GestureDetector(
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (_) => AdjustBalanceDialog(
-                                      account: acc,
-                                      currency: state.currency,
-                                      onSave: (val) => state.adjustAccountBalance(acc.id, val),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (_) => AdjustBalanceDialog(
+                                          account: acc,
+                                          currency: state.currency,
+                                          onSave: (val) => state.adjustAccountBalance(acc.id, val),
+                                        ),
+                                      );
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: isDark ? AppTheme.darkBgSurface : AppTheme.primarySoft,
+                                        borderRadius: AppTheme.borderRadius(isDark, 6),
+                                      ),
+                                      child: Text(
+                                        'Adjust',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
-                                  );
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                  decoration: BoxDecoration(
-                                    color: isDark ? AppTheme.darkBgSurface : AppTheme.primarySoft,
-                                    borderRadius: AppTheme.borderRadius(isDark, 6),
                                   ),
-                                  child: Text(
-                                    'Adjust',
-                                    style: TextStyle(fontSize: 10, color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary, fontWeight: FontWeight.bold),
+                                  const SizedBox(width: 6),
+                                  GestureDetector(
+                                    onTap: () => _confirmDeleteAccount(context, acc),
+                                    behavior: HitTestBehavior.opaque,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: BoxDecoration(
+                                        color: isDark ? const Color(0x28EF4444) : const Color(0xFFFEE2E2),
+                                        borderRadius: AppTheme.borderRadius(isDark, 6),
+                                      ),
+                                      child: const Icon(
+                                        Icons.delete_outline_rounded,
+                                        size: 13,
+                                        color: AppTheme.expense,
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
                             ],
                           ),
