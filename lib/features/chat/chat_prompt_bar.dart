@@ -1,4 +1,3 @@
-import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/parsers/nlp_transaction_parser.dart';
@@ -100,18 +99,14 @@ class _ChatPromptBarState extends State<ChatPromptBar> {
 
     final barRadius = AppTheme.borderRadius(isDark, 18);
 
-    return ClipRRect(
-      borderRadius: barRadius,
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          decoration: AppTheme.liquidGlassDecoration(
-            isDark: isDark,
-            radius: 18,
-            elevated: true,
-          ),
-          child: Row(
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: AppTheme.liquidGlassDecoration(
+        isDark: isDark,
+        radius: 18,
+        elevated: true,
+      ),
+      child: Row(
             children: [
               IconButton(
                 icon: Icon(Icons.chat_bubble_outline_rounded, size: 18, color: primaryAccent),
@@ -168,8 +163,6 @@ class _ChatPromptBarState extends State<ChatPromptBar> {
                 ),
             ],
           ),
-        ),
-      ),
-    );
+        );
   }
 }
