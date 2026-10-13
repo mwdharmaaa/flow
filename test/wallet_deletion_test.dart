@@ -74,9 +74,18 @@ void main() {
 
       expect(find.byType(DeleteAccountDialog), findsOneWidget);
       expect(find.text('Delete Wallet'), findsOneWidget);
-      expect(find.text('Secondary Wallet'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(DeleteAccountDialog),
+          matching: find.text('Secondary Wallet'),
+        ),
+        findsOneWidget,
+      );
 
-      await tester.tap(find.text('Delete'));
+      await tester.tap(find.descendant(
+        of: find.byType(DeleteAccountDialog),
+        matching: find.text('Delete'),
+      ));
       await tester.pumpAndSettle();
 
       expect(state.accounts.length, 1);
