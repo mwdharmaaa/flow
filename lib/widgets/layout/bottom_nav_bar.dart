@@ -1,4 +1,3 @@
-import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
 
@@ -27,18 +26,14 @@ class BottomNavBar extends StatelessWidget {
     return Container(
       color: Colors.transparent,
       padding: EdgeInsets.fromLTRB(16, 8, 16, 16 + bottomInset),
-      child: ClipRRect(
-        borderRadius: navRadius,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-          child: Container(
-            height: 66,
-            decoration: AppTheme.liquidGlassDecoration(
-              isDark: isDark,
-              radius: 34,
-              elevated: true,
-            ),
-            child: Row(
+      child: Container(
+        height: 66,
+        decoration: AppTheme.liquidGlassDecoration(
+          isDark: isDark,
+          radius: 34,
+          elevated: true,
+        ),
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildNavItem(
@@ -100,9 +95,7 @@ class BottomNavBar extends StatelessWidget {
           ],
         ),
       ),
-    ),
-  ),
-);
+    );
   }
 
   Widget _buildNavItem({
