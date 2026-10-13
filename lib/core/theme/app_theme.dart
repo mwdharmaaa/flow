@@ -39,6 +39,10 @@ class AppTheme {
       brightness: Brightness.light,
       scaffoldBackgroundColor: background,
       primaryColor: primary,
+      splashFactory: InkRipple.splashFactory,
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
+      hoverColor: Colors.transparent,
       colorScheme: const ColorScheme.light(
         primary: primary,
         surface: surface,
@@ -70,6 +74,10 @@ class AppTheme {
       brightness: Brightness.dark,
       scaffoldBackgroundColor: darkBgBase,
       primaryColor: darkAccentPrimary,
+      splashFactory: InkRipple.splashFactory,
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
+      hoverColor: Colors.transparent,
       colorScheme: const ColorScheme.dark(
         primary: darkAccentPrimary,
         surface: darkBgSurface,
