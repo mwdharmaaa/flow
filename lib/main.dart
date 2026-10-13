@@ -18,6 +18,20 @@ void main() {
   runApp(const FlowApp());
 }
 
+class FlowScrollBehavior extends ScrollBehavior {
+  const FlowScrollBehavior();
+
+  @override
+  Widget buildOverscrollIndicator(BuildContext context, Widget child, ScrollableDetails details) {
+    return child;
+  }
+
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) {
+    return const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics());
+  }
+}
+
 class FlowApp extends StatefulWidget {
   const FlowApp({super.key});
 
@@ -36,6 +50,7 @@ class _FlowAppState extends State<FlowApp> {
         return MaterialApp(
           title: 'Flow',
           debugShowCheckedModeBanner: false,
+          scrollBehavior: const FlowScrollBehavior(),
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
