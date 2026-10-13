@@ -265,10 +265,16 @@ class AppState extends ChangeNotifier {
     }
   }
 
-  void deleteAccount(String id) {
+  bool deleteAccount(String id) {
+    if (_accounts.length <= 1) return false;
+    final initialCount = _accounts.length;
     _accounts.removeWhere((a) => a.id == id);
-    _saveState();
-    notifyListeners();
+    if (_accounts.length < initialCount) {
+      _saveState();
+      notifyListeners();
+      return true;
+    }
+    return false;
   }
 
   String resolveOrCreateAccountId(String? walletName) {
