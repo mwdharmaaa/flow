@@ -50,6 +50,36 @@ jobs:
           done
           echo "[OK] Injected official Flow waves icon into Android launcher mipmaps"
 
+      - name: Configure Android Permissions and Recognition Services
+        run: |
+          python3 -c '
+          manifest_path = "android/app/src/main/AndroidManifest.xml"
+          with open(manifest_path, "r", encoding="utf-8") as f:
+              content = f.read()
+
+          permissions = """    <!-- Audio recording & internet permissions for speech recognition -->
+              <uses-permission android:name="android.permission.RECORD_AUDIO" />
+              <uses-permission android:name="android.permission.INTERNET" />
+              <uses-permission android:name="android.permission.BLUETOOTH" />
+              <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+              <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
+              <!-- Android 11+ query intents for SpeechRecognition services -->
+              <queries>
+                  <intent>
+                      <action android:name="android.speech.RecognitionService" />
+                  </intent>
+              </queries>
+          """
+          if "RECORD_AUDIO" not in content:
+              content = content.replace("<application", permissions + "    <application", 1)
+              with open(manifest_path, "w", encoding="utf-8") as f:
+                  f.write(content)
+              print("[OK] Successfully injected RECORD_AUDIO and SpeechRecognition queries into AndroidManifest.xml")
+          else:
+              print("[OK] Permissions already present in AndroidManifest.xml")
+          '
+
       - name: Install Flutter Dependencies
         run: flutter pub get
 
@@ -72,12 +102,13 @@ jobs:
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/devv'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v2.0.2-${{ github.sha }}
-          name: Flow Release v2.0.2 (Flutter Native)
+          tag_name: v2.0.3-${{ github.sha }}
+          name: Flow Release v2.0.3 (Flutter Native)
           make_latest: true
           body: |
             ## Flow - Personal Finance Tracker (Flutter Native APK)
             - Rebuilt 100% with Flutter & Dart
+            - Native Android Speech-to-Text integration with microphone permission & SpeechRecognizer
             - Official Flow waves launcher icon branded on Android
             - ZERO LOGIN: Akses langsung tanpa registrasi, tanpa otentikasi, tanpa server
             - Semua fitur premium terbuka bebas (Multi-dompet, anggaran, analitik, rutin, hutang/piutang)
