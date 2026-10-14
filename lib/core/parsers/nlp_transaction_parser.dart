@@ -33,7 +33,8 @@ class NlpTransactionParser {
     'Food': [
       'coffee', 'kopi', 'makan', 'lunch', 'dinner', 'sarapan', 'nasi',
       'ayam', 'mie', 'snack', 'jajan', 'burger', 'pizza', 'minum',
-      'tea', 'teh', 'esteh', 'es teh', 'matcha', 'maca', 'macha',
+      'minuman', 'minuman manis', 'air mineral', 'aqua', 'teh manis',
+      'kopi susu', 'tea', 'teh', 'esteh', 'es teh', 'matcha', 'maca', 'macha',
       'mat cha', 'mat ca', 'macca', 'matca', 'matsa', 'matsya',
       'masha', 'masya', 'marsha', 'macah', 'matchah', 'greentea',
       'green tea', 'jus', 'juice', 'boba', 'food', 'resto',
@@ -310,12 +311,10 @@ class NlpTransactionParser {
     itemTitle = itemTitle.replaceAll(RegExp(r'\s+'), ' ').trim();
     itemTitle = itemTitle.replaceFirst(_leadingPronounPattern, '').trim();
     itemTitle = itemTitle.replaceFirst(_leadingConjunctionPattern, '').trim();
-    itemTitle = itemTitle.replaceFirst(_leadingActionVerbPattern, '').trim();
-    if (itemTitle.isEmpty) {
-      itemTitle = 'Quick Record';
-    }
 
-    final formattedTitle = _formatTitle(itemTitle);
+    final verbMatch = _leadingActionVerbPattern.firstMatch(itemTitle);
+    String? strippedVerb = verbMatch?.group(0)?.trim();
+    itemTitle = itemTitle.replaceFirst(_leadingActionVerbPattern, '').trim();
 
     String detectedCategory = 'Other';
     TransactionType detectedType = TransactionType.expense;
@@ -337,6 +336,29 @@ class NlpTransactionParser {
       }
     }
 
+    if (itemTitle.isEmpty) {
+      if (strippedVerb != null && strippedVerb.isNotEmpty) {
+        final v = strippedVerb.toLowerCase();
+        if (v.contains('jajan')) {
+          itemTitle = 'Jajan';
+        } else if (v.contains('beli') || v.contains('pesan') || v.contains('order')) {
+          itemTitle = detectedCategory != 'Other' ? detectedCategory : 'Belanja';
+        } else if (v.contains('bayar')) {
+          itemTitle = 'Pembayaran';
+        } else {
+          itemTitle = detectedCategory != 'Other'
+              ? detectedCategory
+              : (detectedType == TransactionType.income ? 'Pemasukan' : 'Pengeluaran');
+        }
+      } else if (detectedCategory != 'Other') {
+        itemTitle = detectedCategory;
+      } else {
+        itemTitle = detectedType == TransactionType.income ? 'Pemasukan' : 'Pengeluaran';
+      }
+    }
+
+    final formattedTitle = _formatTitle(itemTitle);
+
     return ParsedTransactionResult(
       amount: finalAmount,
       category: detectedCategory,
@@ -349,7 +371,7 @@ class NlpTransactionParser {
 
   static String _formatTitle(String raw) {
     final clean = raw.trim();
-    if (clean.isEmpty) return 'Quick Record';
+    if (clean.isEmpty) return 'Pengeluaran';
     return clean
         .split(' ')
         .where((w) => w.isNotEmpty)
