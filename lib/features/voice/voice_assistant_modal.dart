@@ -39,6 +39,16 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
   bool _speakResponse = true;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _toggleListening();
+      }
+    });
+  }
+
+  @override
   void dispose() {
     SpeechRecognitionService.instance.stopListening();
     _transcriptController.dispose();
