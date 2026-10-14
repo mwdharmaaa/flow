@@ -103,13 +103,14 @@ jobs:
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/devv'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v2.0.4-${{ github.sha }}
-          name: Flow Release v2.0.4 (Flutter Native)
+          tag_name: v2.0.5-${{ github.sha }}
+          name: Flow Release v2.0.5 (Flutter Native)
           make_latest: true
           body: |
             ## Flow - Personal Finance Tracker (Flutter Native APK)
-            - Rebuilt 100% with Flutter & Dart
-            - Native Android Speech-to-Text with continuous listening, cloud engine parity, and Indonesian locale lock
+            - Instant 1-tap Voice Auto-recording on modal open
+            - Replaced generic Quick Record fallback with intelligent contextual titles
+            - Strict BCP-47 id-ID Indonesian locale lock with 5-second pause tolerance
             - Official Flow waves launcher icon branded on Android
             - ZERO LOGIN: Akses langsung tanpa registrasi, tanpa otentikasi, tanpa server
             - Semua fitur premium terbuka bebas (Multi-dompet, anggaran, analitik, rutin, hutang/piutang)
