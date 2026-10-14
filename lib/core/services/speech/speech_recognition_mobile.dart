@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_recognition_error.dart';
 import 'speech_recognition_interface.dart';
 
 class SpeechRecognitionMobile implements SpeechRecognitionInterface {
@@ -84,7 +86,7 @@ class SpeechRecognitionMobile implements SpeechRecognitionInterface {
     } catch (_) {}
   }
 
-  void _handleResult(stt.SpeechRecognitionResult result) {
+  void _handleResult(SpeechRecognitionResult result) {
     if (_userStopped || _currentOnResult == null) return;
 
     String words = result.recognizedWords;
@@ -122,7 +124,7 @@ class SpeechRecognitionMobile implements SpeechRecognitionInterface {
     }
   }
 
-  void _handleError(stt.SpeechRecognitionError errorNotification) {
+  void _handleError(SpeechRecognitionError errorNotification) {
     if (_userStopped) return;
 
     final err = errorNotification.errorMsg.toLowerCase();
