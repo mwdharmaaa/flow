@@ -60,6 +60,7 @@ jobs:
           permissions = """    <!-- Audio recording & internet permissions for speech recognition -->
               <uses-permission android:name="android.permission.RECORD_AUDIO" />
               <uses-permission android:name="android.permission.INTERNET" />
+              <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
               <uses-permission android:name="android.permission.BLUETOOTH" />
               <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
               <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
@@ -102,13 +103,13 @@ jobs:
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/devv'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v2.0.3-${{ github.sha }}
-          name: Flow Release v2.0.3 (Flutter Native)
+          tag_name: v2.0.4-${{ github.sha }}
+          name: Flow Release v2.0.4 (Flutter Native)
           make_latest: true
           body: |
             ## Flow - Personal Finance Tracker (Flutter Native APK)
             - Rebuilt 100% with Flutter & Dart
-            - Native Android Speech-to-Text integration with microphone permission & SpeechRecognizer
+            - Native Android Speech-to-Text with continuous listening, cloud engine parity, and Indonesian locale lock
             - Official Flow waves launcher icon branded on Android
             - ZERO LOGIN: Akses langsung tanpa registrasi, tanpa otentikasi, tanpa server
             - Semua fitur premium terbuka bebas (Multi-dompet, anggaran, analitik, rutin, hutang/piutang)
