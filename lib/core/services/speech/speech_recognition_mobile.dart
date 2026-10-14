@@ -62,12 +62,15 @@ class SpeechRecognitionMobile implements SpeechRecognitionInterface {
     if (_userStopped || _speech == null) return;
 
     try {
-      String targetLocale = 'id_ID';
+      String targetLocale = 'id-ID';
       try {
         final locales = await _speech!.locales();
-        final id = locales.where((l) => l.localeId.toLowerCase().startsWith('id')).firstOrNull;
+        final id = locales.where((l) {
+          final loc = l.localeId.toLowerCase().replaceAll('_', '-');
+          return loc.startsWith('id') || loc.startsWith('in');
+        }).firstOrNull;
         if (id != null) {
-          targetLocale = id.localeId;
+          targetLocale = id.localeId.replaceAll('_', '-');
         }
       } catch (_) {}
 
@@ -75,7 +78,7 @@ class SpeechRecognitionMobile implements SpeechRecognitionInterface {
         onResult: _handleResult,
         localeId: targetLocale,
         listenFor: const Duration(minutes: 5),
-        pauseFor: const Duration(seconds: 4),
+        pauseFor: const Duration(seconds: 5),
         listenOptions: stt.SpeechListenOptions(
           listenMode: stt.ListenMode.dictation,
           cancelOnError: false,
