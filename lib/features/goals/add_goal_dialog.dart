@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
+import 'package:flow/core/formatters/currency_formatter.dart';
+import 'package:flow/core/formatters/thousands_separator_input_formatter.dart';
 import 'package:flow/models/goal_model.dart';
 
 class AddGoalDialog extends StatefulWidget {
   final Function(GoalModel) onSave;
+  final String currency;
 
-  const AddGoalDialog({super.key, required this.onSave});
+  const AddGoalDialog({
+    super.key,
+    required this.onSave,
+    this.currency = 'IDR',
+  });
 
   @override
   State<AddGoalDialog> createState() => _AddGoalDialogState();
@@ -18,8 +25,8 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
 
   void _submit() {
     final name = _nameController.text.trim();
-    final target = double.tryParse(_targetController.text.replaceAll(RegExp(r'[^0-9.]'), ''));
-    if (name.isEmpty || target == null || target <= 0) return;
+    final target = CurrencyFormatter.parseAmount(_targetController.text, currency: widget.currency);
+    if (name.isEmpty || target <= 0) return;
 
     final goal = GoalModel(
       id: 'goal_${DateTime.now().millisecondsSinceEpoch}',
@@ -76,11 +83,12 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
             TextField(
               controller: _targetController,
               keyboardType: TextInputType.number,
+              inputFormatters: [ThousandsSeparatorInputFormatter(currency: widget.currency)],
               style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold),
               decoration: InputDecoration(
                 labelText: 'Target Amount',
                 labelStyle: const TextStyle(color: AppTheme.subtle, fontSize: 13),
-                prefixText: 'Rp ',
+                prefixText: '${CurrencyFormatter.getSymbol(widget.currency)} ',
                 prefixStyle: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold),
                 filled: true,
                 fillColor: const Color(0xFFF6F9FD),

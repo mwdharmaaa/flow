@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/formatters/currency_formatter.dart';
+import 'package:flow/core/formatters/thousands_separator_input_formatter.dart';
 import 'package:flow/core/widgets/liquid_background.dart';
 import 'package:flow/core/widgets/liquid_glass_container.dart';
 import 'package:flow/state/app_state.dart';
@@ -22,11 +23,12 @@ class GoalsScreen extends StatelessWidget {
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.number,
+          inputFormatters: [ThousandsSeparatorInputFormatter(currency: state.currency)],
           style: TextStyle(color: state.isDarkMode ? AppTheme.darkTextPrimary : AppTheme.textPrimary, fontWeight: FontWeight.bold),
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Deposit Amount',
-            prefixText: 'Rp ',
-            labelStyle: TextStyle(color: AppTheme.subtle),
+            prefixText: '${CurrencyFormatter.getSymbol(state.currency)} ',
+            labelStyle: const TextStyle(color: AppTheme.subtle),
           ),
         ),
         actions: [
@@ -37,8 +39,8 @@ class GoalsScreen extends StatelessWidget {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary, elevation: 0),
             onPressed: () {
-              final val = double.tryParse(controller.text.replaceAll(RegExp(r'[^0-9.]'), ''));
-              if (val != null && val > 0) {
+              final val = CurrencyFormatter.parseAmount(controller.text, currency: state.currency);
+              if (val > 0) {
                 state.updateGoalSavedAmount(goalId, val);
               }
               Navigator.pop(context);
@@ -95,7 +97,10 @@ class GoalsScreen extends StatelessWidget {
                       onPressed: () {
                         showDialog(
                           context: context,
-                          builder: (_) => AddGoalDialog(onSave: (g) => state.addGoal(g)),
+                          builder: (_) => AddGoalDialog(
+                            currency: state.currency,
+                            onSave: (g) => state.addGoal(g),
+                          ),
                         );
                       },
                       icon: const Icon(Icons.add, size: 16, color: Colors.white),
