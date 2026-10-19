@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/formatters/currency_formatter.dart';
-import 'package:flow/core/widgets/liquid_background.dart';
 import 'package:flow/core/widgets/liquid_glass_container.dart';
 import 'package:flow/state/app_state.dart';
 
@@ -19,10 +18,8 @@ class RecurringScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: LiquidBackground(
-        isDark: isDark,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -121,7 +118,6 @@ class RecurringScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 }
