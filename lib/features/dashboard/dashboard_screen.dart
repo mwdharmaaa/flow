@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flow/core/theme/app_theme.dart';
-import 'package:flow/core/widgets/liquid_background.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/features/dashboard/dashboard_hero.dart';
 import 'package:flow/features/dashboard/dashboard_summary.dart';
-import 'package:flow/features/transactions/add_transaction_dialog.dart';
 import 'package:flow/features/transactions/log_options_modal.dart';
 import 'package:flow/models/transaction_model.dart';
 
@@ -26,51 +23,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: widget.state,
-      builder: (context, _) {
-        final state = widget.state;
+    final state = widget.state;
 
-        // Filter transactions for current month
-        final monthTransactions = state.transactions.where((tx) {
-          return tx.date.year == _currentMonth.year && tx.date.month == _currentMonth.month;
-        }).toList();
+    // Filter transactions for current month
+    final monthTransactions = state.transactions.where((tx) {
+      return tx.date.year == _currentMonth.year && tx.date.month == _currentMonth.month;
+    }).toList();
 
-        final monthExpense = monthTransactions
-            .where((t) => t.type == TransactionType.expense)
-            .fold(0.0, (sum, t) => sum + t.amount);
+    final monthExpense = monthTransactions
+        .where((t) => t.type == TransactionType.expense)
+        .fold(0.0, (sum, t) => sum + t.amount);
 
-        final isDark = state.isDarkMode;
-
-        return LiquidBackground(
-          isDark: isDark,
-          child: SafeArea(
-            bottom: false,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  DashboardHero(
-                    monthExpense: monthExpense,
-                    currency: state.currency,
-                    currentMonth: _currentMonth,
-                    onAddTransaction: () => _openAddTransaction(context),
-                    state: state,
-                  ),
-                  DashboardSummary(
-                    state: state,
-                    onAddRecord: () => _openAddTransaction(context),
-                    onSeeAllWallets: () => state.setTabIndex(3),
-                    onSeeAllBudgets: () => state.setTabIndex(2),
-                    onSeeAllDebts: () => state.setTabIndex(4),
-                    onSeeAllRecurring: () => state.setTabIndex(5),
-                    onSeeAllSavings: () => state.setTabIndex(6),
-                  ),
-                ],
-              ),
+    return SafeArea(
+      bottom: false,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            DashboardHero(
+              monthExpense: monthExpense,
+              currency: state.currency,
+              currentMonth: _currentMonth,
+              onAddTransaction: () => _openAddTransaction(context),
+              state: state,
             ),
-          ),
-        );
-      },
+            DashboardSummary(
+              state: state,
+              onAddRecord: () => _openAddTransaction(context),
+              onSeeAllWallets: () => state.setTabIndex(3),
+              onSeeAllBudgets: () => state.setTabIndex(2),
+              onSeeAllDebts: () => state.setTabIndex(4),
+              onSeeAllRecurring: () => state.setTabIndex(5),
+              onSeeAllSavings: () => state.setTabIndex(6),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

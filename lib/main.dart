@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flow/core/theme/app_theme.dart';
+import 'package:flow/core/widgets/liquid_background.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/widgets/layout/bottom_nav_bar.dart';
 import 'package:flow/features/dashboard/dashboard_screen.dart';
@@ -135,6 +136,14 @@ class FlowMainScaffold extends StatelessWidget {
           body: Stack(
             fit: StackFit.expand,
             children: [
+              // Unified liquid ambient background (cached once across all tabs)
+              Positioned.fill(
+                child: LiquidBackground(
+                  isDark: isDark,
+                  child: const SizedBox.expand(),
+                ),
+              ),
+
               // Content layer cached across tab switches with IndexedStack
               IndexedStack(
                 index: state.currentTabIndex.clamp(0, 6),
