@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/parsers/nlp_transaction_parser.dart';
@@ -196,16 +195,14 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
 
     return ClipRRect(
       borderRadius: sheetRadius,
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-        child: Container(
-          padding: EdgeInsets.fromLTRB(16, 12, 16, 20 + bottomInset),
-          decoration: AppTheme.liquidGlassDecoration(
-            isDark: isDark,
-            borderRadius: sheetRadius,
-            elevated: true,
-          ),
-          child: SingleChildScrollView(
+      child: Container(
+        padding: EdgeInsets.fromLTRB(16, 12, 16, 20 + bottomInset),
+        decoration: AppTheme.liquidGlassDecoration(
+          isDark: isDark,
+          borderRadius: sheetRadius,
+          elevated: true,
+        ),
+        child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -302,8 +299,7 @@ class _VoiceAssistantModalState extends State<VoiceAssistantModal> {
         ),
       ),
     ),
-    ),
-    );
+  );
   }
 
   Widget _buildResultCard(bool isDark) {
