@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/parsers/nlp_transaction_parser.dart';
@@ -158,24 +157,21 @@ class _ChatAssistantModalState extends State<ChatAssistantModal> {
 
     return ClipRRect(
       borderRadius: sheetRadius,
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-        child: Container(
-          height: MediaQuery.of(context).size.height * 0.75,
-          margin: EdgeInsets.only(bottom: bottomInset),
-          decoration: AppTheme.liquidGlassDecoration(
-            isDark: isDark,
-            borderRadius: sheetRadius,
-            elevated: true,
-          ),
-          child: Column(
-            children: [
-              _buildHeader(isDark),
-              _buildSuggestions(isDark),
-              Expanded(child: _buildMessagesList()),
-              _buildInputBar(isDark),
-            ],
-          ),
+      child: Container(
+        height: MediaQuery.of(context).size.height * 0.75,
+        margin: EdgeInsets.only(bottom: bottomInset),
+        decoration: AppTheme.liquidGlassDecoration(
+          isDark: isDark,
+          borderRadius: sheetRadius,
+          elevated: true,
+        ),
+        child: Column(
+          children: [
+            _buildHeader(isDark),
+            _buildSuggestions(isDark),
+            Expanded(child: _buildMessagesList()),
+            _buildInputBar(isDark),
+          ],
         ),
       ),
     );
