@@ -147,7 +147,10 @@ class AccountsScreen extends StatelessWidget {
                       onPressed: () {
                         showDialog(
                           context: context,
-                          builder: (_) => AddAccountDialog(onSave: (acc) => state.addAccount(acc)),
+                          builder: (_) => AddAccountDialog(
+                            currency: state.currency,
+                            onSave: (acc) => state.addAccount(acc),
+                          ),
                         );
                       },
                       icon: const Icon(Icons.add, size: 16, color: Colors.white),

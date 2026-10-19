@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
+import 'package:flow/core/formatters/currency_formatter.dart';
+import 'package:flow/core/formatters/thousands_separator_input_formatter.dart';
 import 'package:flow/models/account_model.dart';
 
 class AddAccountDialog extends StatefulWidget {
   final Function(AccountModel) onSave;
+  final String currency;
 
-  const AddAccountDialog({super.key, required this.onSave});
+  const AddAccountDialog({
+    super.key,
+    required this.onSave,
+    this.currency = 'IDR',
+  });
 
   @override
   State<AddAccountDialog> createState() => _AddAccountDialogState();
@@ -29,7 +36,7 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
   void _submit() {
     final name = _nameController.text.trim();
     if (name.isEmpty) return;
-    final balance = double.tryParse(_balanceController.text.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0.0;
+    final balance = CurrencyFormatter.parseAmount(_balanceController.text, currency: widget.currency);
 
     final acc = AccountModel(
       id: 'acc_${DateTime.now().millisecondsSinceEpoch}',
@@ -85,8 +92,12 @@ class _AddAccountDialogState extends State<AddAccountDialog> {
             TextField(
               controller: _balanceController,
               keyboardType: TextInputType.number,
+              inputFormatters: [ThousandsSeparatorInputFormatter(currency: widget.currency)],
               style: const TextStyle(color: AppTheme.textPrimary),
-              decoration: _inputDecoration('Initial Balance (Rp)'),
+              decoration: _inputDecoration(
+                'Initial Balance (${CurrencyFormatter.getSymbol(widget.currency)})',
+                prefixText: '${CurrencyFormatter.getSymbol(widget.currency)} ',
+              ),
             ),
             const SizedBox(height: 14),
             const Text('Color Accent', style: TextStyle(fontSize: 11, color: AppTheme.subtle, fontWeight: FontWeight.bold)),
