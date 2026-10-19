@@ -86,7 +86,7 @@ class LogOptionsModal extends StatelessWidget {
           _buildOptionTile(
             icon: Icons.chat_bubble_outline_rounded,
             title: 'Type',
-            subtitle: 'Chat to Moni as usual: "lunch 5k".',
+            subtitle: 'Chat to Flow as usual: "lunch 5k".',
             isDark: isDark,
             onTap: () {
               Navigator.of(context).pop();
@@ -108,7 +108,7 @@ class LogOptionsModal extends StatelessWidget {
           _buildOptionTile(
             icon: Icons.receipt_long_outlined,
             title: 'Receipt photo',
-            subtitle: 'Point at the receipt, Moni reads the rest.',
+            subtitle: 'Point at the receipt, Flow reads the rest.',
             isDark: isDark,
             onTap: () {
               Navigator.of(context).pop();
