@@ -1,6 +1,7 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
+import 'package:flow/core/formatters/currency_formatter.dart';
+import 'package:flow/core/widgets/currency_picker_modal.dart';
 import 'package:flow/models/transaction_model.dart';
 import 'package:flow/models/account_model.dart';
 import 'package:flow/state/app_state.dart';
@@ -176,8 +177,10 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
 
   double _getCalculatedAmount() {
     _calculateResult();
-    final clean = _amountText.replaceAll(RegExp(r'[^0-9.]'), '');
-    return double.tryParse(clean) ?? 0.0;
+    return CurrencyFormatter.parseAmount(
+      _amountText,
+      currency: widget.state?.currency ?? 'IDR',
+    );
   }
 
   void _submit() {
@@ -286,69 +289,70 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
 
     return ClipRRect(
       borderRadius: sheetRadius,
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-        child: Container(
-          constraints: BoxConstraints(maxHeight: maxHeight),
-          decoration: AppTheme.liquidGlassDecoration(
-            isDark: isDark,
-            borderRadius: sheetRadius,
-            elevated: true,
-          ),
-          child: SafeArea(
-        top: false,
-        child: Column(
-          children: [
-            _buildTopBar(isDark),
-            _buildSegmentedTabs(isDark),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    const SizedBox(height: 12),
-                    TransactionAmountDisplay(
-                      amountText: _amountText,
-                      categoryName: _selectedCategory,
-                      isDark: isDark,
-                    ),
-                    const SizedBox(height: 14),
-                    TransactionCategoryChips(
-                      selectedCategory: _selectedCategory,
-                      categories: categories,
-                      onCategorySelected: (cat) => setState(() => _selectedCategory = cat),
-                      onAllTap: _openAllCategories,
-                      isDark: isDark,
-                    ),
-                    const SizedBox(height: 10),
-                    TransactionDetailRows(
-                      walletName: currentAccount?.name,
-                      date: _selectedDate,
-                      noteController: _noteController,
-                      excludeFromTotals: _excludeFromTotals,
-                      onChooseWalletTap: _openWalletPicker,
-                      onChooseDateTap: _openDatePicker,
-                      onReceiptTap: () {
-                        if (widget.state != null) {
-                          ReceiptScannerModal.show(context, widget.state!);
-                        }
-                      },
-                      onExcludeChanged: (val) => setState(() => _excludeFromTotals = val),
-                      isDark: isDark,
-                    ),
-                    _buildActionButtons(isDark),
-                  ],
+      child: Container(
+        constraints: BoxConstraints(maxHeight: maxHeight),
+        decoration: AppTheme.liquidGlassDecoration(
+          isDark: isDark,
+          borderRadius: sheetRadius,
+          elevated: true,
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            children: [
+              _buildTopBar(isDark),
+              _buildSegmentedTabs(isDark),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 12),
+                      TransactionAmountDisplay(
+                        amountText: _amountText,
+                        categoryName: _selectedCategory,
+                        isDark: isDark,
+                        currency: widget.state?.currency ?? 'IDR',
+                        onCurrencyTap: widget.state != null
+                            ? () => CurrencyPickerModal.show(context, widget.state!)
+                            : null,
+                      ),
+                      const SizedBox(height: 14),
+                      TransactionCategoryChips(
+                        selectedCategory: _selectedCategory,
+                        categories: categories,
+                        onCategorySelected: (cat) => setState(() => _selectedCategory = cat),
+                        onAllTap: _openAllCategories,
+                        isDark: isDark,
+                      ),
+                      const SizedBox(height: 10),
+                      TransactionDetailRows(
+                        walletName: currentAccount?.name,
+                        date: _selectedDate,
+                        noteController: _noteController,
+                        excludeFromTotals: _excludeFromTotals,
+                        onChooseWalletTap: _openWalletPicker,
+                        onChooseDateTap: _openDatePicker,
+                        onReceiptTap: () {
+                          if (widget.state != null) {
+                            ReceiptScannerModal.show(context, widget.state!);
+                          }
+                        },
+                        onExcludeChanged: (val) => setState(() => _excludeFromTotals = val),
+                        isDark: isDark,
+                      ),
+                      _buildActionButtons(isDark),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            TransactionCalculatorKeypad(
-              onKeyTap: _onKeypadTap,
-              isDark: isDark,
-            ),
-          ],
+              TransactionCalculatorKeypad(
+                onKeyTap: _onKeypadTap,
+                isDark: isDark,
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-    ),
     );
   }
 
