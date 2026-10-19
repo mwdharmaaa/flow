@@ -7,6 +7,7 @@ import 'package:flow/state/app_state.dart';
 import 'package:flow/features/accounts/add_account_dialog.dart';
 import 'package:flow/features/accounts/adjust_balance_dialog.dart';
 import 'package:flow/features/accounts/delete_account_dialog.dart';
+import 'package:flow/core/widgets/currency_picker_modal.dart';
 
 class AccountsScreen extends StatelessWidget {
   final AppState state;
@@ -75,14 +76,49 @@ class AccountsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Wallets',
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w900,
-                    color: textPrimary,
-                    letterSpacing: -0.5,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Wallets',
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.w900,
+                        color: textPrimary,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => CurrencyPickerModal.show(context, state),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: isDark ? AppTheme.darkBgElevated : Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: borderSubtle),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '${state.currency} (${CurrencyFormatter.getSymbol(state.currency)})',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              size: 16,
+                              color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 18),
                 LiquidGlassContainer(
