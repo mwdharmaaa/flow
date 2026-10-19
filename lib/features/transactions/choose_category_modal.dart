@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/models/transaction_model.dart';
@@ -106,16 +105,14 @@ class _ChooseCategoryModalState extends State<ChooseCategoryModal> {
 
     return ClipRRect(
       borderRadius: sheetRadius,
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-        child: Container(
-          constraints: BoxConstraints(maxHeight: maxHeight),
-          padding: EdgeInsets.fromLTRB(20, 10, 20, 24 + bottomInset),
-          decoration: AppTheme.liquidGlassDecoration(
-            isDark: isDark,
-            borderRadius: sheetRadius,
-            elevated: true,
-          ),
+      child: Container(
+        constraints: BoxConstraints(maxHeight: maxHeight),
+        padding: EdgeInsets.fromLTRB(20, 10, 20, 24 + bottomInset),
+        decoration: AppTheme.liquidGlassDecoration(
+          isDark: isDark,
+          borderRadius: sheetRadius,
+          elevated: true,
+        ),
           child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -180,8 +177,7 @@ class _ChooseCategoryModalState extends State<ChooseCategoryModal> {
         ],
       ),
     ),
-    ),
-    );
+  );
   }
 
   Widget _buildSegmentedTabs(bool isDark) {
