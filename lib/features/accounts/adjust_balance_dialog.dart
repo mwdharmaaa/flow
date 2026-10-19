@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/formatters/currency_formatter.dart';
+import 'package:flow/core/formatters/thousands_separator_input_formatter.dart';
 import 'package:flow/models/account_model.dart';
 
 class AdjustBalanceDialog extends StatefulWidget {
@@ -25,14 +26,14 @@ class _AdjustBalanceDialogState extends State<AdjustBalanceDialog> {
   @override
   void initState() {
     super.initState();
-    _controller.text = widget.account.balance == 0
+    final raw = widget.account.balance == 0
         ? '0'
         : widget.account.balance.toStringAsFixed(0);
+    _controller.text = CurrencyFormatter.formatAmountInput(raw, currency: widget.currency);
   }
 
   void _submit() {
-    final val = double.tryParse(_controller.text.replaceAll(RegExp(r'[^0-9.-]'), ''));
-    if (val == null) return;
+    final val = CurrencyFormatter.parseAmount(_controller.text, currency: widget.currency);
     widget.onSave(val);
     Navigator.of(context).pop();
   }
@@ -74,14 +75,15 @@ class _AdjustBalanceDialogState extends State<AdjustBalanceDialog> {
             const SizedBox(height: 18),
             TextField(
               controller: _controller,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+              keyboardType: TextInputType.number,
+              inputFormatters: [ThousandsSeparatorInputFormatter(currency: widget.currency)],
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
               decoration: InputDecoration(
                 labelText: 'Actual New Balance',
                 labelStyle: const TextStyle(color: AppTheme.subtle),
                 filled: true,
                 fillColor: const Color(0xFFF6F9FD),
-                prefixText: '${widget.currency} ',
+                prefixText: '${CurrencyFormatter.getSymbol(widget.currency)} ',
                 prefixStyle: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
