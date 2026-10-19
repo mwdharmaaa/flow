@@ -25,7 +25,10 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
   void _openAddOrEditBudget(BuildContext context) {
     showDialog(
       context: context,
-      builder: (_) => AddBudgetDialog(onSave: (bgt) => widget.state.addBudget(bgt)),
+      builder: (_) => AddBudgetDialog(
+        currency: widget.state.currency,
+        onSave: (bgt) => widget.state.addBudget(bgt),
+      ),
     );
   }
 

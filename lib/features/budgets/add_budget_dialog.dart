@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
+import 'package:flow/core/formatters/currency_formatter.dart';
+import 'package:flow/core/formatters/thousands_separator_input_formatter.dart';
 import 'package:flow/models/budget_model.dart';
 
 class AddBudgetDialog extends StatefulWidget {
   final Function(BudgetModel) onSave;
+  final String currency;
 
-  const AddBudgetDialog({super.key, required this.onSave});
+  const AddBudgetDialog({
+    super.key,
+    required this.onSave,
+    this.currency = 'IDR',
+  });
 
   @override
   State<AddBudgetDialog> createState() => _AddBudgetDialogState();
@@ -28,7 +35,7 @@ class _AddBudgetDialogState extends State<AddBudgetDialog> {
   ];
 
   void _submit() {
-    final limit = double.tryParse(_limitController.text.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0.0;
+    final limit = CurrencyFormatter.parseAmount(_limitController.text, currency: widget.currency);
     if (limit <= 0) return;
 
     final bgt = BudgetModel(
@@ -84,8 +91,12 @@ class _AddBudgetDialogState extends State<AddBudgetDialog> {
             TextField(
               controller: _limitController,
               keyboardType: TextInputType.number,
+              inputFormatters: [ThousandsSeparatorInputFormatter(currency: widget.currency)],
               style: const TextStyle(color: AppTheme.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
-              decoration: _inputDecoration('Monthly Limit (Rp)', prefixText: 'Rp '),
+              decoration: _inputDecoration(
+                'Monthly Limit (${CurrencyFormatter.getSymbol(widget.currency)})',
+                prefixText: '${CurrencyFormatter.getSymbol(widget.currency)} ',
+              ),
             ),
             const SizedBox(height: 22),
             ElevatedButton(
