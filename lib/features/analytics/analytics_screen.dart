@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/formatters/currency_formatter.dart';
-import 'package:flow/core/widgets/liquid_background.dart';
 import 'package:flow/core/widgets/liquid_glass_container.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/features/analytics/widgets/analytics_daily_chart.dart';
@@ -35,10 +34,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: LiquidBackground(
-        isDark: isDark,
-        child: SafeArea(
-          child: SingleChildScrollView(
+      body: SafeArea(
+        child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 110),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -272,8 +269,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildTab(String label, int index, bool isDark) {
