@@ -9,6 +9,7 @@ import 'package:flow/features/receipt/receipt_scanner_modal.dart';
 import 'package:flow/features/voice/voice_assistant_modal.dart';
 import 'package:flow/core/widgets/flow_logo.dart';
 import 'package:flow/core/widgets/liquid_glass_container.dart';
+import 'package:flow/core/widgets/currency_picker_modal.dart';
 
 class DashboardHero extends StatefulWidget {
   final double monthExpense;
@@ -98,6 +99,8 @@ class _DashboardHeroState extends State<DashboardHero> {
               // Pills
               Row(
                 children: [
+                  _buildCurrencyPill(widget.currency, isDark),
+                  const SizedBox(width: 6),
                   _buildPill(dayLabel, isDark),
                   const SizedBox(width: 6),
                   _buildBadgePill('Day $dayNum', isDark),
@@ -266,6 +269,37 @@ class _DashboardHeroState extends State<DashboardHero> {
     ),
   );
 }
+
+  Widget _buildCurrencyPill(String currency, bool isDark) {
+    return GestureDetector(
+      onTap: () => CurrencyPickerModal.show(context, widget.state),
+      child: LiquidGlassContainer(
+        isDark: isDark,
+        radius: 20,
+        elevated: true,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              currency,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary,
+              ),
+            ),
+            const SizedBox(width: 3),
+            Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: 14,
+              color: isDark ? AppTheme.darkAccentPrimary : AppTheme.primary,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildPill(String text, bool isDark) {
     return LiquidGlassContainer(
