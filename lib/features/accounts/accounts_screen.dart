@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/formatters/currency_formatter.dart';
-import 'package:flow/core/widgets/liquid_background.dart';
 import 'package:flow/core/widgets/liquid_glass_container.dart';
 import 'package:flow/state/app_state.dart';
 import 'package:flow/features/accounts/add_account_dialog.dart';
@@ -67,12 +66,10 @@ class AccountsScreen extends StatelessWidget {
     final borderSubtle = isDark ? AppTheme.darkBorderSubtle : AppTheme.border;
 
     return Scaffold(
-      backgroundColor: isDark ? AppTheme.darkBgBase : AppTheme.background,
-      body: LiquidBackground(
-        isDark: isDark,
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -273,7 +270,6 @@ class AccountsScreen extends StatelessWidget {
           ),
         ),
       ),
-    ),
-  );
+    );
   }
 }
