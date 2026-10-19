@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flow/core/theme/app_theme.dart';
 import 'package:flow/core/formatters/currency_formatter.dart';
+import 'package:flow/core/formatters/thousands_separator_input_formatter.dart';
 import 'package:flow/core/widgets/liquid_background.dart';
 import 'package:flow/core/widgets/liquid_glass_container.dart';
 import 'package:flow/state/app_state.dart';
@@ -76,8 +77,14 @@ class DebtsScreen extends StatelessWidget {
                 TextField(
                   controller: amountController,
                   keyboardType: TextInputType.number,
+                  inputFormatters: [ThousandsSeparatorInputFormatter(currency: state.currency)],
                   style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold),
-                  decoration: const InputDecoration(labelText: 'Amount (Rp)', filled: true, fillColor: Color(0xFFF6F9FD)),
+                  decoration: InputDecoration(
+                    labelText: 'Amount (${CurrencyFormatter.getSymbol(state.currency)})',
+                    prefixText: '${CurrencyFormatter.getSymbol(state.currency)} ',
+                    filled: true,
+                    fillColor: const Color(0xFFF6F9FD),
+                  ),
                 ),
                 const SizedBox(height: 10),
                 TextField(
@@ -88,7 +95,7 @@ class DebtsScreen extends StatelessWidget {
                 const SizedBox(height: 22),
                 ElevatedButton(
                   onPressed: () {
-                    final amount = double.tryParse(amountController.text.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0.0;
+                    final amount = CurrencyFormatter.parseAmount(amountController.text, currency: state.currency);
                     if (nameController.text.trim().isEmpty || amount <= 0) return;
                     state.addDebt(DebtModel(
                       id: 'debt_${DateTime.now().millisecondsSinceEpoch}',
